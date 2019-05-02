@@ -1,0 +1,202 @@
+<!doctype html>
+<html class="no-js" lang="en" 
+      ng-app="baseApp">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="css/base.css">
+
+        <link rel="stylesheet" href="resources/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="resources/angular-loading-bar/build/loading-bar.min.css">
+        <link rel="stylesheet" href="resources/font-awesome/css/font-awesome.min.css" type="text/css">
+
+        <script src="resources/jquery/dist/jquery.min.js"></script>
+        <script src="resources/bootstrap/dist/js/bootstrap.min.js"></script>
+
+        <script src="resources/angular/angular.min.js"></script>
+        <script src="resources/angular-translate/angular-translate.min.js"></script>
+        <script src="resources/angular-route/angular-route.min.js"></script>
+        <script src="resources/angular-sanitize/angular-sanitize.js"></script>
+        <script src="resources/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
+
+        <script>
+            var lang = navigator.language || navigator.userLanguage;
+            if (lang) {
+            lang = lang.toLocaleLowerCase();
+            document.write("<script src='resources/angular-i18n/angular-locale_" + lang + ".js'><\/script>");
+            }
+        </script>
+
+        <script src="ng/baseApp.js"></script>
+    </head>
+
+    <body>
+        <div id="wrapper" ng-controller="mainController">
+
+            <nav class="navbar navbar-default navbar-static-top" 
+                 role="navigation" style="margin-bottom: 0;">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" 
+                            data-target=".navbar-collapse">
+                        <span class="sr-only" translate="TOGGLE_NAVIGATION"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">{{app.name}}</a>
+                </div>
+                <!-- /.navbar-header -->
+                <ul class="nav navbar-top-links navbar-right">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-messages">
+                            <ng-repeat ng-repeat="msg in messages">
+                                <li>
+                                    <a href="#">
+                                        <div>
+                                            <strong>{{msg.userFron.name}}</strong>
+                                            <span class="pull-right text-muted">
+                                                <em>{{msg.date}}</em>
+                                            </span>
+                                        </div>
+                                        <div>{{msg.message}}</div>
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                            </ng-repeat>
+                            <li>
+                                <a class="text-center" href="#">
+                                    <strong translate="ALL_MESSAGES"></strong>
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-messages -->
+                    </li>
+                    <!-- /.dropdown -->
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-tasks fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-tasks">
+                            <ng-repeat ng-repeat="task in tasks">
+                                <li>
+                                    <a href="#">
+                                        <div>
+                                            <p>
+                                                <strong>{{task.name}}</strong>
+                                                <span class="pull-right text-muted">{{task.percent}}% {{ 'COMPLETE' | translate }}</span>
+                                            </p>
+                                            <div class="progress progress-striped active">
+                                                <div class="progress-bar progress-bar-{{task.type}}" 
+                                                     role="progressbar" aria-valuenow="{{task.percent}}" 
+                                                     aria-valuemin="0" aria-valuemax="100" style="width: {{task.percent}}%">
+                                                    <span class="sr-only">{{task.percent}}% {{ 'COMPLETE' | translate }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                            </ng-repeat>
+                            <li>
+                                <a class="text-center" href="#">
+                                    <strong translate="ALL_TASKS"></strong>
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-tasks -->
+                    </li>
+                    <!-- /.dropdown -->
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-bell fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-alerts">
+                            <ng-repeat ng-repeat="alert in alerts">
+                                <li>
+                                    <a href="#">
+                                        <div>
+                                            <i class="fa fa-comment fa-fw"></i> {{alert.name}}
+                                            <span class="pull-right text-muted small">{{alert.date}}</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                            </ng-repeat>
+                            <li>
+                                <a class="text-center" href="#">
+                                    <strong translate="ALL_ALERTS"></strong>
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-alerts -->
+                    </li>
+                    <!-- /.dropdown -->
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="#" translate>
+                                    <i class="fa fa-user fa-fw"></i> {{ 'USER_PROFILE'}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" translate>
+                                    <i class="fa fa-gear fa-fw"></i> {{ 'SETTINGS'}}
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a ui-sref="login" translate>
+                                    <i class="fa fa-sign-out fa-fw"></i> {{ 'LOGOUT'}}
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-user -->
+                    </li>
+                    <!-- /.dropdown -->
+                </ul>
+
+                <sidemenu></sidemenu>
+
+                <!--                <ul class="nav navbar-nav navbar-right">
+                                    <li><a href="#">
+                                            <i class="fa fa-home"></i> Home
+                                        </a>
+                                    </li>
+                                    <li><a href="#blank">
+                                            <i class="fa fa-shield"></i> Blank
+                                        </a>
+                                    </li>
+                                    <li><a href="#partner">
+                                            <i class="fa fa-comment"></i> Partner
+                                        </a>
+                                    </li>
+                                </ul>-->
+            </nav>
+
+            <div id="main">
+                <div id="content-wrapper">
+                    <div id="page-wrapper" 
+                         style="min-height: 561px;">
+                        <!-- Main Content -->
+
+                        <!-- angular templating -->
+                        <!-- this is where content will be injected -->
+                        <div ng-view></div>
+
+                    </div>
+                </div><!-- End Page Content -->
+            </div><!-- End Content Wrapper -->
+        </div><!-- End Page Wrapper -->
+    </body>
+</html>

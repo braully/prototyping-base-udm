@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <ui:composition>
+        <nav class="base-app-main-menu" role="navigation" id="base-app-main-menu">
+            <ul class="base-app-main-menu-list">
+                <li class="base-app-main-menu-list-item" rendered="#{menu.parent == null}"
+                    jsfc="ui:repeat" value="#{genericMB.userMenus}" var="menu">
+                    <a class="base-app-main-menu-list-item-link" href="#{menu.link}">
+                        #{menu.name}<i class="#{menu.icon}"></i> 
+                    </a>
+                    <ui:fragment rendered="#{not empty menu.childs}">
+                        <ul class="base-app-main-menu-sublist">
+                            <li class="base-app-main-menu-sublist-item" 
+                                jsfc="ui:repeat" value="#{menu.childs}" var="submenu">
+                                <a class="base-app-main-menu-list-item-link" href="#{submenu.link}">
+                                    #{submenu.name}<i class="#{menu.icon}"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </ui:fragment>
+                </li>
+            </ul>
+        </nav>
+    </ui:composition>
+</html>

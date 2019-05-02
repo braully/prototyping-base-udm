@@ -1,0 +1,6 @@
+CREATE SCHEMA base;
+CREATE SCHEMA financial;
+CREATE SCHEMA sale;
+CREATE SCHEMA security;
+CREATE SCHEMA legacy;
+CREATE SCHEMA tmp;

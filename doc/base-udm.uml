@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="4002.0617283950614" y="209.0">com.github.braully.domain.UserLogin</node>
+    <node x="935.3117283950614" y="553.5">com.github.braully.domain.Budget</node>
+    <node x="2388.3117283950614" y="542.0">com.github.braully.domain.FinancialAccount</node>
+    <node x="1448.3117283950614" y="565.0">com.github.braully.domain.UserMessage</node>
+    <node x="717.5" y="232.0">com.github.braully.domain.City</node>
+    <node x="540.5" y="255.0">com.github.braully.domain.Role</node>
+    <node x="561.0" y="847.0">com.github.braully.domain.Money</node>
+    <node x="1652.3117283950614" y="542.0">com.github.braully.domain.Menu</node>
+    <node x="2553.0617283950614" y="266.5">com.github.braully.domain.AbstractMigrableEntity</node>
+    <node x="3252.0617283950614" y="243.5">com.github.braully.domain.GenericType</node>
+    <node x="2749.0617283950614" y="243.5">com.github.braully.domain.PartnerGroup</node>
+    <node x="944.5" y="255.0">com.github.braully.domain.AbstractExpirableEntity</node>
+    <node x="3465.0617283950614" y="232.0">com.github.braully.domain.Phone</node>
+    <node x="3694.0617283950614" y="197.5">com.github.braully.domain.GenericValue</node>
+    <node x="259.5" y="186.0">com.github.braully.domain.Address</node>
+    <node x="35.5" y="255.0">com.github.braully.domain.AbstractAuditableEntity</node>
+    <node x="1170.3117283950614" y="542.0">com.github.braully.domain.ProductPrice</node>
+    <node x="298.0" y="847.0">com.github.braully.domain.PartnerPartnerPK</node>
+    <node x="2236.704861111111" y="209.0">com.github.braully.domain.InventoryItem</node>
+    <node x="2901.3117283950614" y="576.5">com.github.braully.domain.Partner</node>
+    <node x="2657.3117283950614" y="553.5">com.github.braully.domain.Account</node>
+    <node x="0.0" y="847.0">com.github.braully.domain.PartnerPartner</node>
+    <node x="2336.0617283950614" y="0.0">com.github.braully.domain.AbstractEntity</node>
+    <node x="498.42283950617275" y="553.5">com.github.braully.domain.Product</node>
+    <node x="1938.3117283950614" y="450.0">com.github.braully.domain.AccountTransaction</node>
+    <node x="4278.061728395061" y="220.5">com.github.braully.domain.PurchaseOrderItem</node>
+    <node x="3004.0617283950614" y="232.0">com.github.braully.domain.Inventory</node>
+    <node x="0.0" y="519.0">com.github.braully.domain.PurchaseOrder</node>
+    <node x="2020.7048611111109" y="243.5">com.github.braully.domain.Email</node>
+    <node x="1563.8117283950614" y="266.5">com.github.braully.domain.AbstractLightRemoveEntity</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.github.braully.domain.Product" target="com.github.braully.domain.AbstractExpirableEntity">
+      <point x="0.0" y="-72.5" />
+      <point x="624.4228395061727" y="430.0" />
+      <point x="974.1666666666665" y="430.0" />
+      <point x="-59.33333333333337" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.FinancialAccount" target="com.github.braully.domain.AbstractMigrableEntity">
+      <point x="0.0" y="-84.0" />
+      <point x="2512.8117283950614" y="430.0" />
+      <point x="2619.0617283950614" y="430.0" />
+      <point x="-22.0" y="26.5" />
+    </edge>
+    <edge source="com.github.braully.domain.GenericType" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-49.5" />
+      <point x="3348.5617283950614" y="136.0" />
+      <point x="2428.7804783950614" y="136.0" />
+      <point x="28.21875" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.PurchaseOrderItem" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-72.5" />
+      <point x="4398.561728395061" y="96.0" />
+      <point x="2461.0304783950614" y="96.0" />
+      <point x="60.46875" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.Inventory" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-61.0" />
+      <point x="3118.0617283950614" y="146.0" />
+      <point x="2420.7179783950614" y="146.0" />
+      <point x="20.15625" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.AbstractLightRemoveEntity" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-26.5" />
+      <point x="1662.8117283950614" y="146.0" />
+      <point x="2380.4054783950614" y="146.0" />
+      <point x="-20.15625" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.UserMessage" target="com.github.braully.domain.AbstractLightRemoveEntity">
+      <point x="0.0" y="-61.0" />
+      <point x="1540.3117283950614" y="430.0" />
+      <point x="1613.3117283950614" y="430.0" />
+      <point x="-49.5" y="26.5" />
+    </edge>
+    <edge source="com.github.braully.domain.Partner" target="com.github.braully.domain.AbstractMigrableEntity">
+      <point x="0.0" y="-49.5" />
+      <point x="3014.8117283950614" y="420.0" />
+      <point x="2707.0617283950614" y="420.0" />
+      <point x="66.0" y="26.5" />
+    </edge>
+    <edge source="com.github.braully.domain.PurchaseOrder" target="com.github.braully.domain.AbstractAuditableEntity">
+      <point x="0.0" y="-107.0" />
+      <point x="0.0" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.AbstractAuditableEntity" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-38.0" />
+      <point x="137.5" y="96.0" />
+      <point x="2340.0929783950614" y="96.0" />
+      <point x="-60.46875" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.InventoryItem" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-84.0" />
+      <point x="2365.704861111111" y="166.0" />
+      <point x="2396.5304783950614" y="166.0" />
+      <point x="-4.03125" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.AbstractExpirableEntity" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-38.0" />
+      <point x="1033.5" y="136.0" />
+      <point x="2372.3429783950614" y="136.0" />
+      <point x="-28.21875" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.GenericValue" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-95.5" />
+      <point x="3838.0617283950614" y="116.0" />
+      <point x="2444.9054783950614" y="116.0" />
+      <point x="44.34375" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.Budget" target="com.github.braully.domain.AbstractExpirableEntity">
+      <point x="0.0" y="-72.5" />
+      <point x="1042.8117283950614" y="430.0" />
+      <point x="1033.5" y="430.0" />
+      <point x="0.0" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.PartnerGroup" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-49.5" />
+      <point x="2866.5617283950614" y="156.0" />
+      <point x="2412.6554783950614" y="156.0" />
+      <point x="12.09375" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.Account" target="com.github.braully.domain.AbstractMigrableEntity">
+      <point x="0.0" y="-72.5" />
+      <point x="2769.3117283950614" y="430.0" />
+      <point x="2663.0617283950614" y="430.0" />
+      <point x="22.0" y="26.5" />
+    </edge>
+    <edge source="com.github.braully.domain.Address" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-107.0" />
+      <point x="390.0" y="106.0" />
+      <point x="2348.1554783950614" y="106.0" />
+      <point x="-52.40625" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.Menu" target="com.github.braully.domain.AbstractLightRemoveEntity">
+      <point x="0.0" y="-84.0" />
+      <point x="1785.3117283950614" y="430.0" />
+      <point x="1712.3117283950614" y="430.0" />
+      <point x="49.5" y="26.5" />
+    </edge>
+    <edge source="com.github.braully.domain.Role" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-38.0" />
+      <point x="619.0" y="116.0" />
+      <point x="2356.2179783950614" y="116.0" />
+      <point x="-44.34375" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.City" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-61.0" />
+      <point x="821.0" y="126.0" />
+      <point x="2364.2804783950614" y="126.0" />
+      <point x="-36.28125" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.Email" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-49.5" />
+      <point x="2118.704861111111" y="156.0" />
+      <point x="2388.4679783950614" y="156.0" />
+      <point x="-12.09375" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.UserLogin" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-84.0" />
+      <point x="4130.061728395061" y="106.0" />
+      <point x="2452.9679783950614" y="106.0" />
+      <point x="52.40625" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.AbstractMigrableEntity" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-26.5" />
+      <point x="2641.0617283950614" y="166.0" />
+      <point x="2404.5929783950614" y="166.0" />
+      <point x="4.03125" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.ProductPrice" target="com.github.braully.domain.AbstractExpirableEntity">
+      <point x="0.0" y="-84.0" />
+      <point x="1299.3117283950614" y="430.0" />
+      <point x="1092.8333333333335" y="430.0" />
+      <point x="59.33333333333337" y="38.0" />
+    </edge>
+    <edge source="com.github.braully.domain.AccountTransaction" target="com.github.braully.domain.AbstractMigrableEntity">
+      <point x="0.0" y="-176.0" />
+      <point x="2153.3117283950614" y="420.0" />
+      <point x="2575.0617283950614" y="420.0" />
+      <point x="-66.0" y="26.5" />
+    </edge>
+    <edge source="com.github.braully.domain.Phone" target="com.github.braully.domain.AbstractEntity">
+      <point x="0.0" y="-61.0" />
+      <point x="3569.5617283950614" y="126.0" />
+      <point x="2436.8429783950614" y="126.0" />
+      <point x="36.28125" y="38.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.8" x="2540.4047619047624" y="311.1666666666664" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -10,3 +10,11 @@ buildNumber.properties
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
+
+#builds directories
+/src/main/webapp/node_modules/
+/src/main/webapp/node/
+/src/main/generated/
+
+#secret project files
+/src/main/resources/application-prod.properties

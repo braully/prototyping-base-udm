@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jpa:entity-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" pkg="com.github.braully.domain" v="1.5.4" dv="1.0.0" thm="PNBColorScheme" persistenceUnitName="commonPU" xs="false" id="_14679205156641" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd">
+    <jpa:schema>common</jpa:schema>
+    <jpa:default-class abs="false" class="PartnerPartnerPK" visibile="true" minimized="false">
+        <jpa:embeddable>false</jpa:embeddable>
+        <jpa:attribute attribute-type="Long" visibile="true" name="id"/>
+        <jpa:attribute attribute-type="Long" visibile="true" name="partnerSource"/>
+        <jpa:attribute attribute-type="Long" visibile="true" name="partnerTarget"/>
+    </jpa:default-class>
+    <jpa:mapped-superclass xre="false" sm="false" abs="false" class="AbstractEntity" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467921506442">
+        <jpa:attributes>
+            <jpa:id attribute-type="Long" visibile="true" name="id" id="_14679215318609">
+                <jpa:generated-value strategy="AUTO"/>
+            </jpa:id>
+            <jpa:version attribute-type="int" visibile="true" name="version" id="_146792153634710"/>
+        </jpa:attributes>
+    </jpa:mapped-superclass>
+    <jpa:mapped-superclass xre="false" sm="false" abs="false" class="AbstractAuditableEntity" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467981080277">
+        <jpa:attributes>
+            <basic attribute-type="java.util.Date" visibile="true" name="lastModified" id="_14679811249105"/>
+            <basic attribute-type="Long" visibile="true" name="userIdModified" id="_14679813496116"/>
+        </jpa:attributes>
+    </jpa:mapped-superclass>
+    <jpa:mapped-superclass xre="false" sm="false" abs="false" class="AbstractMigrableEntity" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467991336953">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="uniqueCode" id="_1467991355355192">
+                <jpa:column unique="true" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+            </basic>
+        </jpa:attributes>
+    </jpa:mapped-superclass>
+    <jpa:mapped-superclass xre="false" sm="false" abs="false" class="AbstractExpirableEntity" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468159863331">
+        <jpa:attributes>
+            <basic attribute-type="java.util.Date" visibile="true" name="dateBegin" id="_146815989774546"/>
+            <basic attribute-type="java.util.Date" visibile="true" name="dateEnd" id="_146815989840947"/>
+        </jpa:attributes>
+    </jpa:mapped-superclass>
+    <jpa:mapped-superclass xre="false" sm="false" abs="false" class="AbstractLightRemoveEntity" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468440856243">
+        <jpa:attributes>
+            <basic attribute-type="Boolean" visibile="true" name="removed" id="_146844088651685"/>
+        </jpa:attributes>
+    </jpa:mapped-superclass>
+    <jpa:entity xre="false" sm="false" abs="false" class="Partner" superclassId="_1467991336953" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467920691592">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="name" id="_14679207244667"/>
+            <basic attribute-type="String" visibile="true" name="phoneticName" id="_146798165947210"/>
+            <basic attribute-type="String" visibile="true" name="attribute" id="_146798183818212"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" compositePrimaryKeyType="IDCLASS" compositePrimaryKeyClass="PartnerPartnerPK" sm="false" abs="false" class="PartnerPartner" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467981847148">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="type" id="_146798214223519"/>
+            <many-to-one optional="true" primaryKey="true" connected-entity-id="_1467920691592" visibile="true" name="partnerSource" id="_1467986316425169"/>
+            <many-to-one optional="true" primaryKey="true" connected-entity-id="_1467920691592" visibile="true" name="partnerTarget" id="_1467986331899170"/>
+            <jpa:id attribute-type="Long" visibile="true" name="id" id="_146798184714913">
+                <jpa:generated-value/>
+            </jpa:id>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Phone" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467982219859">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="type" id="_146798227432224"/>
+            <basic attribute-type="String" visibile="true" name="number" id="_146798232894525"/>
+            <basic attribute-type="String" visibile="true" name="observation" id="_146798233501726"/>
+            <one-to-many own="true" collection-type="java.util.List" connected-entity-id="_1467920691592" visibile="true" name="partner" id="_146798236067427"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Address" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467982402300">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="type" id="_146798257515935"/>
+            <basic attribute-type="String" visibile="true" name="zip" id="_146798265661436"/>
+            <basic attribute-type="String" visibile="true" name="street" id="_146798269963737"/>
+            <basic attribute-type="String" visibile="true" name="district" id="_146798292755539"/>
+            <basic attribute-type="String" visibile="true" name="addressLine1" id="_146798305882642"/>
+            <basic attribute-type="String" visibile="true" name="addressLine2" id="_146798308875343"/>
+            <one-to-many own="true" collection-type="java.util.List" connected-entity-id="_1467982432986" visibile="true" name="city" id="_146798281350238"/>
+            <one-to-many own="true" collection-type="java.util.List" connected-entity-id="_1467920691592" visibile="true" name="partner" id="_146798301119641"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="City" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467982432986">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="name" id="_146798245240832"/>
+            <basic attribute-type="String" visibile="true" name="phoneticName" id="_146798245574433"/>
+            <basic attribute-type="String" visibile="true" name="state" id="_146798249471234"/>
+            <basic attribute-type="String" visibile="true" name="country" id="_146798295863540"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="PartnerGroup" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467983156107">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="type" id="_146798318633646"/>
+            <basic attribute-type="String" visibile="true" name="description" id="_146798320083247"/>
+            <many-to-many own="true" collection-type="java.util.List" connected-entity-id="_1467920691592" visibile="true" name="partners" id="_146798321694548"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="GenericType" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467983421157">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="grouping" id="_146798344546251"/>
+            <basic attribute-type="String" visibile="true" name="attribute" id="_146798347413352"/>
+            <basic attribute-type="String" visibile="true" name="type" id="_146798348277353"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="GenericValue" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467983543179">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="grouping" id="_146798357448456"/>
+            <basic attribute-type="String" visibile="true" name="attribute" id="_146798357594857"/>
+            <basic attribute-type="String" visibile="true" name="type" id="_146798357762858"/>
+            <basic attribute-type="Boolean" visibile="true" name="booleanValue" id="_146798358026859"/>
+            <basic attribute-type="Integer" visibile="true" name="intValue" id="_146798358049260"/>
+            <basic attribute-type="String" visibile="true" name="stringValue" id="_146798358074861"/>
+            <basic attribute-type="Double" visibile="true" name="doubleValue" id="_146798358156462"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Account" superclassId="_1467991336953" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467985248066">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="name" id="_1467985300626159"/>
+            <basic attribute-type="String" visibile="true" name="groupingGL" id="_1467985301514161"/>
+            <basic attribute-type="String" visibile="true" name="typeGL" id="_1467985484272162"/>
+            <basic attribute-type="String" visibile="true" name="description" id="_1467985543312163"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467985248066" visibile="true" name="parentAccount" id="_1467986651880173"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Email" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467986220965">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="type" id="_1467986272272167"/>
+            <basic attribute-type="String" visibile="true" name="value" id="_1467986280192168"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467920691592" visibile="true" name="partner" id="_1467986256425166"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="InventoryItem" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467986446314">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="type" id="_1467987138391174"/>
+            <basic attribute-type="String" visibile="true" name="name" id="_1467987145103175"/>
+            <basic attribute-type="String" visibile="true" name="quantity" id="_146817290564575"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468172193749" visibile="true" name="inventory" id="_146817230238661"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468159975912" visibile="true" name="product" id="_146817232286662"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467920691592" visibile="true" name="supplier" id="_146817354128986"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="FinancialAccount" superclassId="_1467991336953" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467987201526">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="type" id="_1467987383005183"/>
+            <basic attribute-type="String" visibile="true" name="agency" id="_1467987384013184"/>
+            <basic attribute-type="String" visibile="true" name="number" id="_1467987384541185"/>
+            <basic attribute-type="String" visibile="true" name="bank" id="_1467993384350205"/>
+            <basic attribute-type="String" visibile="true" name="name" id="_1467993385030206"/>
+            <basic attribute-type="String" visibile="true" name="description" id="_1467993385430207"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="AccountTransaction" superclassId="_1467991336953" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467992031636">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="typeMethod" id="_1467992504007196"/>
+            <basic attribute-type="String" visibile="true" name="dateExecuted" id="_1467992533527197"/>
+            <basic attribute-type="String" visibile="true" name="memo" id="_1467992735477198"/>
+            <basic attribute-type="String" visibile="true" name="observation" id="_1467992735861199"/>
+            <basic attribute-type="String" visibile="true" name="typeTransaction" id="_1468181439714123"/>
+            <basic attribute-type="String" visibile="true" name="typeOperation" id="_1468181614390124"/>
+            <basic attribute-type="String" visibile="true" name="status" id="_1468182652946134"/>
+            <basic attribute-type="java.util.Date" visibile="true" name="datePrevist" id="_146818294635587"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467985248066" visibile="true" name="account" id="_1467992106268195"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467987201526" visibile="true" name="financialAccount" id="_1467993524366211"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467920691592" visibile="true" name="partner" id="_1468182593776133"/>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="creditTotal" id="_1467993686213213">
+                <jpa:attribute-override name="value">
+                    <jpa:column name="credit_total_value" unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+                </jpa:attribute-override>
+            </embedded>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="debitTotal" id="_1467993700540214">
+                <jpa:attribute-override name="value">
+                    <jpa:column name="debit_total_value" unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+                </jpa:attribute-override>
+            </embedded>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="actualBalance" id="_1467993705148215">
+                <jpa:attribute-override name="value">
+                    <jpa:column name="actual_balance_value" unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+                </jpa:attribute-override>
+            </embedded>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Product" superclassId="_1468159863331" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468159975912">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="name" id="_146817148890450"/>
+            <basic attribute-type="String" visibile="true" name="typeProduct" id="_146817150296751"/>
+            <basic attribute-type="String" visibile="true" name="typeUnit" id="_146817300229177"/>
+            <basic attribute-type="Double" visibile="true" name="unit" id="_146817301811578"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467920691592" visibile="true" name="manufacturer" id="_146817339529284"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="PurchaseOrder" superclassId="_1467981080277" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468172071616">
+        <jpa:attributes>
+            <basic attribute-type="java.util.Date" visibile="true" name="dateOrder" id="_146817248652663"/>
+            <basic attribute-type="String" visibile="true" name="fiscalCode" id="_146817248704564"/>
+            <basic attribute-type="String" visibile="true" name="statusType" id="_146817248735065"/>
+            <basic attribute-type="String" visibile="true" name="type" id="_146817248954966"/>
+            <basic attribute-type="String" visibile="true" name="observation" id="_146817249069367"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467920691592" visibile="true" name="partner" id="_146817367957488"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468172193749" visibile="true" name="inventory" id="_1468179635254115"/>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="total" id="_146817377297189"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Inventory" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468172193749">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="name" id="_146817223345856"/>
+            <basic attribute-type="String" visibile="true" name="description" id="_146817223406657"/>
+            <basic attribute-type="String" visibile="true" name="type" id="_146817223430658"/>
+            <basic attribute-type="String" visibile="true" name="localization" id="_146817223453059"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="ProductPrice" superclassId="_1468159863331" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468172677961">
+        <jpa:attributes>
+            <basic attribute-type="Double" visibile="true" name="percent" id="_146817282666374"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468159975912" visibile="true" name="product" id="_146817270673870"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468172193749" visibile="true" name="inventory" id="_146817295270976"/>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="price" id="_146817277368971">
+                <jpa:attribute-override name="value">
+                    <jpa:column name="price_value" unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+                </jpa:attribute-override>
+            </embedded>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="base" id="_146817278759372">
+                <jpa:attribute-override name="value">
+                    <jpa:column name="base_value" unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+                </jpa:attribute-override>
+            </embedded>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="charge" id="_146817280840073">
+                <jpa:attribute-override name="value">
+                    <jpa:column name="charge_value" unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+                </jpa:attribute-override>
+            </embedded>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="PurchaseOrderItem" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468173248926">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="attribute" id="_1468178395567105"/>
+            <basic attribute-type="Double" visibile="true" name="quantity" id="_1468178396167106"/>
+            <basic attribute-type="String" visibile="true" name="observation" id="_1468178396375107"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468172071616" visibile="true" name="purchaseOrder" id="_146817327415082"/>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="priceUnit" id="_1468178466628110"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="User" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468173927542">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="userName" id="_146817396528992"/>
+            <basic attribute-type="String" visibile="true" name="passwordHash" id="_146817396553793"/>
+            <basic attribute-type="String" visibile="true" name="attribute2" id="_146817396580994"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467920691592" visibile="true" name="partner" id="_146817400075595"/>
+            <many-to-many own="true" collection-type="java.util.List" connected-entity-id="_1468174220232" visibile="true" name="roles" id="_146817425253298"/>
+            <many-to-many own="true" collection-type="java.util.List" connected-entity-id="_1468440959220" visibile="true" name="menus" id="_1468586524015171"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Role" superclassId="_1467921506442" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468174220232">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="name" id="_146817435173199">
+                <jpa:column unique="true" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+            </basic>
+            <many-to-many own="true" collection-type="java.util.List" connected-entity-id="_1468440959220" visibile="true" name="menus" id="_1468586506049170"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Budget" superclassId="_1468159863331" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468182232122">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="typePeriod" id="_1468182414737129"/>
+            <basic attribute-type="String" visibile="true" name="typePeriodConsolidation" id="_1468182478303131"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1467985248066" visibile="true" name="account" id="_1468182301479127"/>
+            <embedded connected-class-id="_1467992911275" visibile="true" name="total" id="_1468182386819128"/>
+            <transient attribute-type="Double" visibile="true" name="percent" id="_1468182529654132"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="Menu" superclassId="_1468440856243" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468440959220">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="name" id="_146844103269788"/>
+            <basic attribute-type="String" visibile="true" name="value" id="_146844103352989"/>
+            <basic attribute-type="String" visibile="true" name="link" id="_146844103489790"/>
+            <basic attribute-type="Integer" visibile="true" name="sortIndex" id="_146844106175291"/>
+            <basic attribute-type="String" visibile="true" name="icon" id="_146844185706494"/>
+            <one-to-many own="true" collection-type="java.util.List" connected-entity-id="_1468440959220" visibile="true" name="menuChilds" id="_146844140288593"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity xre="false" sm="false" abs="false" class="UserMessage" superclassId="_1468440856243" visibile="true" minimized="false" rootElement="_14679205156641" id="_1468586830258">
+        <jpa:attributes>
+            <basic attribute-type="String" visibile="true" name="message" id="_1468586938113176"/>
+            <basic attribute-type="java.util.Date" visibile="true" name="date" id="_1468586938689177"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468173927542" visibile="true" name="userFrom" id="_1468586905284174"/>
+            <many-to-one optional="true" primaryKey="false" connected-entity-id="_1468173927542" visibile="true" name="userTo" id="_1468586917379175"/>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:embeddable sm="false" abs="false" class="Money" visibile="true" minimized="false" rootElement="_14679205156641" id="_1467992911275">
+        <jpa:attributes>
+            <basic attribute-type="Long" visibile="true" name="value" id="_1467992945451201"/>
+        </jpa:attributes>
+    </jpa:embeddable>
+    <jpa:c>
+        <ct>java.util.List</ct>
+        <ct>java.util.Set</ct>
+        <ct>java.util.Collection</ct>
+    </jpa:c>
+    <jpa:diagram>
+        <plane elementRef="_14679205156641">
+            <shape elementRef="_1467920691592">
+                <Bounds x="122.0" y="310.0" width="152.0" height="98.0"/>
+            </shape>
+            <shape elementRef="_1467981847148">
+                <Bounds x="371.0" y="309.0" width="206.0" height="143.0"/>
+            </shape>
+            <shape elementRef="_1467982219859">
+                <Bounds x="-71.0" y="-68.0" width="143.0" height="131.0"/>
+            </shape>
+            <shape elementRef="_1467982402300">
+                <Bounds x="-84.0" y="132.0" width="156.0" height="211.0"/>
+            </shape>
+            <shape elementRef="_1467982432986">
+                <Bounds x="434.0" y="132.0" width="143.0" height="118.0"/>
+            </shape>
+            <shape elementRef="_1467983156107">
+                <Bounds x="-123.0" y="452.0" width="195.0" height="111.0"/>
+            </shape>
+            <shape elementRef="_1467983421157">
+                <Bounds x="598.0" y="-68.0" width="186.0" height="98.0"/>
+            </shape>
+            <shape elementRef="_1467983543179">
+                <Bounds x="611.0" y="132.0" width="192.0" height="178.0"/>
+            </shape>
+            <shape elementRef="_1467985248066">
+                <Bounds x="-83.0" y="724.0" width="154.0" height="151.0"/>
+            </shape>
+            <shape elementRef="_1467986220965">
+                <Bounds x="-275.0" y="341.0" width="135.0" height="111.0"/>
+            </shape>
+            <shape elementRef="_1467986446314">
+                <Bounds x="-727.0" y="1523.0" width="196.0" height="171.0"/>
+            </shape>
+            <shape elementRef="_1467987201526">
+                <Bounds x="611.0" y="848.0" width="217.0" height="158.0"/>
+            </shape>
+            <shape elementRef="_1467992031636">
+                <Bounds x="315.0" y="848.0" width="238.0" height="344.0"/>
+            </shape>
+            <shape elementRef="_1468159975912">
+                <Bounds x="-808.0" y="1092.0" width="153.0" height="151.0"/>
+            </shape>
+            <shape elementRef="_1468172071616">
+                <Bounds x="-408.0" y="848.0" width="205.0" height="224.0"/>
+            </shape>
+            <shape elementRef="_1468172193749">
+                <Bounds x="-645.0" y="848.0" width="165.0" height="118.0"/>
+            </shape>
+            <shape elementRef="_1468172677961">
+                <Bounds x="61.0" y="1290.0" width="188.0" height="184.0"/>
+            </shape>
+            <shape elementRef="_1468173248926">
+                <Bounds x="-422.0" y="1243.0" width="236.0" height="164.0"/>
+            </shape>
+            <shape elementRef="_1468173927542">
+                <Bounds x="-789.0" y="341.0" width="144.0" height="171.0"/>
+            </shape>
+            <shape elementRef="_1468174220232">
+                <Bounds x="-579.0" y="106.0" width="129.0" height="91.0"/>
+            </shape>
+            <shape elementRef="_1468182232122">
+                <Bounds x="315.0" y="1203.0" width="204.0" height="177.0"/>
+            </shape>
+            <shape elementRef="_1468440959220">
+                <Bounds x="-782.0" y="106.0" width="137.0" height="171.0"/>
+            </shape>
+            <shape elementRef="_1468586830258">
+                <Bounds x="-774.0" y="-84.0" width="195.0" height="131.0"/>
+            </shape>
+            <shape elementRef="_1467921506442">
+                <Bounds x="304.0" y="529.0" width="199.0" height="90.0"/>
+            </shape>
+            <shape elementRef="_1467981080277">
+                <Bounds x="122.0" y="132.0" width="267.0" height="78.0"/>
+            </shape>
+            <shape elementRef="_1467991336953">
+                <Bounds x="304.0" y="724.0" width="261.0" height="58.0"/>
+            </shape>
+            <shape elementRef="_1468159863331">
+                <Bounds x="-450.0" y="704.0" width="264.0" height="78.0"/>
+            </shape>
+            <shape elementRef="_1468440856243">
+                <Bounds x="-493.0" y="518.0" width="290.0" height="58.0"/>
+            </shape>
+            <shape elementRef="_1467992911275">
+                <Bounds x="-77.0" y="1034.0" width="149.0" height="58.0"/>
+            </shape>
+        </plane>
+    </jpa:diagram>
+</jpa:entity-mappings>

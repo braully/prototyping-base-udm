@@ -1,0 +1,213 @@
+/* 
+ * References:  
+ * https://sass-lang.com/guide
+ * https://uxplanet.org/how-to-customize-bootstrap-b8078a011203
+ * https://getbootstrap.com.br/docs/4.1/getting-started/theming
+ * https://getbootstrap.com/docs/4.1/components/navbar
+ * https://getbootstrap.com/docs/4.1/examples/dashboard/
+ * https://fontawesome.com/v4.7.0/icon
+ * https://stackoverflow.com/questions/48816716/bootstrap-4-navbar-not-collapsing-or-expanding
+*/
+
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/nav";
+@import "../node_modules/bootstrap/scss/navbar";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import '../node_modules/font-awesome/scss/font-awesome';
+@import '../node_modules/font-awesome/scss/variables';
+@import '../node_modules/font-awesome/scss/icons';
+@import '../node_modules/font-awesome/scss/mixins';
+
+
+/*App style layout*/
+.base-app-main {
+    @extend .container;
+    @extend .row;
+}
+
+.base-app-main-content {
+    @extend .col-md-9;
+    //@extend .col-lg-9;
+    @extend .ml-sm-auto;
+    @extend .p-4;
+    @extend .px-4;
+}
+
+.base-app-header {
+    @extend .navbar;
+    @extend .navbar-dark;
+    @extend .bg-dark;
+    @extend .flex-md-nowrap;
+    //@extend .p-0;
+    @extend .px-3;
+    /*@extend .navbar-expand;
+    @extend .flex-column;
+    @extend .flex-md-row;*/
+    top: 0;
+}
+
+.base-app-main-menu {
+    @extend .navbar;
+    @extend .bg-light;
+    @extend .col-md-3;
+    @extend .d-md-block;
+    position: sticky;
+    //position: relative;
+    top: 48px;
+    min-height: calc(100vh - 48px);
+    /*
+    min-width: 250px;
+    max-width: 250px;
+    padding-top: 25px;
+    border-color: #e7e7e7;
+    border-style: solid;
+    border-width: 0 0 1px;
+    */
+}
+
+.base-app-main-menu-list {
+    @extend .nav;
+    @extend .flex-column;
+    position: -webkit-sticky;
+    position: sticky;
+    /*    @extend .collapse;*/
+}
+
+.base-app-main-menu-list-item {
+    @extend .nav-item;
+}
+
+.base-app-main-menu-sublist-item {
+    @extend .nav-item;
+}
+
+.base-app-main-menu-list-item-link {
+    @extend .nav-link;
+}
+
+
+/*Form content*/
+.autogen-form-group {
+    @extend .form-group;
+}
+
+.autogen-form-group-input {
+    @extend .form-control;
+}
+
+.autogen-form-group-check {
+    @extend .form-check;
+}
+
+.autogen-form-group-input-check {
+    @extend .form-check-input;
+}
+
+.autogen-form-group-label-check {
+    @extend .form-check-label;
+}
+
+
+.autogen-form-group-button-save {
+    @extend .btn;
+    @extend .btn-primary;
+    /*
+    @extend .col-2;
+    @extend .float-right;
+    */
+}
+
+/* Filter */
+.autogen-filter-group {
+    /*
+    @extend .form-group;
+    @extend .row;
+    */
+    @extend .input-group;
+}
+
+.autogen-filter-group-button-search {
+    @extend .input-group-append;
+    /*@extend .input-group-btn;*/
+    @extend .btn;
+    /*    @extend .btn-info;*/
+    @extend .btn-primary;
+}
+
+.autogen-filter-group-input {
+    @extend .form-control;
+    /*@extend .col-10;*/
+}
+
+.autogen-filter-group-button-search {
+    @extend .btn;
+    @extend .btn-primary;
+    /*    @extend .btn-info;*/
+    @extend .float-right;
+    /*@extend .col-2;*/
+}
+
+/* List content */
+.autogen-list-table{
+    @extend .table;
+    @extend .table-striped;
+}
+
+.autogen-list-table-body-col-input {
+    @extend .btn;
+    @extend .btn-outline-primary;
+}
+
+.autogen-list-group {
+    @extend .d-flex;
+    @extend .flex-row;
+}
+
+.autogen-list-group-button-prev {
+    @extend .page-item;
+    @extend .page-link;
+}
+
+.autogen-list-group-button-next {
+    @extend .page-item;
+    @extend .page-link;
+}
+
+.autogen-list-group-button-page {
+    @extend .page-item;
+    @extend .page-link;
+}
+
+.autogen-list-group-button-page-active {
+    @extend .page-item, .active, .page-link;
+    z-index: 1;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    /*    @extend .page-item, .active;
+        @extend .page-link;*/
+}
+
+.autogen-message-error {
+    @extend .alert;
+    @extend .alert-danger;
+}
+
+.autogen-message-warning {
+    @extend .alert;
+    @extend .alert-warning;
+}
+
+.autogen-message-info {
+    @extend .alert;
+    @extend .alert-info;
+}
+
+// icones
+
+.ico-caixa{
+    @extend .fa;
+    @extend .fa-calculator;
+}
