@@ -6,9 +6,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.braully</groupId>
-    <artifactId>prototyping-base-udm-maxge-legado</artifactId>
+    <artifactId>prototyping-base</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>prototyping-base-udm-maxge-legado</name>    
+    <name>prototyping-base-udm</name>    
 
     <parent>
         <groupId>org.springframework.boot</groupId>
