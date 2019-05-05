@@ -1,6 +1,7 @@
 package com.github.braully.domain;
 
 import com.github.braully.interfaces.IGlobalEntity;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -17,17 +18,21 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(schema = "security")
 @NamedQueries({
     @NamedQuery(name = "Usuario.userByNome", query = "select u from UserLogin u where u.userName = :nome"),
     @NamedQuery(name = "Usuario.idUsuarioByNome", query = "select u.id from UserLogin u where u.userName = :nome")}
 )
 @Inheritance(strategy = InheritanceType.JOINED)
-public class UserLogin extends AbstractGlobalEntity implements IGlobalEntity {
+public class UserLogin extends AbstractGlobalEntity implements IGlobalEntity, UserDetails {
 
     @Column(unique = true)
     @Basic
@@ -90,5 +95,36 @@ public class UserLogin extends AbstractGlobalEntity implements IGlobalEntity {
 
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    //Spring security methods
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.userName;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return isEnabled();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return isEnabled();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return isEnabled();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.active == null || this.active;
     }
 }

@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -20,11 +19,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(name = "role", schema = "security")
 @Access(AccessType.FIELD)
-public class Role extends AbstractEntity implements Serializable {
+public class Role extends AbstractEntity implements Serializable, GrantedAuthority {
 
     //TODO: Refatorar
     public static enum SysRole {
@@ -132,5 +132,10 @@ public class Role extends AbstractEntity implements Serializable {
                 menus1.add(m);
             }
         }
+    }
+
+    //Spring security    @Override
+    public String getAuthority() {
+        return this.name;
     }
 }

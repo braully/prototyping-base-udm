@@ -525,9 +525,9 @@
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
-                        <goals>
+<!--                        <goals>
                             <goal>update-stylesheets</goal>
-                        </goals>
+                        </goals>-->
                     </execution>
                 </executions>
                 <configuration>

@@ -13,7 +13,7 @@ insert into security.menu (id, name, value, link, icon, sort_index, removed) val
 
 insert into security.menu (fk_parent, id, name, value, link, icon) values 
 (1, 10, 'Colaborator', 'colaborator', '/administrative/colaborator', 'ico-colab'),
-(1, 11, 'Payroll', 'payroll', '/administrative/folha', 'ico-payroll'),
+(1, 11, 'Payroll', 'payroll', '/administrative/payroll', 'ico-payroll'),
 (1, 12, 'Task', 'task', '/administrative/task', 'ico-task'),
 
 (2, 20, 'Cashier', 'cashier', '/financial/cashier', 'ico-cashier'),
@@ -24,7 +24,7 @@ insert into security.menu (fk_parent, id, name, value, link, icon) values
 
 (3, 30, 'Report', 'report', '/system/report', 'ico-report'),
 (3, 31, 'Settings', 'settings', '/system/settings', 'ico-settings'),
-(3, 32, 'Import', 'import', '/system/importacao', 'ico-import');
+(3, 32, 'Import', 'import', '/system/import', 'ico-import');
 
 
 

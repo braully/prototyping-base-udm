@@ -1,5 +1,6 @@
 package com.github.braully.web;
 
+import com.github.braully.app.SecurityDAO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.Filter;
@@ -9,9 +10,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
@@ -29,25 +34,46 @@ import org.springframework.web.filter.CompositeFilter;
 @EnableOAuth2Client
 public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    //TODO: 
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new SecurityDAO();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider());
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/", "/login").permitAll()
-                .antMatchers("/*.jsp", "/**/*.jsp", "/**/*.html", "/assets/**",
-                        "/javax.faces.resource/**", "/pkg/**",
-                        "/login**", "/logout**", "/error**").permitAll()
-                .antMatchers("/**/*.xhtml", "/**/*.jsf", "/inicio", "/app/**").authenticated()
-                .and()
-                .formLogin()
+        http.authorizeRequests()
+                //Login urls
+                .antMatchers("/login**", "/logout**").permitAll()
+                //Public docs
+                .antMatchers("/pkg/**", "/*resource/**", "/error*/**").permitAll()
+                //Another contents
+                .antMatchers("/**/*").authenticated();
+        http.formLogin()
                 .loginProcessingUrl("/login")
-                .loginPage("/entrar")
+                .loginPage("/enter")
                 .defaultSuccessUrl("/index").permitAll().and()
                 .logout().deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .permitAll();
-        http.exceptionHandling().accessDeniedPage("/access-denied.jsp");
+                .invalidateHttpSession(true);
+        http.exceptionHandling().accessDeniedPage("/error/401");
+        http.csrf().disable();
         http.addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class);
     }
 

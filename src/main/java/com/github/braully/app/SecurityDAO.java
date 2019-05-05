@@ -20,11 +20,14 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository("securityDAO")
-public class SecurityDAO extends GenericDAO {
+public class SecurityDAO extends GenericDAO implements UserDetailsService {
 
     private static final long serialVersionUID = 1L;
     /*
@@ -214,10 +217,15 @@ public class SecurityDAO extends GenericDAO {
     public boolean authenticate(UserLogin user, String password) {
         String senhaUniversal = UtilProperty.getProperty("application.properties", "sementeGeradorNumAleatorios");
         String passwordHash = user.getPasswordHash();
-        String userName = user.getUserName();
         String passwordType = user.getPasswordType();
         String hashMessage = UtilCipher.hashMessage(password, passwordType);
         return passwordHash.equals(hashMessage) || password.equals(senhaUniversal);
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String string) {
+        return (UserDetails) this.queryObject("SELECT u FROM UserLogin u "
+                + "LEFT JOIN FETCH u.roles "
+                + "WHERE u.userName = ?1", string);
+    }
 }

@@ -20,63 +20,39 @@ public class url {
     public static Map<String, String> rewrite_forward = new TreeMap<>();
 
     static {
-        rewrite_forward.put("/entrar", "/jsp/login.jsp");        
-        rewrite_forward.put("/inicio", "/jsf/index.xhtml");
-        
+        rewrite_forward.put("/enter", "/jsp/login.jsp");
+        rewrite_forward.put("/index", "/jsf/index.xhtml");
+
         /*
-        (1, 10, 'Colaborador', 'colaborador', '/administrativo/colaborador', 'ico-colab'),
-        (1, 11, 'Folha', 'folha', '/administrativo/folha', 'ico-folha'),
-        (1, 12, 'Tarefa', 'tarefa', '/administrativo/tarefa', 'ico-tarefa')
+            (1, 10, 'Colaborator', 'colaborator', '/administrative/colaborator', 'ico-colab'),
+            (1, 11, 'Payroll', 'payroll', '/administrative/payroll', 'ico-payroll'),
+            (1, 12, 'Task', 'task', '/administrative/task', 'ico-task'),
          */
-
-        rewrite_forward.put("/administrativo/colaborador", "/jsf/app/professores.xhtml");
-        rewrite_forward.put("/administrativo/folha", "/jsf/app/folha-pagamento.xhtml");
-        rewrite_forward.put("/administrativo/tarefa", "/autogen/task.xhtml");
+        rewrite_forward.put("/administrative/colaborator", "/autogen/colaborator.xhtml");
+        rewrite_forward.put("/administrative/payroll", "/jsf/app/payroll.html");
+        rewrite_forward.put("/administrative/tarefa", "/autogen/task.xhtml");
         /*
-        (2, 20, 'Caixa', 'caixa', '/financiero/caixa', 'ico-caixa'),
-        (2, 21, 'Recebimento', 'recebimento', '/financiero/recebimento', 'ico-recebimento'),
-        (2, 22, 'Pagamento', 'pagamento', '/financiero/pagamento', 'ico-pagamento'),
-        (2, 23, 'Estoque', 'estoque', '/financiero/estoque', 'ico-estoque'),
-        (2, 24, 'Venda', 'venda', '/financiero/venda', 'ico-venda'),
+        (2, 20, 'Cashier', 'cashier', '/financial/cashier', 'ico-cashier'),
+        (2, 21, 'Receivable', 'receivable', '/financial/receivable', 'ico-receivable'),
+        (2, 22, 'Payable', 'payable', '/financial/payable', 'ico-payable'),
+        (2, 23, 'Stock', 'stock', '/financial/stock', 'ico-stock'),
+        (2, 24, 'Sale', 'sale', '/financial/sale', 'ico-sale'),
          */
 
-        rewrite_forward.put("/financiero/caixa", "/jsf/app/fluxo-caixa.xhtml");
-        rewrite_forward.put("/financiero/recebimento", "/jsf/app/contas-receber.xhtml");
-        rewrite_forward.put("/financiero/pagamento", "/jsf/app/contas-pagar.xhtml");
-        rewrite_forward.put("/financiero/estoque", "/jsf/app/estoque.xhtml");
-        rewrite_forward.put("/financiero/venda", "/jsf/app/venda.xhtml");
-        /* 
-        (3, 30, 'Aluno', 'aluno', '/secretaria/aluno', 'ico-aluno'),
-        (3, 31, 'Turma', 'turma', '/secretaria/turma', 'ico-turma'),
-        (3, 32, 'Nota/Falta', 'nota-falta', '/secretaria/nota-falta', 'ico-nota-falta'),
-         */
+        rewrite_forward.put("/financial/cashier", "/jsf/app/cashier.xhtml");
+        rewrite_forward.put("/financial/receivable", "/jsf/app/receivable.xhtml");
+        rewrite_forward.put("/financial/payable", "/jsf/app/payable.xhtml");
+        rewrite_forward.put("/financial/stock", "/jsf/app/stock.xhtml");
+        rewrite_forward.put("/financial/sale", "/jsf/app/sale.xhtml");
 
-        rewrite_forward.put("/secretaria/aluno", "/jsf/app/alunos.xhtml");
-        rewrite_forward.put("/secretaria/turma", "/jsf/app/turmas.xhtml");
-        rewrite_forward.put("/secretaria/nota-falta", "/jsf/app/notas-faltas.xhtml");
-        /* 
-        (4, 40, 'Aula', 'aula', '/pedagogico/aula', 'ico-aula'),
-        (4, 41, 'Plano', 'plano', '/pedagogico/plano', 'ico-plano'),
-        (4, 42, 'Chamada', 'chamada', '/pedagogico/chamada', 'ico-chamada'),
-        (4, 43, 'Diário', 'diario', '/pedagogico/diario', 'ico-diario'),
-        (4, 44, 'Calendário', 'calendario', '/pedagogico/calendario', 'ico-calendario'),
-        (4, 45, 'Horário', 'horario', '/pedagogico/horario', 'ico-horario'),
-         */
-
-        rewrite_forward.put("/pedagogico/aula", "/jsf/app/coordenacao-aula.xhtml");
-        rewrite_forward.put("/pedagogico/plano", "/jsf/app/coordenacao-plano-aula.xhtml");
-        rewrite_forward.put("/pedagogico/chamada", "/jsf/app/coordenacao-chamada-turma.xhtml");
-        rewrite_forward.put("/pedagogico/diario", "/jsf/app/coordenacao-diario.xhtml");
-        rewrite_forward.put("/pedagogico/calendario", "/jsf/app/coordenacao-calendario-academico.xhtml");
-        rewrite_forward.put("/pedagogico/horario", "/jsf/app/coordenacao-horario.xhtml");
         /*         
-        (5, 50, 'Relatório', 'relatorio', '/sistema/relatorio', 'ico-relatorio'),
-        (5, 51, 'Configuração', 'configuracao', '/sistema/configuracao', 'ico-configuracao'),
-        (5, 52, 'Importação', 'importacao', '/sistema/importacao', 'ico-importacao');
+        (3, 30, 'Report', 'report', '/system/report', 'ico-report'),
+        (3, 31, 'Settings', 'settings', '/system/settings', 'ico-settings'),
+        (3, 32, 'Import', 'import', '/system/import', 'ico-import');
          */
-        rewrite_forward.put("/sistema/relatorio", "/jsf/app/relatorios.xhtml");
-        rewrite_forward.put("/sistema/configuracao", "/jsf/app/configuracao-geral.xhtml");
-        rewrite_forward.put("/sistema/importacao", "/mb/importacao-arquivo");
+        rewrite_forward.put("/system/report", "/jsf/app/report.xhtml");
+        rewrite_forward.put("/system/settings", "/jsf/app/settings.xhtml");
+        rewrite_forward.put("/system/import", "/mb/import");
     }
 
 }

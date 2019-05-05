@@ -17,11 +17,13 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UtilCipher {
 
     static final org.apache.log4j.Logger log4j = org.apache.log4j.Logger.getLogger(UtilCipher.class);
     static final Logger log = Logger.getLogger(UtilCipher.class.getName());
+    /* */
     private static char[] MD5_HEX = "0123456789abcdef".toCharArray();
     private static final byte[] encoding = {65, 66, 67, 68, 69, 70, 71, 72,
         73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
@@ -32,51 +34,6 @@ public class UtilCipher {
     public static String DEFAULT_ALGORITHM = "MD5";
     public static String DEFAULT_HASH_ENCODING = "BASE64";
     public static String DEFAULT_HASH_CHARSET = "UTF-8";
-
-    /*
-    
-     */
-    public static void main(String... args) {
-        String strAlgorithm = null;
-        String strMsg = null;
-        String strSalt = null;
-
-        Option algorithm = new Option("a", "algorithm", true, "Algorithm for cipher");
-        Options options = new Options();
-        options.addOption(algorithm);
-
-        Option msg = new Option("m", "message", true, "Message for cipher");
-        msg.setRequired(true);
-        options.addOption(msg);
-
-        Option salt = new Option("s", "salt", true, "Salt for cipher message");
-        options.addOption(salt);
-
-        CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
-        CommandLine cmd = null;
-
-        try {
-            cmd = parser.parse(options, args);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            formatter.printHelp(UtilCipher.class.getName(), options);
-            return;
-        }
-
-        strAlgorithm = cmd.getOptionValue("algorithm");
-        strMsg = cmd.getOptionValue("message");
-        strSalt = cmd.getOptionValue("salt");
-
-        if (strAlgorithm == null) {
-            strAlgorithm = DEFAULT_ALGORITHM;
-        }
-        String strEncoding = DEFAULT_HASH_ENCODING;
-        String strCharset = DEFAULT_HASH_CHARSET;
-        String hashMessage = hashMessage(strAlgorithm, strEncoding, strCharset, strMsg, strSalt);
-        System.out.println(hashMessage);
-
-    }
 
     public static String hashMessage(String strMessage, String cipherMethod) {
         return UtilCipher.hashMessage(cipherMethod, DEFAULT_HASH_ENCODING, DEFAULT_HASH_CHARSET, strMessage);
@@ -326,5 +283,52 @@ public class UtilCipher {
             } while (two_halfs++ < 1);
         }
         return buf.toString();
+    }
+
+    /*
+    
+     */
+    public static void main(String... args) {
+        String strAlgorithm = null;
+        String strMsg = null;
+        String strSalt = null;
+
+        Option algorithm = new Option("a", "algorithm", true, "Algorithm for cipher");
+        Options options = new Options();
+        options.addOption(algorithm);
+
+        Option msg = new Option("m", "message", true, "Message for cipher");
+//        msg.setRequired(true);
+        options.addOption(msg);
+
+        Option salt = new Option("s", "salt", true, "Salt for cipher message");
+        options.addOption(salt);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd = null;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp(UtilCipher.class.getName(), options);
+            return;
+        }
+
+        strAlgorithm = cmd.getOptionValue("algorithm");
+        strMsg = cmd.getOptionValue("message");
+        strSalt = cmd.getOptionValue("salt");
+
+        if (strAlgorithm == null) {
+            strAlgorithm = DEFAULT_ALGORITHM;
+        }
+        String strEncoding = DEFAULT_HASH_ENCODING;
+        String strCharset = DEFAULT_HASH_CHARSET;
+//        String hashMessage = hashMessage(strAlgorithm, strEncoding, strCharset, strMsg, strSalt);
+        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+        strMsg = "user";
+        String hashMessage = bcrypt.encode(strMsg);
+        System.out.println(hashMessage);
     }
 }
