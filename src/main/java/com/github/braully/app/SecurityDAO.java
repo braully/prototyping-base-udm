@@ -16,13 +16,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.bouncycastle.util.Arrays;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,9 @@ public class SecurityDAO extends GenericDAO implements UserDetailsService {
 
     @Value("${spring.profiles.active}")//@Value("${spring.profiles.active:production}")
     private String activeProfile;
+
+    @Autowired
+    Environment env;
 
     /*
      *
@@ -153,11 +159,11 @@ public class SecurityDAO extends GenericDAO implements UserDetailsService {
         }
 
         //TODO: Central property
-        if ("development".equals(activeProfile)) {
-            Menu desenvMenu = new Menu("Desenvolvimento");
+        if (ArrayUtils.contains(env.getActiveProfiles(), "dev")) {
+            Menu desenvMenu = new Menu("Development");
             desenvMenu
                     .addChild(new Menu("Autogen").link("/autogen/index.xhtml"))
-                    .addChild(new Menu("Legado").link("/jsf/tmp/index.xhtml"))
+                    .addChild(new Menu("Legacy").link("/jsf/tmp/index.xhtml"))
                     .addChild(new Menu("Layout-1").link("/pkg/startbootstrap-sb-admin/index.html"))
                     .addChild(new Menu("Layout-2").link("/pkg/startbootstrap-sb-admin-2/index.html")) //                    .addChild(new Menu("Layout-3").link("/jsf/tmp/index.xhtml"))
                     ;
