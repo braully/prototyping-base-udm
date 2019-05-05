@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.braully</groupId>
-    <artifactId>prototyping-base</artifactId>
+    <artifactId>prototyping-base-udm</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>prototyping-base-udm</name>    
 
@@ -525,7 +525,7 @@
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
-<!--                        <goals>
+                        <!--                        <goals>
                             <goal>update-stylesheets</goal>
                         </goals>-->
                     </execution>
