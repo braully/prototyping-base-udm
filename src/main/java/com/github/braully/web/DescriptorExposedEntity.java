@@ -105,6 +105,13 @@ public class DescriptorExposedEntity {
         return new DescriptorHtmlEntity(this);
     }
 
+    public static class ActionHtmlEntity {
+        String name;
+        String action;
+        String actionUrl;
+        boolean bulk;
+    }
+
     /* */
     public static class DescriptorHtmlEntity {
 

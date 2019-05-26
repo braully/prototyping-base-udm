@@ -160,6 +160,11 @@
     @extend .btn-outline-primary;
 }
 
+.autogen-list-table-body-col-input-group {
+    @extend .btn-group;
+    @extend .btn-group-sm;
+}
+
 .autogen-list-group {
     @extend .d-flex;
     @extend .flex-row;
