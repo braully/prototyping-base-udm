@@ -178,6 +178,35 @@ public abstract class CRUDGenericController<T extends IEntity> {
         }
     }
 
+    public void remove(T entidade) {
+        if (this.remove(entidade, "Removido com sucesso", "Falha ao remover")) {
+            this.loadAllEntities();
+            this.newEntity();
+        }
+    }
+
+    public boolean remove(IEntity entidade, String mensagemSuc, String mensagemErro) {
+        boolean ret = true;
+        try {
+            ret = validatePreSave(entidade);
+            if (ret) {
+                this.getGenericoBC().saveEntity(entidade);
+                addMensagem(mensagemSuc);
+            } else {
+                addAlerta(mensagemErro);
+            }
+        } catch (RuntimeException e) {
+            addErro(mensagemErro, e);
+            ret = false;
+            log.error("erro", e);
+        }
+        return ret;
+    }
+
+    public boolean validatePreRemove(IEntity entidade) {
+        return true;
+    }
+
     public void setEntity(T entidade) {
         this.entity = entidade;
     }

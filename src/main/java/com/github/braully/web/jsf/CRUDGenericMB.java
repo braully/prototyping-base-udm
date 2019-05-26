@@ -19,7 +19,6 @@ package com.github.braully.web.jsf;
 
 import com.github.braully.app.CRUDGenericController;
 import com.github.braully.persistence.IEntity;
-import com.github.braully.web.jsf.MessageUtilJSF;
 
 /**
  *
