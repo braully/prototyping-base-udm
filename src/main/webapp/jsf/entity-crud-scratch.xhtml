@@ -19,6 +19,10 @@
         </ui:define>
 
         <ui:define name="template.body.append">
+            <form id="form-action" action="/app/action" class="hidden">
+                <input type="hidden" name="action" />
+                <input type="hidden" name="param" />
+            </form>
             <!-- Modal -->
             <div class="modal fade" id="autogen-modal" 
                  tabindex="-1" role="dialog" 
