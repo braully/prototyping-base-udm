@@ -18,6 +18,36 @@
                         showSummary="true" showDetail="true"  />
         </ui:define>
 
+        <ui:define name="template.body.append">
+            <!-- Modal -->
+            <div class="modal fade" id="autogen-modal" 
+                 tabindex="-1" role="dialog" 
+                 aria-labelledby="autogen-modalLabel" 
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" 
+                                id="autogen-modalLabel">Modal title</h5>
+                            <button type="button" class="close" 
+                                    data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-dismiss="modal">Close</button>
+                            <button type="button" 
+                                    class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </ui:define>
+
         <ui:define name="template.app.content.form">
             <h:form>
                 <div class="autogen-form-group">
@@ -80,6 +110,7 @@
                 <table class="autogen-list-table">
                     <thead class="autogen-list-table-head">
                         <tr class="autogen-list-table-head-row">
+                            <th class="autogen-list-table-head-col" scope="col"><input type="checkbox" /></th>
                             <th class="autogen-list-table-head-col" scope="col">#</th>
                             <th class="autogen-list-table-head-col" scope="col">Name</th>
                             <th class="autogen-list-table-head-col" scope="col">Code</th>
@@ -92,6 +123,7 @@
                     <tbody class="autogen-list-table-body">
                         <ui:repeat value="#{genericMB.crud('entityDummy').entities}" var="lin">
                             <tr class="autogen-list-table-body-row">
+                                <td class="autogen-list-table-body-col"><input type="checkbox" /></td>
                                 <td class="autogen-list-table-body-col">#{lin.id}</td>
                                 <td class="autogen-list-table-body-col">#{lin.name}</td>
                                 <td class="autogen-list-table-body-col">#{lin.code}</td>
@@ -99,9 +131,51 @@
                                 <td class="autogen-list-table-body-col">#{lin.checked}</td>
                                 <td class="autogen-list-table-body-col">#{lin.statusType}</td>
                                 <td class="autogen-list-table-body-col">
-                                    <input class="autogen-list-table-body-col-input"
-                                           jsfc="h:commandButton" value="Editar" title="Editar"
-                                           actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" />
+                                    <div class="btn-group" role="group">
+                                        <input actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}"
+                                               jsfc="h:commandButton" value="Ver" title="Ver"
+                                               class="btn btn-outline-dark">
+                                        </input>
+
+                                        <input actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}"
+                                               jsfc="h:commandButton" value="Editar" title="Editar"
+                                               class="autogen-list-table-body-col-input">
+                                        </input>
+
+                                        <input data-toggle="modal" data-target="#autogen-modal" 
+                                               value="Excluir" title="Excluir" type="button"
+                                               class="btn btn-outline-danger">
+                                        </input>
+
+                                        <div class="btn-group" role="group">
+                                            <button id="autogen-list-table-body-col-input-extra-action"
+                                                    type="button" class="btn btn-outline-secondary" title="Mais" 
+                                                    data-toggle="dropdown" aria-haspopup="true" 
+                                                    aria-expanded="false">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </button>
+                                            <div class="dropdown-menu" 
+                                                 aria-labelledby="autogen-list-table-body-col-input-extra-action">
+                                                <a class="dropdown-item" href="#"><i class="fa fa-search"></i> Ver</a>
+                                                <a class="dropdown-item" href="#"
+                                                   jsfc="h:commandLink" title="Editar"  
+                                                   actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" >
+                                                    <i class="fa fa-pencil"></i> Editar
+                                                </a>
+                                                <a class="dropdown-item" href="#"
+                                                   jsfc="h:commandLink" title="Excluir"  
+                                                   actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" >
+                                                    <i class="fa fa-trash"></i> Excluir
+                                                </a>
+                                                <a class="dropdown-item" href="#">
+                                                    <i class="fa fa-barcode"></i> Boleto
+                                                </a>
+                                                <a class="dropdown-item" href="#">
+                                                    <i class="fa fa-barcode"></i> Boleto
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </ui:repeat>
@@ -116,7 +190,7 @@
 
                     <!--TODO: ui:repeat begin="" end="" has bug, verify in future -->
                     <c:forEach begin="0" end="#{genericMB.crud('entityDummy').totalPages}" var="idx">
-                        <input class="#{ genericMB.crud('entityDummy').currentPage eq idx ? 'autogen-list-group-button-page-active':'autogen-list-group-button-page'}" 
+                        <input class="#{genericMB.crud('entityDummy').currentPage eq idx ? 'autogen-list-group-button-page-active':'autogen-list-group-button-page'}" 
                                jsfc="h:commandButton" action="#{genericMB.crud('entityDummy').paginate(idx)}"
                                value="#{idx+1}" aria-label="Pagina #{idx}" />
                     </c:forEach>
