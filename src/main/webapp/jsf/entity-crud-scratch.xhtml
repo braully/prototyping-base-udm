@@ -174,8 +174,8 @@
                                                 <a class="dropdown-item" href="#">
                                                     <i class="fa fa-barcode"></i> Boleto
                                                 </a>
-                                                <a class="dropdown-item" 
-                                                   title="Excluir" href="entityName/delete/123">
+                                                <a onclick="$.post('/app/action', { action: 'delete', entity: 'entityDummy' , id: ['1', '2'] } );" 
+                                                   class="dropdown-item" title="Excluir" href="#">
                                                     <i class="fa fa-trash"></i> Excluir
                                                 </a>
                                             </div>

@@ -29,8 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.io.IOException;
 import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -95,6 +98,21 @@ public class EntityRESTfulWS {
 
     @Autowired
     private EntitySearch entitySearch;
+
+    @RequestMapping(value = {"/action"}, method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void action(@RequestBody String strBody) {
+    public void action(HttpServletRequest request) {
+        log.info("action()");
+        Map<String, String[]> parameters = request.getParameterMap();
+        for (String key : parameters.keySet()) {
+            System.out.println(key);
+            String[] vals = parameters.get(key);
+            for (String val : vals) {
+                System.out.println(" -> " + val);
+            }
+        }
+    }
 
     @RequestMapping(value = {"/rest/{classe}/{id}"}, method = RequestMethod.GET)
     public IEntity getEntity(@PathVariable("classe") String classe,
@@ -156,9 +174,9 @@ public class EntityRESTfulWS {
 
     @RequestMapping(value = {"/rest/{classe}/{id}"},
             method = RequestMethod.DELETE)
-    public void removeEntity(@PathVariable("classe") String classe,
-            @PathVariable("id") Integer id) {
+    public void removeEntity(@PathVariable("classe") String classe, @PathVariable("id") Integer id) {
         log.info("removeEntity()");
+        genericDAO.delete(id, EXPOSED_ENTITY.get(classe).getClassExposed());
     }
 
     @RequestMapping(value = {"/rest/{classe}"},

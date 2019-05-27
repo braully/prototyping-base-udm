@@ -8,10 +8,14 @@ import com.github.braully.domain.Menu;
 import com.github.braully.persistence.ICrudEntity;
 import com.github.braully.persistence.IEntity;
 import com.github.braully.web.DescriptorExposedEntity;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.event.data.PageEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -89,4 +93,8 @@ public class GenericMB extends CRUDGenericController {
         return genericDAO;
     }
 
+    public void reload() throws IOException {
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+    }
 }
