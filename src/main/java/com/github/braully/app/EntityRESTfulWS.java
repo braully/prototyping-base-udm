@@ -151,7 +151,7 @@ public class EntityRESTfulWS {
             method = {RequestMethod.PUT, RequestMethod.POST})
     @ResponseBody
     public IEntity updateEntity(@PathVariable("classe") String classe,
-            @PathVariable("id") Integer id,
+            @PathVariable("id") Long id,
             @RequestBody String jsonEntity) {
         log.info("updateEntity()");
         IEntity entidade = null;
@@ -172,9 +172,9 @@ public class EntityRESTfulWS {
         return entidade;
     }
 
-    @RequestMapping(value = {"/rest/{classe}/{id}"},
-            method = RequestMethod.DELETE)
-    public void removeEntity(@PathVariable("classe") String classe, @PathVariable("id") Integer id) {
+    @RequestMapping(value = {"/rest/{classe}/{id}", "/delete/{classe}/{id}"},
+            method = {RequestMethod.DELETE, RequestMethod.POST})
+    public void removeEntity(@PathVariable("classe") String classe, @PathVariable("id") Long id) {
         log.info("removeEntity()");
         genericDAO.delete(id, EXPOSED_ENTITY.get(classe).getClassExposed());
     }

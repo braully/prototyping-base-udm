@@ -10,6 +10,12 @@
         <ui:define name="template.app.menu">
             <ui:include src="/jsf/template/menu-base-app.xhtml" />
         </ui:define>
+        <ui:define name="template.head.append">
+            <meta name="_csrf" content="${_csrf.token}"/>
+            <!-- default header name is X-CSRF-TOKEN -->
+            <meta name="_csrf_header" content="${_csrf.headerName}"/>
+        </ui:define>
+
         <ui:define name="template.app.content">
             <h:messages infoClass="autogen-message-info" 
                         warnClass="autogen-message-warning"
@@ -174,7 +180,7 @@
                                                 <a class="dropdown-item" href="#">
                                                     <i class="fa fa-barcode"></i> Boleto
                                                 </a>
-                                                <a onclick="$.post('/app/action', { action: 'delete', entity: 'entityDummy' , id: ['1', '2'] } );" 
+                                                <a onclick="$.post('/app/delete/entityDummy/#{lin.id}'); location.reload();" 
                                                    class="dropdown-item" title="Excluir" href="#">
                                                     <i class="fa fa-trash"></i> Excluir
                                                 </a>
