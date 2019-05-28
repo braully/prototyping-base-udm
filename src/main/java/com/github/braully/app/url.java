@@ -54,6 +54,6 @@ public class url {
         rewrite_forward.put("/system/settings", "/jsf/app/settings.xhtml");
         rewrite_forward.put("/system/import", "/mb/import");
 
-        rewrite_forward.put("/entity-crud-scratch", "/jsf/entity-crud-scratch.xhtml");
+        rewrite_forward.put("/entity-scratch", "/jsf/entity-crud-scratch.xhtml");
     }
 }
