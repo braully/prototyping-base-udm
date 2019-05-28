@@ -61,9 +61,9 @@ public class SpringWebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 //Login urls
-                .antMatchers("/login**", "/logout**").permitAll()
+                .antMatchers("/login**", "/logout**", "/enter**", "/jsp/login.jsp").permitAll()
                 //Public docs
-                .antMatchers("/pkg/**", "/*resource/**", "/error*/**").permitAll()
+                .antMatchers("/pkg/**", "/resources/**", "/*resource/**", "/error*/**").permitAll()
                 //Another contents
                 .antMatchers("/**/*").authenticated();
         http.formLogin()
