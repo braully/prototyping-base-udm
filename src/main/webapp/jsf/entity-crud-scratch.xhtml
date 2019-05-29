@@ -179,7 +179,13 @@
                                                    actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" >
                                                     <i class="fa fa-trash"></i> Excluir
                                                 </a>
-                                                <a class="dropdown-item" href="#">
+                                                <form action="/jsf/index.xhtml" method="post">
+                                                    <input type="hidden" name="id" value="#{lin.id}" />
+                                                    <input type="submit" value="submit" />
+                                                    <button>Boleto</button>
+                                                </form>
+                                                <a onclick="normal_post('/jsf/index.xhtml', {id: '#{lin.id}'});"
+                                                   class="dropdown-item" href="#">
                                                     <i class="fa fa-barcode"></i> Boleto
                                                 </a>
                                                 <a onclick="$.post('/app/delete/entityDummy/#{lin.id}'); location.reload();" 

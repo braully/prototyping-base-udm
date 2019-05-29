@@ -28,9 +28,9 @@
         <ui:define name="template.app.menu">
             <ui:include src="/jsf/template/menu-base-app.xhtml" />
         </ui:define>
-        
-        <ui:define name="template.app.content">
 
+        <ui:define name="template.app.content">
+            <h:outputText value="Entity-id: #{param['id']}" />
         </ui:define>
     </ui:composition>
 </html>

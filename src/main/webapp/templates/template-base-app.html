@@ -26,7 +26,13 @@
             </div>
         </main>
         <!--{template.foot.append}-->
+        <form id="autogen-form-action" method="post" class="hidden">
+            <input id="autogen-form-action-input-action" type="hidden" name="action" />
+            <input id="autogen-form-action-input-param" type="hidden" name="param" />
+        </form>
+        <div id="autogen-modal" aria-hidden="true">></div>
         <script src="/pkg/jquery/dist/jquery.min.js"></script>
+        <script src="/assets/js/template-base-app.js"></script>
         <script src="/pkg/popper.js/dist/umd/popper.min.js"></script>
         <script src="/pkg/bootstrap/dist/js/bootstrap.min.js"></script>
     </body>
