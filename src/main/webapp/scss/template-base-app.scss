@@ -149,7 +149,26 @@
     /*@extend .col-2;*/
 }
 
+.autogen-button-default {
+    @extend .btn;
+    @extend .btn-sm;
+}
+
+.autogen-button-default {
+    @extend .btn-outline-dark;
+}
+
+.autogen-button-info {
+    @extend .btn-outline-primary;
+}
+
+.autogen-button-warn {
+    @extend .btn-outline-danger;
+}
+
 /* List content */
+
+
 .autogen-list-table{
     @extend .table;
     @extend .table-striped;
@@ -170,23 +189,61 @@
     @extend .flex-row;
 }
 
-.autogen-list-group-button-prev {
+.autogen-list-group-button-raw {
+    @extend .btn;
+    @extend .btn-sm;
+}
+
+
+.autogen-list-group-button {
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-outline-dark;
+}
+
+.autogen-list-group-col {
+    @extend .col;
+}
+
+.autogen-list-group-button-extra {
+    @extend .dropdown-menu;
+}
+
+.autogen-list-group-button-extra-button {
+    @extend .dropdown-item;
+}
+
+.autogen-list-group-button-col {
+    @extend .btn-group;
+    @extend .btn-group-sm;
+}
+
+.autogen-list-group-pagination-col {
+    @extend .ml-auto;
+    @extend .pagination;
+    @extend .pagination-sm;
+    @extend .justify-content-end;
+}
+
+.autogen-list-group-button-prev, .autogen-list-group-pagination-button-prev {
     @extend .page-item;
     @extend .page-link;
 }
 
-.autogen-list-group-button-next {
+.autogen-list-group-button-next, .autogen-list-group-pagination-button-next {
     @extend .page-item;
     @extend .page-link;
 }
 
-.autogen-list-group-button-page {
+.autogen-list-group-button-page, .autogen-list-group-pagination-button-page {
     @extend .page-item;
     @extend .page-link;
 }
 
-.autogen-list-group-button-page-active {
-    @extend .page-item, .active, .page-link;
+.autogen-list-group-button-page-active, .autogen-list-group-pagination-button-page-active {
+    @extend .page-item;
+    @extend .active;
+    @extend .page-link;
     z-index: 1;
     color: #fff;
     background-color: #007bff;

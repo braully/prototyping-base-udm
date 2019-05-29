@@ -13,3 +13,26 @@ function normal_post(url, data) {
     $(document.body).append(vform);
     vform.submit();
 }
+
+
+function table_selected_id(callobj) {
+    var seleteds = [];
+    $(callobj).closest('table').find('tbody :checkbox:checked').each(function () {
+        seleteds.push($(this).data("id"));
+    });
+    if (seleteds.length == 0) {
+        //trying in same form
+        $(callobj).closest('form').find('table tbody :checkbox:checked').each(function () {
+            seleteds.push($(this).data("id"));
+        });
+    }
+    return seleteds;
+}
+
+//https://codepen.io/diegobdev/pen/vGoqKW
+//TODO: Aprimorar o comportamento do selectall, caso um item seja descelecionado, desmaca-lo, e caso seja selecionado novamente marca-lo
+function checkAll(callobj) {
+    $(callobj).closest('table').find('tbody :checkbox')
+            .prop('checked', callobj.checked)
+            .closest('tr').toggleClass('selected', callobj.checked);
+}

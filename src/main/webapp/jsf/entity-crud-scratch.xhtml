@@ -112,30 +112,88 @@
                     <input class="autogen-filter-group-input" jsfc="h:inputText" 
                            value="#{genericMB.crud('entityDummy').searchString}" />
                     <input class="autogen-filter-group-button-search" jsfc="h:commandButton" 
-                           value="Pesquisar" action="#{genericMB.crud('entityDummy').find()}" />
+                           value="Buscar" action="#{genericMB.crud('entityDummy').find()}" />
                 </div>
             </h:form>
         </ui:define>
 
         <ui:define name="template.app.content.list">
             <h:form>
+                <div class="autogen-list-group">
+                    <div class="autogen-list-group-button-col" role="group">
+                        <input data-toggle="modal" data-target="#autogen-modal" 
+                               value="Excluir" title="Excluir" type="button"
+                               class="autogen-list-group-button-raw autogen-button-warn">
+                        </input>
+                        <button type="button" class="autogen-list-group-button" title="Mais" 
+                                data-toggle="dropdown"
+                                aria-haspopup="true" 
+                                aria-expanded="false" 
+                                id="autogen-list-head-extra-action">
+                            Selecionados
+                            <i class="fa fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-menu" 
+                             aria-labelledby="autogen-list-head-extra-action">
+                            <a class="autogen-list-group-button-extra-button" href="#">
+                                <i class="fa fa-search"></i> Ver
+                            </a>
+                            <a class="autogen-list-group-button-extra-button"
+                               jsfc="h:commandLink" title="Editar" href="#"
+                               actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}">
+                                <i class="fa fa-pencil"></i> Editar
+                            </a>
+                            <a onclick="normal_post('/jsf/index.xhtml', {ids: table_selected_id(this)});"
+                               class="autogen-list-group-button-extra-button" href="#">
+                                <i class="fa fa-barcode"></i> Boleto
+                            </a>
+                        </div>
+                    </div>  
+
+                    <div class="autogen-list-group-pagination-col">
+                        <input class="autogen-list-group-pagination-button-prev" jsfc="h:commandButton" value="«"
+                               disabled="#{not genericMB.crud('entityDummy').hasPreviousPageQueryResult()}"
+                               action="#{genericMB.crud('entityDummy').previousPageQueryResult()}"
+                               aria-label="Anterior"/>
+
+                        <!--TODO: ui:repeat begin="" end="" has bug, verify in future -->
+                        <c:forEach begin="0" end="#{genericMB.crud('entityDummy').totalPages}" var="idx">
+                            <input class="#{genericMB.crud('entityDummy').currentPage eq idx ? 'autogen-list-group-button-page-active':'autogen-list-group-button-page'}" 
+                                   jsfc="h:commandButton" action="#{genericMB.crud('entityDummy').paginate(idx)}"
+                                   value="#{idx+1}" aria-label="Pagina #{idx}" />
+                        </c:forEach>
+
+                        <input class="autogen-list-group-pagination-button-next" jsfc="h:commandButton" value="»"
+                               disabled="#{not genericMB.crud('entityDummy').hasNextPageQueryResult()}"
+                               action="#{genericMB.crud('entityDummy').nextPageQueryResult()}"
+                               aria-label="Proximo"/>
+                    </div>
+                </div>
+
                 <table class="autogen-list-table">
                     <thead class="autogen-list-table-head">
                         <tr class="autogen-list-table-head-row">
-                            <th class="autogen-list-table-head-col" scope="col"><input type="checkbox" /></th>
+                            <th class="autogen-list-table-head-col" scope="col">
+                                <input type="checkbox" onclick="checkAll(this);" />
+                            </th>
                             <th class="autogen-list-table-head-col" scope="col">#</th>
                             <th class="autogen-list-table-head-col" scope="col">Name</th>
                             <th class="autogen-list-table-head-col" scope="col">Code</th>
                             <th class="autogen-list-table-head-col" scope="col">Fraction</th>
                             <th class="autogen-list-table-head-col" scope="col">Checked</th>
                             <th class="autogen-list-table-head-col" scope="col">Status</th>
-                            <th class="autogen-list-table-head-col" scope="col"></th>
+                            <th class="autogen-list-table-head-col" scope="col">
+
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="autogen-list-table-body">
                         <ui:repeat value="#{genericMB.crud('entityDummy').entities}" var="lin">
-                            <tr class="autogen-list-table-body-row">
-                                <td class="autogen-list-table-body-col"><input type="checkbox" /></td>
+                            <tr class="autogen-list-table-body-row" data-id="#{lin.id}">
+                                <td class="autogen-list-table-body-col">
+                                    <input data-id="#{lin.id}" type="checkbox" 
+                                           onclick="$(this).toggleClass('selected')" />
+                                </td>
                                 <td class="autogen-list-table-body-col">#{lin.id}</td>
                                 <td class="autogen-list-table-body-col">#{lin.name}</td>
                                 <td class="autogen-list-table-body-col">#{lin.code}</td>
@@ -200,25 +258,6 @@
                         </ui:repeat>
                     </tbody>
                 </table>
-
-                <div class="autogen-list-group">
-                    <input class="autogen-list-group-button-prev" jsfc="h:commandButton" value="«"
-                           disabled="#{not genericMB.crud('entityDummy').hasPreviousPageQueryResult()}"
-                           action="#{genericMB.crud('entityDummy').previousPageQueryResult()}"
-                           aria-label="Anterior"/>
-
-                    <!--TODO: ui:repeat begin="" end="" has bug, verify in future -->
-                    <c:forEach begin="0" end="#{genericMB.crud('entityDummy').totalPages}" var="idx">
-                        <input class="#{genericMB.crud('entityDummy').currentPage eq idx ? 'autogen-list-group-button-page-active':'autogen-list-group-button-page'}" 
-                               jsfc="h:commandButton" action="#{genericMB.crud('entityDummy').paginate(idx)}"
-                               value="#{idx+1}" aria-label="Pagina #{idx}" />
-                    </c:forEach>
-
-                    <input class="autogen-list-group-button-next" jsfc="h:commandButton" value="»"
-                           disabled="#{not genericMB.crud('entityDummy').hasNextPageQueryResult()}"
-                           action="#{genericMB.crud('entityDummy').nextPageQueryResult()}"
-                           aria-label="Proximo"/>
-                </div>
             </h:form>
         </ui:define>
     </ui:composition>
