@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -33,10 +34,30 @@ import org.springframework.stereotype.Component;
 @Scope("view")
 public class GenericMB extends CRUDGenericController {
 
+    public static final String NOME_PROPRIEDADE_INDICE_TAB = "tabIndex";
+
     @Resource(name = "genericDAO")
     private GenericDAO genericDAO;
     @Resource(name = "securityDAO")
     private SecurityDAO securityDAO;
+
+    private int index;
+
+    @PostConstruct
+    public void init() {
+        super.init();
+        try {
+            String value = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get(NOME_PROPRIEDADE_INDICE_TAB);
+            if (value != null && !value.trim().isEmpty()) {
+                Integer i = getInt(value);
+                if (i != null && i > 0) {
+                    index = i;
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
 
     public void paginacaoTabelaLazy(PageEvent event) {
         int pagina = event.getPage();
@@ -58,7 +79,8 @@ public class GenericMB extends CRUDGenericController {
 
     public CRUDGenericController crud(String entityName) {
         CRUDGenericController tmp = null;
-        tmp = CACHE_CRUDS.get(entityName);
+        String entityNameLower = entityName.toLowerCase();
+        tmp = CACHE_CRUDS.get(entityNameLower);
         if (tmp == null) {
             DescriptorExposedEntity desc = EntityRESTfulWS.EXPOSED_ENTITY.get(entityName);
             if (desc != null) {
@@ -69,7 +91,7 @@ public class GenericMB extends CRUDGenericController {
                         return genericDAO;
                     }
                 };
-                CACHE_CRUDS.put(entityName, tmp);
+                CACHE_CRUDS.put(entityNameLower, tmp);
             }
         }
         return tmp;
@@ -91,6 +113,14 @@ public class GenericMB extends CRUDGenericController {
 
     protected ICrudEntity getGenericoBC() {
         return genericDAO;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public void reload() throws IOException {

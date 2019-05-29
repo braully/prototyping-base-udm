@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.Deflater;
@@ -31,7 +32,10 @@ public class UtilIO {
     private static final String PDF_EXTENSION = ".pdf";
 
     public static byte[] loadFile(String pathImagem) throws FileNotFoundException, IOException {
-        FileInputStream fis = new FileInputStream(pathImagem);
+        byte[] buffSaida = null;
+        File file = new File(pathImagem);
+        if (file.exists()) {
+            FileInputStream fis = new FileInputStream(file);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         int l;
@@ -42,8 +46,16 @@ public class UtilIO {
         }
         fis.close();
         baos.flush();
-        byte[] buffSaida = baos.toByteArray();
+            buffSaida = baos.toByteArray();
         baos.close();
+        } else if (pathImagem.contains("jar!")) {
+            String jarurl = "jar:" + pathImagem;
+            System.out.println("Url: " + pathImagem);
+            System.out.println("Jar-Url: " + jarurl);
+            URL url = new URL(jarurl);
+            URLConnection openConnection = url.openConnection();
+            buffSaida = loadStream(openConnection.getInputStream());
+        }
         return buffSaida;
     }
 

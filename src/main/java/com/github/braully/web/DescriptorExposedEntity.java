@@ -1,5 +1,6 @@
 package com.github.braully.web;
 
+import com.github.braully.util.UtilReflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -113,12 +114,20 @@ public class DescriptorExposedEntity {
         boolean bulk;
     }
 
+    public DescriptorHtmlEntity getDescriptorHtmlEntity(Map<String, String> extraParameter) {
+        return new DescriptorHtmlEntity(this, extraParameter);
+    }
+
+
     /* */
     public static class DescriptorHtmlEntity {
 
         static final String TYPE_SELECT_ONE = "selectone";
         static final String TYPE_SELECT_MANY = "selectmany";
-
+        /* */
+        private boolean sortFormElemts = false;
+        private boolean sortElementsList = false;
+        /* */
         DescriptorHtmlEntity parent;
         List<DescriptorHtmlEntity> elementsForm;
         List<DescriptorHtmlEntity> elementsFilter;
@@ -156,6 +165,27 @@ public class DescriptorExposedEntity {
             this.parent = parent;
         }
 
+        public DescriptorHtmlEntity(DescriptorExposedEntity descriptorExposedEntity, Map<String, String> extraParams) {
+            this(descriptorExposedEntity);
+            if (extraParams != null && !extraParams.isEmpty()) {
+                String strexcluces = extraParams.get("exclude");
+                String[] excludes = new String[]{strexcluces};
+                if (strexcluces.contains(",")) {
+                    excludes = strexcluces.split(",");
+                }
+                List<String> excluList = Arrays.asList(excludes);
+                this.hiddenForm(excluList);
+                this.hiddenList(excluList);
+            }
+        }
+
+        public DescriptorHtmlEntity(DescriptorExposedEntity descriptorExposedEntity) {
+            this(descriptorExposedEntity.classExposed);
+            this.hiddenForm(descriptorExposedEntity.hiddenFormProperties);
+            this.hiddenList(descriptorExposedEntity.hiddenListProperties);
+            this.hiddenFilter(descriptorExposedEntity.hiddenFilterProperties);
+        }
+
         public DescriptorHtmlEntity(Class classe) {
             this(decapitalize(classe.getSimpleName()), classe, "");
         }
@@ -166,13 +196,54 @@ public class DescriptorExposedEntity {
         }
 
         private void parseFieldClass(Class classe1) {
+            parseFormFieldClass(classe1);
+            parseFilterFieldClass(classe1);
+            parseListFieldClass(classe1);
+        }
+
+        private void parseFormFieldClass(Class classe1) {
+            if (elementsForm == null) {
+                elementsForm = new ArrayList<>();
+            } else {
+                elementsForm.clear();
+            }
+
+            if (hiddenFormProperties == null) {
+                hiddenFormProperties = new HashSet<>();
+            }
             ReflectionUtils.doWithFields(classe1, (Field field) -> {
                 addHtmlFormElement(field);
-                addHtmlFilterElement(field);
-                addHtmlListElement(field);
             });
 
-            Collections.sort(elementsList, new Comparator<DescriptorHtmlEntity>() {
+            if (sortFormElemts) {
+                Collections.sort(elementsForm, new Comparator<DescriptorHtmlEntity>() {
+                    @Override
+                    public int compare(DescriptorHtmlEntity t, DescriptorHtmlEntity t1) {
+                        try {
+                            return t.property.compareToIgnoreCase(t1.property);
+                        } catch (Exception e) {
+                        }
+                        return 0;
+                    }
+                });
+            }
+        }
+
+        private void parseFilterFieldClass(Class classe1) {
+            if (elementsFilter == null) {
+                elementsFilter = new ArrayList<>();
+            } else {
+                elementsFilter.clear();
+            }
+            if (hiddenFilterProperties == null) {
+                hiddenFilterProperties = new HashSet<>();
+            }
+
+            ReflectionUtils.doWithFields(classe1, (Field field) -> {
+                addHtmlFilterElement(field);
+            });
+
+            Collections.sort(elementsFilter, new Comparator<DescriptorHtmlEntity>() {
                 @Override
                 public int compare(DescriptorHtmlEntity t, DescriptorHtmlEntity t1) {
                     try {
@@ -184,48 +255,56 @@ public class DescriptorExposedEntity {
             });
         }
 
-        public DescriptorHtmlEntity(DescriptorExposedEntity descriptorExposedEntity) {
-            this(descriptorExposedEntity.classExposed);
-        }
-
-        private void addHtmlListElement(Field field) {
+        private void parseListFieldClass(Class classe1) {
             if (elementsList == null) {
                 elementsList = new ArrayList<>();
+            } else {
+                elementsList.clear();
             }
             if (hiddenListProperties == null) {
                 hiddenListProperties = new HashSet<>();
             }
+            ReflectionUtils.doWithFields(classe1, (Field field) -> {
+                addHtmlListElement(field);
+            });
+
+            if (sortElementsList) {
+                Collections.sort(elementsList, new Comparator<DescriptorHtmlEntity>() {
+                    @Override
+                    public int compare(DescriptorHtmlEntity t, DescriptorHtmlEntity t1) {
+                        try {
+                            return t.property.compareToIgnoreCase(t1.property);
+                        } catch (Exception e) {
+                        }
+                        return 0;
+                    }
+                });
+            }
+        }
+
+        private void addHtmlListElement(Field field) {
             final int modifiers = field.getModifiers();
             if (!Modifier.isStatic(modifiers)
-                    && !hiddenListProperties.contains(field.getName())) {
+                    && !hiddenListProperties.contains(field.getName())
+                    && !UtilReflection.isExtraAttribute(field, "hidden")) {
                 elementsList.add(buildDescriptorHtmlEntity(field));
             }
         }
 
         private void addHtmlFilterElement(Field field) {
-            if (elementsFilter == null) {
-                elementsFilter = new ArrayList<>();
-            }
-            if (hiddenFilterProperties == null) {
-                hiddenFilterProperties = new HashSet<>();
-            }
             final int modifiers = field.getModifiers();
             if (!Modifier.isStatic(modifiers)
-                    && !hiddenFilterProperties.contains(field.getName())) {
+                    && !hiddenFilterProperties.contains(field.getName())
+                    && !UtilReflection.isExtraAttribute(field, "hidden")) {
                 elementsFilter.add(buildDescriptorHtmlEntity(field));
             }
         }
 
         private void addHtmlFormElement(Field field) {
-            if (elementsForm == null) {
-                elementsForm = new ArrayList<>();
-            }
-            if (hiddenFormProperties == null) {
-                hiddenFormProperties = new HashSet<>();
-            }
             final int modifiers = field.getModifiers();
             if (!Modifier.isStatic(modifiers)
-                    && !hiddenFormProperties.contains(field.getName())) {
+                    && !hiddenFormProperties.contains(field.getName())
+                    && !UtilReflection.isExtraAttribute(field, "hidden")) {
                 DescriptorHtmlEntity htmlElement = buildDescriptorHtmlEntity(field);
                 elementsForm.add(htmlElement);
             }
@@ -263,7 +342,12 @@ public class DescriptorExposedEntity {
             he.classe = field.getType();
             he.type = ltype;
             he.property = lproperty;
-            he.label = llabel;
+            String lllabel = UtilReflection.getExtraAttribute(field, "label");
+            if (lllabel != null) {
+                he.label = lllabel;
+            } else {
+                he.label = llabel;
+            }
             he.pattern = lpattern;
             return he;
         }
@@ -288,6 +372,30 @@ public class DescriptorExposedEntity {
                 ret = Boolean.parseBoolean(this.attributes.get(att));
             }
             return ret;
+        }
+
+        private void hiddenForm(Collection<String> hiddenFormProperties) {
+            if (this.hiddenFormProperties == null) {
+                this.hiddenFormProperties = new HashSet<String>();
+            }
+            this.hiddenFormProperties.addAll(hiddenFormProperties);
+            this.parseFormFieldClass(classe);
+        }
+
+        private void hiddenList(Collection<String> hiddenListProperties) {
+            if (this.hiddenListProperties == null) {
+                this.hiddenListProperties = new HashSet<String>();
+            }
+            this.hiddenListProperties.addAll(hiddenListProperties);
+            this.parseListFieldClass(classe);
+        }
+
+        private void hiddenFilter(Collection<String> hiddenFilterProperties) {
+            if (this.hiddenFilterProperties == null) {
+                this.hiddenFilterProperties = new HashSet<String>();
+            }
+            this.hiddenFilterProperties.addAll(hiddenFilterProperties);
+            this.parseFilterFieldClass(classe);
         }
     }
 }

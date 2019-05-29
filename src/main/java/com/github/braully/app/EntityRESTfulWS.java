@@ -211,4 +211,9 @@ public class EntityRESTfulWS {
         ret = genericDAO.loadCollection(entityClass);
         return ret;
     }
+
+    public static boolean isExposed(Class classe) {
+        String simpleName = classe.getSimpleName();
+        return EXPOSED_ENTITY.containsKey(simpleName.toLowerCase());
+    }
 }

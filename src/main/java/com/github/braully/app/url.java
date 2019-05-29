@@ -24,9 +24,9 @@ public class url {
         rewrite_forward.put("/index", "/jsf/index.xhtml");
 
         /*
-            (1, 10, 'Colaborator', 'colaborator', '/administrative/colaborator', 'ico-colab'),
-            (1, 11, 'Payroll', 'payroll', '/administrative/payroll', 'ico-payroll'),
-            (1, 12, 'Task', 'task', '/administrative/task', 'ico-task'),
+        (1, 10, 'Colaborator', 'colaborator', '/administrative/colaborator', 'ico-colab'),
+        (1, 11, 'Payroll', 'payroll', '/administrative/payroll', 'ico-payroll'),
+        (1, 12, 'Task', 'task', '/administrative/task', 'ico-task'),
          */
         rewrite_forward.put("/administrative/colaborator", "/autogen/colaborator.xhtml");
         rewrite_forward.put("/administrative/payroll", "/jsf/app/payroll.html");

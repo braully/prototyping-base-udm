@@ -9,6 +9,7 @@ import com.github.braully.web.DescriptorExposedEntity;
 import static com.github.braully.web.SpringWebConfig.*;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import javax.faces.application.Resource;
@@ -91,16 +92,34 @@ public class AutoGenResourceJSF extends ResourceWrapper {
 
     static boolean isAutoGenResource(String resourceName) {
         return resourceName.startsWith(DEFAULT_AUTOGEN_PREFIX)
-                && resourceName.endsWith("html");
+                && resourceName.contains("html");
     }
 
     private DynamicVirtualTemplateFile dynamicTemplate;
+    private Map<String, String> extraParameter = new HashMap<>();
     private String resourceName;
     private Resource wrapped;
 
     AutoGenResourceJSF(String resourceName, ResourceHandler wrapped) {
         this.resourceName = resourceName;
         this.wrapped = this.wrapped;
+        try {
+            URL url = new URL("http://b" + resourceName);
+            String query = url.getQuery();
+            if (query != null) {
+                String[] params = new String[]{query};
+                if (query.contains("&")) {
+                    params = query.split("&");
+                }
+                for (String param : params) {
+                    final int idx = param.indexOf("=");
+                    final String key = idx > 0 ? URLDecoder.decode(param.substring(0, idx), "UTF-8") : param;
+                    final String value = idx > 0 && param.length() > idx + 1 ? URLDecoder.decode(param.substring(idx + 1), "UTF-8") : null;
+                    this.extraParameter.put(key, value);
+                }
+            }
+        } catch (Exception e) {
+        }
         this.dynamicTemplate = dynamicTemplate(resourceName);
     }
 
@@ -217,10 +236,9 @@ public class AutoGenResourceJSF extends ResourceWrapper {
     private DynamicVirtualTemplateFile generateEntityList(String resourceName, String shortResourceName,
             String entityNameExposed, DescriptorExposedEntity descExposedEntity)
             throws IOException {
-        String renderList
-                = AutoGenWebResources.JSF_ENTITY_CRUD.embraceJsfComposition(
-                        AutoGenWebResources.JSF_ENTITY_CRUD.entityHtmlList(descExposedEntity.getDescriptorHtmlEntity())
-                ).renderFormatted();
+        String renderList = AutoGenWebResources.JSF_ENTITY_CRUD.embraceJsfComposition(
+                AutoGenWebResources.JSF_ENTITY_CRUD.entityHtmlList(descExposedEntity.getDescriptorHtmlEntity(extraParameter))
+        ).renderFormatted();
         DynamicVirtualTemplateFile template = new DynamicVirtualTemplateFile(resourceName,
                 renderList, MAP_TRANSLATE_TEMPLATE_PROPERTIES,
                 Map.of(DEFAULT_ENTITY_PROPERTIE_KEY, entityNameExposed));
@@ -231,7 +249,7 @@ public class AutoGenResourceJSF extends ResourceWrapper {
             String entityNameExposed, DescriptorExposedEntity descExposedEntity)
             throws IOException {
         String renderForm = AutoGenWebResources.JSF_ENTITY_CRUD.embraceJsfComposition(
-                AutoGenWebResources.JSF_ENTITY_CRUD.entityHtmlForm(descExposedEntity.getDescriptorHtmlEntity())
+                AutoGenWebResources.JSF_ENTITY_CRUD.entityHtmlForm(descExposedEntity.getDescriptorHtmlEntity(extraParameter))
         ).renderFormatted();
         DynamicVirtualTemplateFile template = new DynamicVirtualTemplateFile(resourceName,
                 renderForm, MAP_TRANSLATE_TEMPLATE_PROPERTIES,

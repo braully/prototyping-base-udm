@@ -16,12 +16,17 @@ limitations under the License.
  */
 package com.github.braully.util;
 
+import com.github.braully.constant.Attr;
+import com.github.braully.constant.Attrs;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -83,6 +88,72 @@ public class UtilReflection {
 
     public static String getPropertyText(Object bean, String name) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         return BeanUtils.getProperty(bean, name);
+    }
+
+    public static synchronized Boolean isExtraAttribute(Field fieldType, String nameAttribute) {
+        return isExtraAttribute(fieldType, nameAttribute, false);
+    }
+
+    public static synchronized Boolean isExtraAttribute(Field fieldType, String nameAttribute, Boolean defau) {
+        String attr = getMapExtraAttributesField(fieldType).get(nameAttribute);
+        Boolean ret = defau;
+        if (attr != null) {
+            ret = Boolean.parseBoolean(attr);
+        }
+        return ret;
+    }
+
+    public static synchronized String getExtraAttribute(Field fieldType, String nameAttribute) {
+        return getMapExtraAttributesField(fieldType).get(nameAttribute);
+    }
+
+    //TODO: Refatorar para um utilitario
+    public static synchronized Map<String, String> getMapExtraAttributesField(Field fieldType) {
+        Map<String, String> param = new HashMap<>();
+
+        if (fieldType.isAnnotationPresent(Attrs.class)
+                || fieldType.isAnnotationPresent(Attr.class)) {
+            Annotation[] annotations = fieldType.getAnnotations();
+            if (annotations != null) {
+                for (Annotation a : annotations) {
+                    System.out.println(a);
+                }
+            }
+            Attr[] value = null;
+            Attrs attrs = fieldType.getAnnotation(Attrs.class);
+            if (attrs == null) {
+                value = fieldType.getAnnotationsByType(Attr.class);
+            } else {
+                value = attrs.value();
+            }
+
+            if (value != null) {
+                for (Attr atr : value) {
+                    String nomeAtributo = null;
+                    String valorAtributo = null;
+                    try {
+                        String attrName = atr.name();
+                        if (attrName != null && !attrName.isEmpty()) {
+                            nomeAtributo = attrName;
+                            valorAtributo = atr.val();
+                        }
+                        String string0 = atr.value()[0];
+                        if (string0 != null && !string0.isEmpty()) {
+                            nomeAtributo = string0;
+                            if (atr.value().length > 1) {
+                                valorAtributo = atr.value()[1];
+                            } else {
+                                valorAtributo = Boolean.TRUE.toString();
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error("Falha ao selecionar attr", e);
+                    }
+                    param.put(nomeAtributo, valorAtributo);
+                }
+            }
+        }
+        return param;
     }
 
 }

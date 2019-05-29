@@ -1,30 +1,29 @@
 package com.github.braully.web;
 
+import com.github.braully.app.EntityRESTfulWS;
 import com.github.braully.app.StatisticalConsolidation;
-import com.github.braully.domain.AbstractEntity;
+import com.github.braully.persistence.IEntity;
 import j2html.tags.ContainerTag;
 import j2html.tags.Tag;
 import static j2html.TagCreator.*;
 import static com.github.braully.web.DescriptorExposedEntity.*;
 import j2html.Config;
-import j2html.tags.DomContent;
-import j2html.tags.EmptyTag;
 
 /**
  *
  * @author braully
  */
 public class AutoGenWebResources {
-    
+
     static {
         Config.closeEmptyTags = true;
         Config.textEscaper = text -> text;
     }
-    
+
     public static final AutoGenEntityHtmlCrudPageJsf JSF_ENTITY_CRUD = new AutoGenEntityHtmlCrudPageJsf();
-    
+
     public static class AutoGenEntityHtmlCrudPage {
-        
+
         public ContainerTag entityHtmlCrud(DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             var html = html(
                     entityHtmlForm(entityDescriptor, statistic),
@@ -34,7 +33,7 @@ public class AutoGenWebResources {
             extraEntityHtmlCrud(html, entityDescriptor, statistic);
             return html;
         }
-        
+
         public ContainerTag entityHtmlForm(DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             /* 
             <form>
@@ -50,23 +49,23 @@ public class AutoGenWebResources {
             </form>
              */
             var form = form();
-            
+
             entityDescriptor.elementsForm.forEach(e
                     -> form.with(entityHtmlFormInputGroup(e, statistic))
             );
-            
+
             var saveInput = input().withClass("autogen-form-group-button-save")
                     .withType("submit")
                     .withValue("Save")
                     .withAction("save");
             form.with(div(saveInput).withClass("autogen-form-group"));
-            
+
             extraEntityHtmlForm(form, entityDescriptor, statistic);
             extraEntityHtmlFormSaveInput(saveInput, entityDescriptor, statistic);
-            
+
             return form;
         }
-        
+
         protected ContainerTag entityHtmlFormInputGroup(DescriptorHtmlEntity e,
                 StatisticalConsolidation statistic) {
             ContainerTag inputGroup = null;
@@ -97,10 +96,10 @@ public class AutoGenWebResources {
                     inputGroup = div(label, input).withClass("autogen-form-group");
                     break;
             }
-            
+
             return inputGroup;
         }
-        
+
         public ContainerTag entityHtmlFilter(DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
             /* 
             <div class="autogen-filter-group">
@@ -109,22 +108,22 @@ public class AutoGenWebResources {
                       value="Pesquisar" action="save" />
             </div>
              */
-            
+
             var input = input().withClass("autogen-filter-group-input");
             var search = input().withClass("autogen-filter-group-button-search")
                     .withType("submit").withValue("Search").withAction("search");
-            
+
             var filter = form(
                     div(input, search).withClass("autogen-filter-group")
             );
-            
+
             extraEntityHtmlFilterInput(input, he, statistic);
             extraEntityHtmlFilterSearchInput(search, he, statistic);
             extraEntityHtmlFilter(filter, he, statistic);
-            
+
             return filter;
         }
-        
+
         public ContainerTag entityHtmlList(DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
             /*<table class="autogen-list-table">
                     <thead class="autogen-list-table-head">
@@ -147,7 +146,7 @@ public class AutoGenWebResources {
                 </table>*/
             var table = table().withClass("autogen-list-table");
             var trh = tr().withClass("autogen-list-table-head-row");
-            
+
             boolean selectable = he.isAttribute("selectable");
 
             //Select list elements
@@ -195,18 +194,18 @@ public class AutoGenWebResources {
             Tag btnEditList = input()
                     .withValue("Edit")
                     .withTitle("Edit")
-                    .withClass("autogen-list-group-button");
-            
+                    .withClass("autogen-list-group-button")
+                    .attr("data-i18n", "Edit");
             extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
-            
+
             Tag btnView = a("View").withHref("#")
                     .withValue("View").withTitle("View")
                     .withClass("autogen-list-group-button-extra-button");
-            
+
             Tag btnRemove = a("Remove").withHref("#")
                     .withValue("Remove").withTitle("Remove")
                     .withClass("autogen-list-group-button-extra-button");
-            
+
             Tag btnListExtraActions = button().withId("autogen-list-table-body-col-input-extra-action")//TODO: Remove id from auto generation
                     .withType("button")
                     .withClass("autogen-list-group-button")
@@ -214,12 +213,12 @@ public class AutoGenWebResources {
                     .attr("data-toggle", "dropdown")
                     .attr("aria-haspopup", "true")
                     .attr("aria-expanded", "false");
-            
+
             Tag menuExtraActions = div(btnView, btnRemove).withClass("dropdown-menu")
                     .attr("aria-labelledby", "autogen-list-table-body-col-input-extra-action");
-            
+
             extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
-            
+
             trb.with(td().with(
                     div(
                             btnEditList,
@@ -228,94 +227,99 @@ public class AutoGenWebResources {
                     ).withClass("autogen-list-group-button-col")
             ));
             extraEntityHtmlListBodyRow(trb, he, statistic);
-            
+
             var tbody = tbody(trb).withClass("autogen-list-table-body");
             table.with(thead, tbody);
-            
+
             extraEntityHtmlList(table, he, statistic);
             return table;
         }
-        
+
         protected void extraEntityHtmlListBodyRowActionEdit(Tag th,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected ContainerTag extraEntityHtmlListBodyRowColumn(ContainerTag th,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             return th;
         }
-        
+
         protected void extraEntityHtmlListBodyRow(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlList(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlFilter(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlFilterSearchInput(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlFilterInput(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlFormInput(ContainerTag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlForm(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlFormSaveInput(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected void extraEntityHtmlCrud(ContainerTag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         protected Tag extraEntityHtmlListBodyRowColumnCheckbox(Tag th,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             return th;
         }
+
+        protected void extraEntityHtmlFormLabel(ContainerTag label, DescriptorHtmlEntity e, StatisticalConsolidation statistic) {
+
+        }
     }
-    
+
     public static class AutoGenEntityHtmlCrudPageJsf extends AutoGenEntityHtmlCrudPage {
-        
+
         public ContainerTag embraceJsfComposition(ContainerTag tag) {
             ContainerTag html = new ContainerTag("html");
             html.attr("xmlns=\"http://www.w3.org/1999/xhtml\"")
                     .attr("xmlns:ui=\"http://java.sun.com/jsf/facelets\"")
                     .attr("xmlns:h=\"http://java.sun.com/jsf/html\"")
+                    .attr("xmlns:ps=\"http://xmlns.jcp.org/jsf/passthrough\"")
                     .attr("xmlns:c=\"http://java.sun.com/jsp/jstl/core\"")
                     .attr("xmlns:f=\"http://java.sun.com/jsf/core\"");
             ContainerTag compostion = new ContainerTag("ui:composition");
@@ -323,85 +327,105 @@ public class AutoGenWebResources {
             html.with(compostion);
             return html;
         }
-        
+
         @Override
         protected void extraEntityHtmlCrud(ContainerTag html, DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             html.attr("xmlns=\"http://www.w3.org/1999/xhtml\"")
                     .attr("xmlns:h=\"http://xmlns.jcp.org/jsf/html\"")
                     .attr("xmlns:f=\"http://xmlns.jcp.org/jsf/core\"")
+                    .attr("xmlns:ps=\"http://xmlns.jcp.org/jsf/passthrough\"")
                     .attr("xmlns:c=\"http://java.sun.com/jsp/jstl/core\"")
                     .attr("xmlns:ui=\"http://xmlns.jcp.org/jsf/facelets\"");
         }
-        
+
         @Override
         protected void extraEntityHtmlForm(Tag form, DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             form.attr("jsfc", "h:form");
         }
-        
+
         @Override
         protected void extraEntityHtmlFormSaveInput(Tag btn, DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             btn.attr("jsfc", "h:commandButton");
             btn.attr("action", "#{genericMB.crud('entityName').save()}");
+            btn.attr("ps:data-i18n", "Save");
         }
-        
+
         @Override
         protected void extraEntityHtmlFormInput(ContainerTag input, DescriptorHtmlEntity fieldEntity,
                 StatisticalConsolidation statistic) {
             input.attr("value", "#{genericMB.crud('entityName').entity." + fieldEntity.property + "}");
             switch (fieldEntity.getTypeLow()) {
+                case "string":
+                    input.attr("jsfc", "h:inputText");
+                    break;
                 case "int":
                 case "integer":
                 case "long":
                 case "float":
                 case "double":
-                case "string":
+                case "date":
+                case "monetary":
+                case "bigdecimal":
                     input.attr("jsfc", "h:inputText");
+                    input.attr("converter", "converterGenericJsf");
+//                    input.with(tag("f:converter").attr("", ""));
                     break;
                 case "boolean":
                     input.attr("jsfc", "h:selectBooleanCheckbox");
                     break;
                 default:
-                    
+
                     input.attr("jsfc", "h:selectOneMenu");
                     /*
                     <f:selectItem itemLabel="" itemValue="" />
                     <f:selectItems value="#{genericMB.crud('entityDummy').values('entityDummy.statusType')}" 
                                    var="st" itemLabel="#{st.toString()}" itemValue="#{st}" /> 
                      */
-                    input.with(
-                            new ContainerTag("f:selectItem")
-                                    .attr("itemLabel", "").attr("itemValue", ""),
-                            new ContainerTag("f:selectItems")
-                                    .withValue("#{genericMB.crud('entityName').values('entityName." + fieldEntity.property + "')}")
+                    Tag selectItemEmpty = new ContainerTag("f:selectItem")
+                            .attr("itemLabel", "").attr("itemValue", "");
+
+                    Tag selectItens = new ContainerTag("f:selectItems")
+                            .withValue("#{genericMB.crud('entityName').values('entityName." + fieldEntity.property + "')}")
+                            .attr("var", "st").attr("itemValue", "#{st}")
+                            .attr("itemLabel", "#{st.toString()}");
+
+                    if (IEntity.class.isAssignableFrom(fieldEntity.classe)) {
+                        if (EntityRESTfulWS.isExposed(fieldEntity.classe)) {
+                            selectItens = new ContainerTag("f:selectItems")
+                                    .withValue("#{genericMB.crud('" + fieldEntity.classe.getSimpleName() + "').allEntities}")
                                     .attr("var", "st").attr("itemValue", "#{st}")
-                                    .attr("itemLabel", "#{st.toString()}")
-                    );
-                    if (AbstractEntity.class.isAssignableFrom(fieldEntity.classe)) {
+                                    .attr("itemLabel", "#{st.toString()}");
+                        }
                         input.attr("converter", "converterEntity");
                     }
+
+                    input.with(
+                            selectItemEmpty, selectItens
+                    );
                     break;
             }
         }
-        
+
         @Override
         protected void extraEntityHtmlFilterInput(Tag input, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             input.attr("value", "#{genericMB.crud('entityName').searchString}");
             input.attr("jsfc", "h:inputText");
         }
-        
+
         protected void extraEntityHtmlFilterSearchInput(Tag btn, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             btn.attr("action", "#{genericMB.crud('entityName').find()}");
             btn.attr("jsfc", "h:commandButton");
+            btn.attr("ps:data-i18n", "Search");
         }
-        
+
         @Override
         protected void extraEntityHtmlFilter(Tag html, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            
+
         }
-        
+
         @Override
         protected void extraEntityHtmlListBodyRow(Tag row, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
@@ -409,26 +433,49 @@ public class AutoGenWebResources {
             row.attr("value", "#{genericMB.crud('entityName').entities}");
             row.attr("var", "ent");
         }
-        
+
         @Override
         protected ContainerTag extraEntityHtmlListBodyRowColumn(ContainerTag th, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            return th.withText("#{ent." + entityDescriptor.property + "}");
+            switch (entityDescriptor.getTypeLow()) {
+                //case "int":
+                //case "long":
+                case "double":
+                case "float":
+                case "date":
+                case "monetary":
+                case "bigdecimal":
+                    th.with(tag("h:outputText")
+                            .attr("converter", "converterGenericJsf")
+                            .withValue("#{ent." + entityDescriptor.property + "}")
+                            .with(
+                                    emptyTag("f:attribute")
+                                            .attr("name", "entityProperty")
+                                            .attr("value", "entityName." + entityDescriptor.property)
+                            )
+                    );
+                    break;
+                default:
+                    th.withText("#{ent." + entityDescriptor.property + "}");
+                    break;
+            }
+            return th;
         }
-        
+
         @Override
         protected Tag extraEntityHtmlListBodyRowColumnCheckbox(Tag th, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             return th.attr("data-id", "#{ent.id}");
         }
-        
+
         @Override
         protected void extraEntityHtmlListBodyRowActionEdit(Tag btn, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             btn.attr("jsfc", "h:commandButton");
             btn.attr("actionListener", "#{genericMB.crud('entityName').setEntity(ent)}");
+            btn.attr("ps:data-i18n", "Edit");
         }
-        
+
         protected ContainerTag entityHtmlListPaginate(DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             /*
@@ -473,21 +520,21 @@ public class AutoGenWebResources {
                                     .attr("jsfc", "h:commandButton").attr("aria-label", "Proximo")
                     );
         }
-        
+
         public ContainerTag entityHtmlFilter(DescriptorHtmlEntity he) {
             return this.entityHtmlFilter(he, null);
         }
-        
+
         public ContainerTag entityHtmlList(DescriptorHtmlEntity he) {
             ContainerTag hform = new ContainerTag("h:form").with(this.entityHtmlList(he, null), entityHtmlListPaginate(he, null));
             return hform;
         }
-        
+
         public ContainerTag entityHtmlForm(DescriptorHtmlEntity he) {
             return this.entityHtmlForm(he, null);
         }
     }
-    
+
     public static void main(String... args) {
 //        String strEntity = null;
 //        String strTemplate = null;
@@ -512,6 +559,6 @@ public class AutoGenWebResources {
 
         DescriptorHtmlEntity descritor = new DescriptorHtmlEntity(com.github.braully.domain.util.EntityDummy.class);
         System.err.println(JSF_ENTITY_CRUD.entityHtmlCrud(descritor, null).renderFormatted());
-        
+
     }
 }
