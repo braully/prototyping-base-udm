@@ -7,22 +7,24 @@ import j2html.tags.Tag;
 import static j2html.TagCreator.*;
 import static com.github.braully.web.DescriptorExposedEntity.*;
 import j2html.Config;
+import j2html.tags.DomContent;
+import j2html.tags.EmptyTag;
 
 /**
  *
  * @author braully
  */
 public class AutoGenWebResources {
-
+    
     static {
         Config.closeEmptyTags = true;
         Config.textEscaper = text -> text;
     }
-
+    
     public static final AutoGenEntityHtmlCrudPageJsf JSF_ENTITY_CRUD = new AutoGenEntityHtmlCrudPageJsf();
-
+    
     public static class AutoGenEntityHtmlCrudPage {
-
+        
         public ContainerTag entityHtmlCrud(DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             var html = html(
                     entityHtmlForm(entityDescriptor, statistic),
@@ -32,7 +34,7 @@ public class AutoGenWebResources {
             extraEntityHtmlCrud(html, entityDescriptor, statistic);
             return html;
         }
-
+        
         public ContainerTag entityHtmlForm(DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             /* 
             <form>
@@ -48,23 +50,23 @@ public class AutoGenWebResources {
             </form>
              */
             var form = form();
-
+            
             entityDescriptor.elementsForm.forEach(e
                     -> form.with(entityHtmlFormInputGroup(e, statistic))
             );
-
+            
             var saveInput = input().withClass("autogen-form-group-button-save")
                     .withType("submit")
                     .withValue("Save")
                     .withAction("save");
             form.with(div(saveInput).withClass("autogen-form-group"));
-
+            
             extraEntityHtmlForm(form, entityDescriptor, statistic);
             extraEntityHtmlFormSaveInput(saveInput, entityDescriptor, statistic);
-
+            
             return form;
         }
-
+        
         protected ContainerTag entityHtmlFormInputGroup(DescriptorHtmlEntity e,
                 StatisticalConsolidation statistic) {
             ContainerTag inputGroup = null;
@@ -95,10 +97,10 @@ public class AutoGenWebResources {
                     inputGroup = div(label, input).withClass("autogen-form-group");
                     break;
             }
-
+            
             return inputGroup;
         }
-
+        
         public ContainerTag entityHtmlFilter(DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
             /* 
             <div class="autogen-filter-group">
@@ -107,22 +109,22 @@ public class AutoGenWebResources {
                       value="Pesquisar" action="save" />
             </div>
              */
-
+            
             var input = input().withClass("autogen-filter-group-input");
             var search = input().withClass("autogen-filter-group-button-search")
                     .withType("submit").withValue("Search").withAction("search");
-
+            
             var filter = form(
                     div(input, search).withClass("autogen-filter-group")
             );
-
+            
             extraEntityHtmlFilterInput(input, he, statistic);
             extraEntityHtmlFilterSearchInput(search, he, statistic);
             extraEntityHtmlFilter(filter, he, statistic);
-
+            
             return filter;
         }
-
+        
         public ContainerTag entityHtmlList(DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
             /*<table class="autogen-list-table">
                     <thead class="autogen-list-table-head">
@@ -144,106 +146,171 @@ public class AutoGenWebResources {
                     </tbody>
                 </table>*/
             var table = table().withClass("autogen-list-table");
-
             var trh = tr().withClass("autogen-list-table-head-row");
+            
+            boolean selectable = he.isAttribute("selectable");
+
+            //Select list elements
+            if (selectable) {
+                trh.with(th().withClass("autogen-list-table-head-col").with(
+                        input().withType("checkbox").attr("onclick", "checkAll(this);")
+                ));
+            }
+
+            //Fields colummns
             he.elementsList.forEach(
                     e -> trh.with(th(e.label)
                             .withClass("autogen-list-table-head-col"))
             );
+            //Action colummn
             trh.with(th().withClass("autogen-list-table-head-col"));
             var thead = thead(trh).withClass("autogen-list-table-head");
 
+            //tbody
+            //tbody-row
             var trb = tr().withClass("autogen-list-table-body-row");
+
+            //tbody-row-col-check
+            trb.with(
+                    td().with(
+                            extraEntityHtmlListBodyRowColumnCheckbox(
+                                    input().withType("checkbox")
+                                            .attr("onclick", "$(this).toggleClass('selected');")
+                                            .attr("data-id", "id"), he, statistic)
+                    )
+            );
+
+            //tbody-row-col-filds
             he.elementsList.forEach(
                     e -> trb.with(
                             extraEntityHtmlListBodyRowColumn(
-                                    td().attr("model", e.property).withClass("autogen-list-table-body-col"),
+                                    td().withClass("autogen-list-table-body-col")
+                                            .attr("model", e.property),
                                     e, statistic
                             )
                     )
             );
-            Tag btnEditList = input().withValue("Edit").withTitle("Edit").withClass("autogen-list-table-body-col-input");
-            trb.with(td(btnEditList).withClass("autogen-list-table-body-col"));
-            extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
-            extraEntityHtmlListBodyRow(trb, he, statistic);
 
+            //tbody-row-col-action
+            Tag btnEditList = input()
+                    .withValue("Edit")
+                    .withTitle("Edit")
+                    .withClass("autogen-list-group-button");
+            
+            extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
+            
+            Tag btnView = a("View").withHref("#")
+                    .withValue("View").withTitle("View")
+                    .withClass("autogen-list-group-button-extra-button");
+            
+            Tag btnRemove = a("Remove").withHref("#")
+                    .withValue("Remove").withTitle("Remove")
+                    .withClass("autogen-list-group-button-extra-button");
+            
+            Tag btnListExtraActions = button().withId("autogen-list-table-body-col-input-extra-action")//TODO: Remove id from auto generation
+                    .withType("button")
+                    .withClass("autogen-list-group-button")
+                    .withTitle("More action")
+                    .attr("data-toggle", "dropdown")
+                    .attr("aria-haspopup", "true")
+                    .attr("aria-expanded", "false");
+            
+            Tag menuExtraActions = div(btnView, btnRemove).withClass("dropdown-menu")
+                    .attr("aria-labelledby", "autogen-list-table-body-col-input-extra-action");
+            
+            extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
+            
+            trb.with(td().with(
+                    div(
+                            btnEditList,
+                            btnListExtraActions,
+                            menuExtraActions
+                    ).withClass("autogen-list-group-button-col")
+            ));
+            extraEntityHtmlListBodyRow(trb, he, statistic);
+            
             var tbody = tbody(trb).withClass("autogen-list-table-body");
             table.with(thead, tbody);
-
+            
             extraEntityHtmlList(table, he, statistic);
             return table;
         }
-
+        
         protected void extraEntityHtmlListBodyRowActionEdit(Tag th,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected ContainerTag extraEntityHtmlListBodyRowColumn(ContainerTag th,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             return th;
         }
-
+        
         protected void extraEntityHtmlListBodyRow(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlList(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlFilter(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlFilterSearchInput(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlFilterInput(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlFormInput(ContainerTag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlForm(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlFormSaveInput(Tag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         protected void extraEntityHtmlCrud(ContainerTag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
+        protected Tag extraEntityHtmlListBodyRowColumnCheckbox(Tag th,
+                DescriptorHtmlEntity entityDescriptor,
+                StatisticalConsolidation statistic) {
+            return th;
+        }
     }
-
+    
     public static class AutoGenEntityHtmlCrudPageJsf extends AutoGenEntityHtmlCrudPage {
-
+        
         public ContainerTag embraceJsfComposition(ContainerTag tag) {
             ContainerTag html = new ContainerTag("html");
             html.attr("xmlns=\"http://www.w3.org/1999/xhtml\"")
@@ -256,7 +323,7 @@ public class AutoGenWebResources {
             html.with(compostion);
             return html;
         }
-
+        
         @Override
         protected void extraEntityHtmlCrud(ContainerTag html, DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             html.attr("xmlns=\"http://www.w3.org/1999/xhtml\"")
@@ -265,18 +332,18 @@ public class AutoGenWebResources {
                     .attr("xmlns:c=\"http://java.sun.com/jsp/jstl/core\"")
                     .attr("xmlns:ui=\"http://xmlns.jcp.org/jsf/facelets\"");
         }
-
+        
         @Override
         protected void extraEntityHtmlForm(Tag form, DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             form.attr("jsfc", "h:form");
         }
-
+        
         @Override
         protected void extraEntityHtmlFormSaveInput(Tag btn, DescriptorHtmlEntity entityDescriptor, StatisticalConsolidation statistic) {
             btn.attr("jsfc", "h:commandButton");
             btn.attr("action", "#{genericMB.crud('entityName').save()}");
         }
-
+        
         @Override
         protected void extraEntityHtmlFormInput(ContainerTag input, DescriptorHtmlEntity fieldEntity,
                 StatisticalConsolidation statistic) {
@@ -294,7 +361,7 @@ public class AutoGenWebResources {
                     input.attr("jsfc", "h:selectBooleanCheckbox");
                     break;
                 default:
-
+                    
                     input.attr("jsfc", "h:selectOneMenu");
                     /*
                     <f:selectItem itemLabel="" itemValue="" />
@@ -315,26 +382,26 @@ public class AutoGenWebResources {
                     break;
             }
         }
-
+        
         @Override
         protected void extraEntityHtmlFilterInput(Tag input, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             input.attr("value", "#{genericMB.crud('entityName').searchString}");
             input.attr("jsfc", "h:inputText");
         }
-
+        
         protected void extraEntityHtmlFilterSearchInput(Tag btn, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             btn.attr("action", "#{genericMB.crud('entityName').find()}");
             btn.attr("jsfc", "h:commandButton");
         }
-
+        
         @Override
         protected void extraEntityHtmlFilter(Tag html, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            
         }
-
+        
         @Override
         protected void extraEntityHtmlListBodyRow(Tag row, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
@@ -342,20 +409,26 @@ public class AutoGenWebResources {
             row.attr("value", "#{genericMB.crud('entityName').entities}");
             row.attr("var", "ent");
         }
-
+        
         @Override
         protected ContainerTag extraEntityHtmlListBodyRowColumn(ContainerTag th, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             return th.withText("#{ent." + entityDescriptor.property + "}");
         }
-
+        
+        @Override
+        protected Tag extraEntityHtmlListBodyRowColumnCheckbox(Tag th, DescriptorHtmlEntity entityDescriptor,
+                StatisticalConsolidation statistic) {
+            return th.attr("data-id", "#{ent.id}");
+        }
+        
         @Override
         protected void extraEntityHtmlListBodyRowActionEdit(Tag btn, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             btn.attr("jsfc", "h:commandButton");
             btn.attr("actionListener", "#{genericMB.crud('entityName').setEntity(ent)}");
         }
-
+        
         protected ContainerTag entityHtmlListPaginate(DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             /*
@@ -400,21 +473,21 @@ public class AutoGenWebResources {
                                     .attr("jsfc", "h:commandButton").attr("aria-label", "Proximo")
                     );
         }
-
+        
         public ContainerTag entityHtmlFilter(DescriptorHtmlEntity he) {
             return this.entityHtmlFilter(he, null);
         }
-
+        
         public ContainerTag entityHtmlList(DescriptorHtmlEntity he) {
             ContainerTag hform = new ContainerTag("h:form").with(this.entityHtmlList(he, null), entityHtmlListPaginate(he, null));
             return hform;
         }
-
+        
         public ContainerTag entityHtmlForm(DescriptorHtmlEntity he) {
             return this.entityHtmlForm(he, null);
         }
     }
-
+    
     public static void main(String... args) {
 //        String strEntity = null;
 //        String strTemplate = null;
@@ -439,6 +512,6 @@ public class AutoGenWebResources {
 
         DescriptorHtmlEntity descritor = new DescriptorHtmlEntity(com.github.braully.domain.util.EntityDummy.class);
         System.err.println(JSF_ENTITY_CRUD.entityHtmlCrud(descritor, null).renderFormatted());
-
+        
     }
 }

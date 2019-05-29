@@ -106,6 +106,7 @@ public class DescriptorExposedEntity {
     }
 
     public static class ActionHtmlEntity {
+
         String name;
         String action;
         String actionUrl;
@@ -279,6 +280,14 @@ public class DescriptorExposedEntity {
             return "DescriptorHtmlEntity{" + "id=" + id + ", label=" + label
                     + ", type=" + type + ", property="
                     + property + ", classe=" + (classe != null ? classe.getSimpleName() : null) + '}';
+        }
+
+        public boolean isAttribute(String att) {
+            boolean ret = false;
+            if (this.attributes != null) {
+                ret = Boolean.parseBoolean(this.attributes.get(att));
+            }
+            return ret;
         }
     }
 }

@@ -12,7 +12,6 @@
         </ui:define>
         <ui:define name="template.head.append">
             <meta name="_csrf" content="${_csrf.token}"/>
-            <!-- default header name is X-CSRF-TOKEN -->
             <meta name="_csrf_header" content="${_csrf.headerName}"/>
         </ui:define>
 
@@ -150,57 +149,47 @@
                                 <td class="autogen-list-table-body-col">#{lin.fraction}</td>
                                 <td class="autogen-list-table-body-col">#{lin.checked}</td>
                                 <td class="autogen-list-table-body-col">#{lin.statusType}</td>
-                                <td class="autogen-list-table-body-col">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <input actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}"
-                                               jsfc="h:commandButton" value="Ver" title="Ver"
-                                               class="btn btn-outline-dark btn-sm">
-                                        </input>
-
+                                <td class="autogen-list-table-body-col" align="right">
+                                    <div class="autogen-list-group-button-col" role="group">
                                         <input actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}"
                                                jsfc="h:commandButton" value="Editar" title="Editar"
-                                               class="autogen-list-table-body-col-input">
+                                               class="autogen-list-group-button">
                                         </input>
-
-                                        <input data-toggle="modal" data-target="#autogen-modal" 
-                                               value="Excluir" title="Excluir" type="button"
-                                               class="btn btn-outline-danger btn-xs">
-                                        </input>
-
-                                        <div class="btn-group" role="group">
-                                            <button id="autogen-list-table-body-col-input-extra-action"
-                                                    type="button" class="btn btn-outline-secondary" title="Mais" 
-                                                    data-toggle="dropdown" aria-haspopup="true" 
-                                                    aria-expanded="false">
-                                                <i class="fa fa-ellipsis-v"></i>
-                                            </button>
-                                            <div class="dropdown-menu" 
-                                                 aria-labelledby="autogen-list-table-body-col-input-extra-action">
-                                                <a class="dropdown-item" href="#"><i class="fa fa-search"></i> Ver</a>
-                                                <a class="dropdown-item" href="#"
-                                                   jsfc="h:commandLink" title="Editar"  
-                                                   actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" >
-                                                    <i class="fa fa-pencil"></i> Editar
-                                                </a>
-                                                <a class="dropdown-item" href="#"
-                                                   jsfc="h:commandLink" title="Excluir"  
-                                                   actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" >
-                                                    <i class="fa fa-trash"></i> Excluir
-                                                </a>
-                                                <form action="/jsf/index.xhtml" method="post">
-                                                    <input type="hidden" name="id" value="#{lin.id}" />
-                                                    <input type="submit" value="submit" />
-                                                    <button>Boleto</button>
-                                                </form>
-                                                <a onclick="normal_post('/jsf/index.xhtml', {id: '#{lin.id}'});"
-                                                   class="dropdown-item" href="#">
-                                                    <i class="fa fa-barcode"></i> Boleto
-                                                </a>
-                                                <a onclick="$.post('/app/delete/entityDummy/#{lin.id}'); location.reload();" 
-                                                   class="dropdown-item" title="Excluir" href="#">
-                                                    <i class="fa fa-trash"></i> Excluir
-                                                </a>
-                                            </div>
+                                        <button id="autogen-list-table-body-col-input-extra-action"
+                                                type="button" class="btn btn-outline-secondary" title="Mais" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu" 
+                                             aria-labelledby="autogen-list-table-body-col-input-extra-action">
+                                            <a class="autogen-list-group-button-extra-button" 
+                                               href="/app/delete/entityDummy/#{lin.id}">
+                                                <i class="fa fa-search"></i> Ver
+                                            </a>
+                                            <a class="autogen-list-group-button-extra-button" href="#"
+                                               jsfc="h:commandLink" title="Editar"  
+                                               actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" >
+                                                <i class="fa fa-pencil"></i> Editar
+                                            </a>
+                                            <a class="autogen-list-group-button-extra-button" 
+                                               href="#" data-toggle="modal" data-target="#autogen-modal"
+                                               title="Excluir Modal">
+                                                <i class="fa fa-trash"></i> Excluir modal
+                                            </a>
+                                            <a class="autogen-list-group-button-extra-button" href="#"
+                                               jsfc="h:commandLink" title="Excluir JSF"  
+                                               actionListener="#{genericMB.crud('entityDummy').remove(lin)}" >
+                                                <i class="fa fa-trash"></i> Excluir jsf
+                                            </a>
+                                            <a onclick="normal_post('/jsf/index.xhtml', {id: '#{lin.id}'});"
+                                               class="autogen-list-group-button-extra-button" href="#">
+                                                <i class="fa fa-barcode"></i> Ação individual (post)
+                                            </a>
+                                            <a onclick="$.post('/app/delete/entityDummy/#{lin.id}'); location.reload();" 
+                                               class="autogen-list-group-button-extra-button" title="Excluir Rest" href="#">
+                                                <i class="fa fa-trash"></i> Excluir rest
+                                            </a>
                                         </div>
                                     </div>
                                 </td>
@@ -211,10 +200,6 @@
 
                 <div class="autogen-list-group">
                     <div class="autogen-list-group-button-col" role="group">
-                        <input data-toggle="modal" data-target="#autogen-modal" 
-                               value="Gerar boletos" title="Gerar boletos" type="button"
-                               class="autogen-list-group-button-raw autogen-button-warn">
-                        </input>
                         <button type="button" class="autogen-list-group-button" title="Mais" 
                                 data-toggle="dropdown"
                                 aria-haspopup="true" 
@@ -226,18 +211,23 @@
                         <div class="dropdown-menu" 
                              aria-labelledby="autogen-list-head-extra-action">
                             <a class="autogen-list-group-button-extra-button" href="#">
-                                <i class="fa fa-search"></i> Ver
-                            </a>
-                            <a class="autogen-list-group-button-extra-button"
-                               jsfc="h:commandLink" title="Editar" href="#"
-                               actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}">
-                                <i class="fa fa-pencil"></i> Editar
+                                <i class="fa fa-search"></i> Excluir
                             </a>
                             <a onclick="normal_post('/jsf/index.xhtml', {ids: table_selected_id(this)});"
                                class="autogen-list-group-button-extra-button" href="#">
-                                <i class="fa fa-barcode"></i> Boleto
+                                <i class="fa fa-barcode"></i> Ação 1  (post)
                             </a>
                         </div>
+                        <input data-toggle="modal" data-target="#autogen-modal" 
+                               value="Ação em lote 2" 
+                               title="Ação em lote 2" type="button"
+                               class="autogen-list-group-button-raw autogen-button-warn">
+                        </input>
+                        <input data-toggle="modal" data-target="#autogen-modal" 
+                               value="Ação em lote 3" 
+                               title="Ação em lote 3" type="button"
+                               class="autogen-list-group-button">
+                        </input>
                     </div>  
 
                     <div class="autogen-list-group-pagination-col">
