@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">entityName</ui:define>
+        <ui:define name="template.head.append"></ui:define>
+        <ui:define name="template.body.append"></ui:define>
+        <ui:define name="template.app.menu">
+            <ui:include src="/jsf/template/menu-base-app.xhtml" />
+        </ui:define>
+        <ui:define name="template.app.content">
+            <h:messages infoClass="autogen-message-info" 
+                        warnClass="autogen-message-warning"
+                        fatalClass="autogen-message-error"
+                        errorClass="autogen-message-error" 
+                        showSummary="true" showDetail="true" 
+                        globalOnly="true"  />
+        </ui:define>
+
+        <ui:define name="template.app.content.form">
+            <ui:include src="/autogen/entityName/template-base-app/form.xhtml" />
+        </ui:define>
+        <ui:define name="template.app.content.filter">
+            <ui:include src="/autogen/entityName/template-base-app/filter.xhtml" />
+        </ui:define>
+        <ui:define name="template.app.content.list">
+            <ui:include src="/autogen/entityName/template-base-app/list.xhtml" /> 
+        </ui:define>
+    </ui:composition>
+</html>
