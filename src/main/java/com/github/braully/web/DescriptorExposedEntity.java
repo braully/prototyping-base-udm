@@ -147,7 +147,7 @@ public class DescriptorExposedEntity {
 
         Class classe;
 
-        Map<String, String> attributes;
+        Map<String, String> attributes = new HashMap<>();
 
         public DescriptorHtmlEntity() {
         }
@@ -168,14 +168,18 @@ public class DescriptorExposedEntity {
         public DescriptorHtmlEntity(DescriptorExposedEntity descriptorExposedEntity, Map<String, String> extraParams) {
             this(descriptorExposedEntity);
             if (extraParams != null && !extraParams.isEmpty()) {
+                this.attributes.putAll(extraParams);
                 String strexcluces = extraParams.get("exclude");
-                String[] excludes = new String[]{strexcluces};
-                if (strexcluces.contains(",")) {
-                    excludes = strexcluces.split(",");
+                //process excludes
+                if (strexcluces != null) {
+                    String[] excludes = new String[]{strexcluces};
+                    if (strexcluces.contains(",")) {
+                        excludes = strexcluces.split(",");
+                    }
+                    List<String> excluList = Arrays.asList(excludes);
+                    this.hiddenForm(excluList);
+                    this.hiddenList(excluList);
                 }
-                List<String> excluList = Arrays.asList(excludes);
-                this.hiddenForm(excluList);
-                this.hiddenList(excluList);
             }
         }
 

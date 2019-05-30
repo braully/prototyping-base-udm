@@ -8,6 +8,8 @@ import j2html.tags.Tag;
 import static j2html.TagCreator.*;
 import static com.github.braully.web.DescriptorExposedEntity.*;
 import j2html.Config;
+import j2html.tags.EmptyTag;
+import org.apache.commons.lang.RandomStringUtils;
 
 /**
  *
@@ -170,14 +172,16 @@ public class AutoGenWebResources {
             var trb = tr().withClass("autogen-list-table-body-row");
 
             //tbody-row-col-check
-            trb.with(
-                    td().with(
-                            extraEntityHtmlListBodyRowColumnCheckbox(
-                                    input().withType("checkbox")
-                                            .attr("onclick", "$(this).toggleClass('selected');")
-                                            .attr("data-id", "id"), he, statistic)
-                    )
-            );
+            if (selectable) {
+                trb.with(
+                        td().with(
+                                extraEntityHtmlListBodyRowColumnCheckbox(
+                                        input().withType("checkbox")
+                                                .attr("onclick", "$(this).toggleClass('selected');")
+                                                .attr("data-id", "id"), he, statistic)
+                        )
+                );
+            }
 
             //tbody-row-col-filds
             he.elementsList.forEach(
@@ -198,15 +202,18 @@ public class AutoGenWebResources {
                     .attr("data-i18n", "Edit");
             extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
 
-            Tag btnView = a("View").withHref("#")
+            Tag btnView = a(i(" ").withClass("ico-search"), span("View").withData("i18n", "View")).withHref("#")
                     .withValue("View").withTitle("View")
                     .withClass("autogen-list-group-button-extra-button");
+            extraEntityHtmlListBodyRowActionView(btnView, he, statistic);
 
-            Tag btnRemove = a("Remove").withHref("#")
+            Tag btnRemove = a(i(" ").withClass("ico-remove"), span("Remove").withData("i18n", "Remove")).withHref("#")
                     .withValue("Remove").withTitle("Remove")
                     .withClass("autogen-list-group-button-extra-button");
+            extraEntityHtmlListBodyRowActionRemove(btnRemove, he, statistic);
 
-            Tag btnListExtraActions = button().withId("autogen-list-table-body-col-input-extra-action")//TODO: Remove id from auto generation
+            Tag btnListExtraActions = button(i().withClass("ico-opcoes"))
+                    .withId("autogen-list-table-body-col-input-extra-action")//TODO: Remove id from auto generation
                     .withType("button")
                     .withClass("autogen-list-group-button")
                     .withTitle("More action")
@@ -214,18 +221,15 @@ public class AutoGenWebResources {
                     .attr("aria-haspopup", "true")
                     .attr("aria-expanded", "false");
 
-            Tag menuExtraActions = div(btnView, btnRemove).withClass("dropdown-menu")
+            ContainerTag menuExtraActions = div(btnView, btnRemove).withClass("dropdown-menu")
                     .attr("aria-labelledby", "autogen-list-table-body-col-input-extra-action");
+            extraEntityHtmlListBodyRowActionMenuExtra(menuExtraActions, he, statistic);
 
-            extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
+            ContainerTag col = div().withClass("autogen-list-group-button-col");
+            extraEntityHtmlListBodyRowAction(col, he, statistic);
+            col.with(btnEditList, btnListExtraActions, menuExtraActions);
 
-            trb.with(td().with(
-                    div(
-                            btnEditList,
-                            btnListExtraActions,
-                            menuExtraActions
-                    ).withClass("autogen-list-group-button-col")
-            ));
+            trb.with(td().with(col));
             extraEntityHtmlListBodyRow(trb, he, statistic);
 
             var tbody = tbody(trb).withClass("autogen-list-table-body");
@@ -233,6 +237,55 @@ public class AutoGenWebResources {
 
             extraEntityHtmlList(table, he, statistic);
             return table;
+        }
+
+        protected ContainerTag entityHtmlListBulkActions(DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+            /*
+            <div class="autogen-list-group-button-col" role="group">
+                <button type="button" class="autogen-list-group-button" title="Mais"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                    id="autogen-list-head-extra-action">
+                    Selecionados<i class="fa fa-ellipsis-v"></i>
+                </button>
+            </div> 
+             */
+
+            String id = "autogen-list-head-extra-action-" + RandomStringUtils.randomAlphanumeric(5);
+            ContainerTag actions = div().withClass("autogen-list-group-button-col").withRole("group");
+            ContainerTag btnSelecionados = button().withType("button")
+                    .withClass("autogen-list-group-button").withTitle("Selecionados")
+                    .withData("toggle", "dropdown").attr("aria-haspopup", "true")
+                    .attr("aria-expanded", "false").withId(id)
+                    .withText("Selecionados")
+                    .with(i().withClass("ico-opcoes"));
+            /*
+            <div class="dropdown-menu"
+            aria-labelledby="autogen-list-head-extra-action">
+            <a class="autogen-list-group-button-extra-button" href="#">
+            <i class="fa fa-search"></i> Excluir
+            </a>
+            <a onclick="normal_post('/jsf/index.xhtml', {ids: table_selected_id(this)});"
+            class="autogen-list-group-button-extra-button" href="#">
+            <i class="fa fa-barcode"></i> Ação 1  (post)
+            </a>
+            </div>
+             */
+            ContainerTag acaoExtra1 = a().withHref("#")
+                    .withClass("autogen-list-group-button-extra-button")
+                    .with(i().withClass("ico-excluir")).withText("Excluir")
+                    .attr("onclick", "normal_post('/app/delete/entityName'), {ids: table_selected_id(this)});");
+            ContainerTag menuExtra = div(acaoExtra1).withClass("dropdown-menu").attr("aria-labelledby", id);
+            extraEntityHtmlListBulkActionMenuExtra(menuExtra, he, statistic);
+            /* 
+            <input data-toggle="modal" data-target="#autogen-modal" 
+                   value="Ação em lote 3" 
+                   title="Ação em lote 3" type="button"
+                   class="autogen-list-group-button">
+            </input>
+             */
+            actions.with(btnSelecionados, menuExtra);
+            extraEntityHtmlListBulkActionExtra(actions, he, statistic);
+            return actions;
         }
 
         protected void extraEntityHtmlListBodyRowActionEdit(Tag th,
@@ -310,6 +363,28 @@ public class AutoGenWebResources {
         protected void extraEntityHtmlFormLabel(ContainerTag label, DescriptorHtmlEntity e, StatisticalConsolidation statistic) {
 
         }
+
+        protected void extraEntityHtmlListBodyRowActionView(Tag btnEditList, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+
+        }
+
+        protected void extraEntityHtmlListBodyRowActionRemove(Tag btnRemove, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+        }
+
+        protected void extraEntityHtmlListBodyRowActionMenuExtra(ContainerTag menuExtraActions, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+
+        }
+
+        protected void extraEntityHtmlListBulkActionMenuExtra(ContainerTag menuExtra, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+        }
+
+        protected void extraEntityHtmlListBulkActionExtra(ContainerTag actions, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+
+        }
+
+        protected void extraEntityHtmlListBodyRowAction(ContainerTag col, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+
+        }
     }
 
     public static class AutoGenEntityHtmlCrudPageJsf extends AutoGenEntityHtmlCrudPage {
@@ -367,7 +442,7 @@ public class AutoGenWebResources {
                 case "monetary":
                 case "bigdecimal":
                     input.attr("jsfc", "h:inputText");
-                    input.attr("converter", "converterGenericJsf");
+//                    input.attr("converter", "converterGenericJsf");
 //                    input.with(tag("f:converter").attr("", ""));
                     break;
                 case "boolean":
@@ -446,7 +521,7 @@ public class AutoGenWebResources {
                 case "monetary":
                 case "bigdecimal":
                     th.with(tag("h:outputText")
-                            .attr("converter", "converterGenericJsf")
+                            //                            .attr("converter", "converterGenericJsf")
                             .withValue("#{ent." + entityDescriptor.property + "}")
                             .with(
                                     emptyTag("f:attribute")
@@ -476,29 +551,48 @@ public class AutoGenWebResources {
             btn.attr("ps:data-i18n", "Edit");
         }
 
+        @Override
+        protected void extraEntityHtmlListBodyRowAction(ContainerTag col, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+            col.with(emptyTag("ui:insert").withName("extraAction"));
+        }
+
+        @Override
+        protected void extraEntityHtmlListBodyRowActionMenuExtra(ContainerTag menuExtraActions, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+            menuExtraActions.with(emptyTag("ui:insert").withName("extraActionMenu"));
+        }
+
+        @Override
+        protected void extraEntityHtmlListBulkActionExtra(ContainerTag actions, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+            actions.with(emptyTag("ui:insert").withName("extraBulkAction"));
+        }
+
+        @Override
+        protected void extraEntityHtmlListBulkActionMenuExtra(ContainerTag menuExtra, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+            menuExtra.with(emptyTag("ui:insert").withName("extraBulkActionMenu"));
+        }
+
+        //TODO: Refatorar para a classe superior
         protected ContainerTag entityHtmlListPaginate(DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             /*
             <div class="autogen-list-group">
-                <input class="autogen-list-group-button-prev" jsfc="h:commandButton" value="«"
-                       disabled="#{not genericMB.crud('entityName').hasPreviousPageQueryResult()}"
-                       action="#{genericMB.crud('entityName').previousPageQueryResult()}"
-                       aria-label="Anterior"/>
-
-                <!--TODO: ui:repeat begin="" end="" has bug, verify in future -->
-                <c:forEach begin="0" end="#{genericMB.crud('entityName').totalPages}" var="idx">
-                    <input class="#{genericMB.crud('entityName').currentPage eq idx ? 'autogen-list-group-button-page-active':'autogen-list-group-button-page'}" 
-                           jsfc="h:commandButton" action="#{genericMB.crud('entityName').paginate(idx)}"
-                           value="#{idx+1}" aria-label="Pagina #{idx}" />
-                </c:forEach>
-
-                <input class="autogen-list-group-button-next" jsfc="h:commandButton" value="»"
-                       disabled="#{not genericMB.crud('entityName').hasNextPageQueryResult()}"
-                       action="#{genericMB.crud('entityName').nextPageQueryResult()}"
-                       aria-label="Proximo"/>
+            <input class="autogen-list-group-button-prev" jsfc="h:commandButton" value="«"
+            disabled="#{not genericMB.crud('entityName').hasPreviousPageQueryResult()}"
+            action="#{genericMB.crud('entityName').previousPageQueryResult()}"
+            aria-label="Anterior"/>
+            <!--TODO: ui:repeat begin="" end="" has bug, verify in future -->
+            <c:forEach begin="0" end="#{genericMB.crud('entityName').totalPages}" var="idx">
+            <input class="#{genericMB.crud('entityName').currentPage eq idx ? 'autogen-list-group-button-page-active':'autogen-list-group-button-page'}"
+            jsfc="h:commandButton" action="#{genericMB.crud('entityName').paginate(idx)}"
+            value="#{idx+1}" aria-label="Pagina #{idx}" />
+            </c:forEach>
+            <input class="autogen-list-group-button-next" jsfc="h:commandButton" value="»"
+            disabled="#{not genericMB.crud('entityName').hasNextPageQueryResult()}"
+            action="#{genericMB.crud('entityName').nextPageQueryResult()}"
+            aria-label="Proximo"/>
             </div>
              */
-            return div().withClass("autogen-list-group")
+            ContainerTag paginationList = div().withClass("autogen-list-group-pagination-col")
                     .with(
                             input().withClass("autogen-list-group-button-prev").withValue("«")
                                     .withAction("#{genericMB.crud('entityName').previousPageQueryResult()}")
@@ -519,6 +613,8 @@ public class AutoGenWebResources {
                                     .attr("disabled", "#{not genericMB.crud('entityName').hasNextPageQueryResult()}")
                                     .attr("jsfc", "h:commandButton").attr("aria-label", "Proximo")
                     );
+
+            return paginationList;
         }
 
         public ContainerTag entityHtmlFilter(DescriptorHtmlEntity he) {
@@ -526,7 +622,16 @@ public class AutoGenWebResources {
         }
 
         public ContainerTag entityHtmlList(DescriptorHtmlEntity he) {
-            ContainerTag hform = new ContainerTag("h:form").with(this.entityHtmlList(he, null), entityHtmlListPaginate(he, null));
+            ContainerTag entityHtmlListGroup = div().withClass("autogen-list-group");
+            ContainerTag entityHtmlList = this.entityHtmlList(he, null);
+            boolean selectable = he.isAttribute("selectable");
+            if (selectable) {
+                ContainerTag entityHtmlListBulkActions = entityHtmlListBulkActions(he, null);
+                entityHtmlListGroup.with(entityHtmlListBulkActions);
+            }
+            ContainerTag entityHtmlListPaginate = entityHtmlListPaginate(he, null);
+            entityHtmlListGroup.with(entityHtmlListPaginate);
+            ContainerTag hform = new ContainerTag("h:form").with(entityHtmlList, entityHtmlListGroup);
             return hform;
         }
 

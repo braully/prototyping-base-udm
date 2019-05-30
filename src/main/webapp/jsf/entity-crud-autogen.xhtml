@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">entityDummy</ui:define>
+
+        <ui:define name="template.head.append">
+            <meta name="_csrf" content="${_csrf.token}"/>
+            <meta name="_csrf_header" content="${_csrf.headerName}"/>
+        </ui:define>
+
+        <ui:define name="template.app.content">
+            <h:messages infoClass="autogen-message-info" 
+                        warnClass="autogen-message-warning"
+                        fatalClass="autogen-message-error"
+                        errorClass="autogen-message-error" 
+                        showSummary="true" showDetail="true"  />
+        </ui:define>
+
+        <ui:define name="template.app.menu">
+            <ui:include src="/jsf/template/menu-base-app.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.body.append">
+            <form id="form-action" action="/app/action" class="hidden">
+                <input type="hidden" name="action" />
+                <input type="hidden" name="param" />
+            </form>
+            <!-- Modal -->
+            <div class="modal fade" id="autogen-modal" 
+                 tabindex="-1" role="dialog" 
+                 aria-labelledby="autogen-modalLabel" 
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" 
+                                id="autogen-modalLabel">Modal title</h5>
+                            <button type="button" class="close" 
+                                    data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-dismiss="modal">Close</button>
+                            <button type="button" 
+                                    class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </ui:define>
+
+        <ui:define name="template.app.content.form">
+            <h:outputText value="Entity-id: #{param['id']}" />
+            <ui:include src="/autogen/entityDummy/template-base-app/form.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content.filter">
+            <hr />
+            <ui:include src="/autogen/entityDummy/template-base-app/filter.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content.list">
+            <br />
+            <!--https://stackoverflow.com/questions/10778068/what-is-the-real-conceptual-difference-between-uidecorate-and-uiinclude-->
+            <ui:decorate template="/autogen/entityDummy/template-base-app/list.xhtml?selectable=true"> 
+                <ui:define name="extraAction">
+                    <input actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}"
+                           jsfc="h:commandButton" value="Boleto" title="Boleto"
+                           class="autogen-list-group-button">
+                    </input>
+                </ui:define> 
+
+                <ui:define name="extraActionMenu">
+                    <a onclick="normal_post('/jsf/index.xhtml', {id: '#{ent.id}'});"
+                       class="autogen-list-group-button-extra-button" href="#">
+                        <i class="fa fa-barcode"></i> Ação individual (post)
+                    </a>
+                </ui:define> 
+
+                <ui:define name="extraBulkAction">
+                    <input data-toggle="modal" data-target="#autogen-modal" 
+                           value="Ação em lote 2" 
+                           title="Ação em lote 2" type="button"
+                           class="autogen-list-group-button-raw autogen-button-warn">
+                    </input>
+                    <input data-toggle="modal" data-target="#autogen-modal" 
+                           value="Ação em lote 3" 
+                           title="Ação em lote 3" type="button"
+                           class="autogen-list-group-button">
+                    </input>
+                </ui:define>
+
+                <ui:define name="extraBulkActionMenu">
+                    <a onclick="normal_post('/jsf/index.xhtml', {ids: table_selected_id(this)});"
+                       class="autogen-list-group-button-extra-button" href="#">
+                        <i class="fa fa-barcode"></i> Ação 1
+                    </a>
+                </ui:define>
+            </ui:decorate>
+        </ui:define>
+    </ui:composition>
+</html>

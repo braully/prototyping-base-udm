@@ -269,7 +269,28 @@
 
 // icones
 
-.ico-caixa{
+.ico-caixa, .ico-caixa {
     @extend .fa;
     @extend .fa-calculator;
+}
+
+.ico-opcoes, .ico-options {
+    @extend .fa;
+    @extend .fa-ellipsis-v
+}
+
+.ico-excluir, .ico-remove {
+    @extend .fa;
+    @extend .fa-trash;    
+}
+
+
+.ico-excluir, .ico-remove {
+    @extend .fa;
+    @extend .fa-trash;    
+}
+
+.ico-buscar, .ico-search {
+    @extend .fa;
+    @extend .fa-search;
 }
