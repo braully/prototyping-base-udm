@@ -91,6 +91,53 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>sass</id>
+            <build>
+                <plugins>
+                    <!--Sass Plugin -->
+                    <!--https://www.geodienstencentrum.nl/sass-maven-plugin/plugin-info.html-->
+                    <!-- TODO: Slow build time -->
+                    <plugin>
+                        <groupId>nl.geodienstencentrum.maven</groupId>
+                        <artifactId>sass-maven-plugin</artifactId>
+                        <version>3.7.2</version>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>update-stylesheets</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <!-- Set source and destination dirs -->
+                                    <source>
+                                        <directory>${webapp-direcotry}/scss</directory>
+                                    </source>
+                                    <destination>${generated-directory}/scss</destination>
+                                </resource>
+                            </resources>
+                            <sassOptions>
+                                <!--https://sass-lang.com/documentation/file.SASS_REFERENCE.html#Options-->
+                                <!--https://www.geodienstencentrum.nl/sass-maven-plugin/update-stylesheets-mojo.html-->
+                                <unix_newlines>true</unix_newlines>
+                                <always_check>true</always_check>
+                                <always_update>true</always_update>
+                                <style>:expanded</style>
+                                <!--
+                                <cache>true</cache>
+                                <always_update>true</always_update>
+                                <cache_location>${project.build.directory}/sass_cache</cache_location>
+                                -->
+                            </sassOptions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 
