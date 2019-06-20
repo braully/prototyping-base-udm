@@ -4,11 +4,14 @@
 package com.github.braully.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import static javax.persistence.TemporalType.DATE;
 
 @Entity
 @Table(schema = "base")
@@ -25,6 +28,10 @@ public class Partner extends AbstractMigrableEntity implements Serializable {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private InfoExtra infoExtra;
+
+    @Basic
+    @Temporal(DATE)
+    protected Date birthDate;
 
     public Partner() {
 
@@ -60,5 +67,13 @@ public class Partner extends AbstractMigrableEntity implements Serializable {
 
     public void setInfoExtra(InfoExtra infoExtra) {
         this.infoExtra = infoExtra;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 }
