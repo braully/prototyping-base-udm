@@ -17,6 +17,7 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Transient;
 
 @Embeddable
 @Access(AccessType.FIELD)
@@ -34,6 +35,7 @@ public class Money implements Serializable, Comparable<MonetaryAmount>, Monetary
      */
     @Column(name = "valor")
     private long valor;
+    @Transient
     private MonetaryAmount delegate;
 //    @Column(name = "moeda", length = 3)
 //    private Currency moeda;

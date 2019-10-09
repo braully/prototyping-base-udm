@@ -39,7 +39,8 @@
         </Logger>
 
         <!-- Log everything in Spring Core -->
-        <Logger name="org.springframework.core" additivity="false"
+        <Logger name="org.springframework.core" 
+                additivity="false"
                 level="warn" >
             <!--level="debug" >-->
             <AppenderRef ref="Console" />
