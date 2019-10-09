@@ -145,14 +145,16 @@ public class AccountTransaction extends AbstractMigrableEntity
     //Cached total
     public MonetaryAmount getTotal() {
         if (total == null) {
-            total = org.javamoney.moneta.Money.zero(CURRENCY_DEFAULT);
-            total = total.add(org.javamoney.moneta.Money.of(creditTotal, CURRENCY_DEFAULT));
-            total = total.subtract(org.javamoney.moneta.Money.of(debitTotal, CURRENCY_DEFAULT));
+            Money tmp = new Money();
+            tmp = tmp.adicionaValorAbsoluto(creditTotal);
+            tmp = tmp.subtraiValorAbsoluto(debitTotal);
             if (childTransactions != null) {
                 for (AccountTransaction at : childTransactions) {
-                    total = total.add(at.getTotal());
+                    tmp = tmp.adicionaValorAbsoluto(at.creditTotal);
+                    tmp = tmp.subtraiValorAbsoluto(at.debitTotal);
                 }
             }
+            total = tmp;
         }
         return total;
     }

@@ -567,7 +567,7 @@ public class AutoGenWebResources {
                                     .attr("var", "st").attr("itemValue", "#{st}")
                                     .attr("itemLabel", "#{st.toString()}");
                         }
-                        input.attr("converter", "converterEntity");
+                        input.attr("converter", "#{converterEntity}");
                     }
 
                     input.with(

@@ -60,7 +60,6 @@ public class StatisticalConsolidation {
             //count = genericDAO.count(classe);
             count = countEntites.get(classe.getSimpleName());
         } catch (Exception e) {
-
         }
         return count;
     }

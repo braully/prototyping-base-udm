@@ -34,6 +34,8 @@ public class BilletTicketFile extends AbstractAuditableEntity implements Compara
     private Date dataGeracao;
     @Column(name = "numero_sequencial")
     private Integer numeroSequencial;
+    @Column
+    private Integer countBilletTicket;
     @OneToMany(mappedBy = "remessa", fetch = FetchType.LAZY)
     private Set<BilletTicketFileDetail> remessaBoleto;
 
@@ -68,6 +70,16 @@ public class BilletTicketFile extends AbstractAuditableEntity implements Compara
         this.remessaBoleto = remessaBoleto;
     }
 
+    public Integer getCountBilletTicket() {
+        return countBilletTicket;
+    }
+
+    public void setCountBilletTicket(Integer countBilletTicket) {
+        this.countBilletTicket = countBilletTicket;
+    }
+
+    
+    
     public String getNome() {
         return nome;
     }
@@ -118,7 +130,11 @@ public class BilletTicketFile extends AbstractAuditableEntity implements Compara
             if (this.remessaBoleto == null) {
                 this.remessaBoleto = new HashSet<BilletTicketFileDetail>();
             }
+            if (this.countBilletTicket == null) {
+                this.countBilletTicket = 0;
+            }
             this.remessaBoleto.add(new BilletTicketFileDetail(boletoEmitido, this, remessaBoleto.size() + 1));
+            this.countBilletTicket++;
         }
     }
 
@@ -139,7 +155,7 @@ public class BilletTicketFile extends AbstractAuditableEntity implements Compara
 
     @Entity
     @Table(schema = "legacy", name = "remessa_boleto")
-    public static class BilletTicketFileDetail extends AbstractEntity 
+    public static class BilletTicketFileDetail extends AbstractEntity
             implements Comparable<BilletTicketFileDetail> {
 
         @ManyToOne

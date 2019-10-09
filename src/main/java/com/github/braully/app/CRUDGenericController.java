@@ -142,8 +142,13 @@ public abstract class CRUDGenericController<T extends IEntity> {
     }
 
     public Class<T> getEntityClass() {
-        if (entityClass == null) {
-            entityClass = UtilReflection.getGenericTypeArgument(this.getClass(), 0);
+        try {
+            if (entityClass == null) {
+                entityClass = UtilReflection.getGenericTypeArgument(this.getClass(), 0);
+            }
+        } catch (Exception e) {
+            log.debug("fail on indentify class type");
+            log.trace("fail on indentify class type", e);
         }
         return entityClass;
     }
