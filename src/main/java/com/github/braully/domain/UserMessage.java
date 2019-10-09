@@ -9,19 +9,29 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "base")
+@Getter
+@Setter
 public class UserMessage extends AbstractLightRemoveEntity implements Serializable {
-
-    @Basic
-    private Date date;
 
     @ManyToOne(targetEntity = UserLogin.class)
     private UserLogin userFrom;
 
     @Basic
+    private String title;
+
+    @Basic
     private String message;
+
+    @Basic
+    private Date date;
+
+    @Basic
+    private Date dateView;
 
     @ManyToOne(targetEntity = UserLogin.class)
     private UserLogin userTo;
@@ -30,35 +40,4 @@ public class UserMessage extends AbstractLightRemoveEntity implements Serializab
 
     }
 
-    public Date getDate() {
-        return this.date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public UserLogin getUserFrom() {
-        return this.userFrom;
-    }
-
-    public void setUserFrom(UserLogin userFrom) {
-        this.userFrom = userFrom;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public UserLogin getUserTo() {
-        return this.userTo;
-    }
-
-    public void setUserTo(UserLogin userTo) {
-        this.userTo = userTo;
-    }
 }

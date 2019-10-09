@@ -1,5 +1,6 @@
 package com.github.braully.persistence;
 
+import com.github.braully.util.UtilCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,6 +14,8 @@ import javax.persistence.Parameter;
  */
 public class PagedQueryResult {
 
+    static int WINDOW_SIZE = 7;
+
     Map<Parameter, Object> parameters;
     String queryString;
 //    Query query;
@@ -20,11 +23,13 @@ public class PagedQueryResult {
     int page;
     int count;
     int size;
+    Map infoExtra;
     String queryCountString;
 
     public PagedQueryResult() {
         result = new ArrayList();
         parameters = new HashMap<>();
+        infoExtra = new HashMap<>();
     }
 
     PagedQueryResult(int size, int page) {
@@ -57,6 +62,27 @@ public class PagedQueryResult {
         return Math.round(tpages);
     }
 
+    public List<Integer> getWindowPages() {
+        return UtilCollection.list(getWindowIni(), getWindowEnd());
+    }
+
+    public int getWindowIni() {
+        if (getTotalPages() > WINDOW_SIZE) {
+            int desloc = (this.page % (WINDOW_SIZE - 2));
+            int pos = desloc * WINDOW_SIZE;
+            return Math.min(this.page, pos);
+        }
+        return 0;
+    }
+
+    public int getWindowEnd() {
+        int totalPages = this.getTotalPages();
+        if (getTotalPages() > WINDOW_SIZE) {
+            return Math.min(getWindowIni() + WINDOW_SIZE, totalPages);
+        }
+        return totalPages;
+    }
+
     void newResults(Collection nwreslt) {
         result.clear();
         result.addAll(nwreslt);
@@ -86,5 +112,13 @@ public class PagedQueryResult {
 
     public boolean hasPrevious() {
         return page > 0;
+    }
+
+    public boolean hasWindowPageQueryResult() {
+        //Se tem mais paginas que o tamanho da janela
+        if (this.getTotalPages() > WINDOW_SIZE) {
+            return true;
+        }
+        return false;
     }
 }

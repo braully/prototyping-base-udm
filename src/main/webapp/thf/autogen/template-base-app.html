@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      ng-app="demo">
+    <!--https://www.thymeleaf.org/doc/articles/layouts.html -->
+    <!--https://github.com/thymeleaf/thymeleafexamples-layouts-->
+
+    <head layout:fragment="head">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!--<title><ui:insert name="template.app.title" /></title>-->
+        <link rel="stylesheet" href="/pkg/font-awesome/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/pkg/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/resources/scss/template-base-app.css" />
+        <script src="/js/angular.min.js"></script>
+        <script src="/js/mycontroller.js"></script>
+        <!--<ui:insert name="template.head.append" />-->
+    </head>
+
+    <body>
+        <!--<ui:insert name="template.body.append" /> -->
+        <header class="base-app-header">
+            <!--<ui:insert name="template.app.header" />-->
+        </header>
+        <main class="base-app-main">
+            <!--
+            <ui:insert name="template.app.menu">
+                <ui:include src="/jsf/template/menu-base-app.xhtml" />
+            </ui:insert>
+            -->
+            <div layout:fragment="template.app.menu">
+
+                <div ng-controller="Controlador">
+                    <ul>
+                        <li ng-repeat='menu in menus' ng-click='show1 = !show1' ng-style ='{cursor:menu1.topic.length > 0?"pointer":"default"}'>
+                            {{menu.name}}
+                            <ul ng-if='show1'>
+                                <li ng-repeat='menu2 in menu.topic' ng-click='show2 = !show2; $event.stopPropagation();' ng-style='{cursor:menu2.subtopic.length > 0?"pointer":"default"}'>
+                                    {{menu2.name}}   
+                                </li>
+                            </ul>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="base-app-main-content">
+                <!--
+                <ui:insert name="template.app.content" />
+                <ui:insert name="template.app.content.form" />
+                <ui:insert name="template.app.content.filter" />
+                <ui:insert name="template.app.content.list" />
+                -->
+                <div layout:fragment="template.app.content"></div>
+                <div layout:fragment="template.app.content.form"></div>
+                <div layout:fragment="template.app.content.filter"></div>
+                <div layout:fragment="template.app.content.list">
+                    <!-- -->
+
+
+                    <!--                    <ul class="base-app-main-menu-list" id="mymenu">
+                                            <li class="base-app-main-menu-list-item" rendered="menu.parent == null" value="userMenus" var="menu">
+                                                <a class="base-app-main-menu-list-item-link" 
+                                                   href="menu.link" data-index-thf="menu.name">Menu<i class="menu.icon"></i> </a>
+                                                <ui:fragment if="not empty menu.childs}">
+                                                <ul class="base-app-main-menu-sublist">
+                                                    <li class="base-app-main-menu-sublist-item" 
+                                                        jsfc="ui:repeat" value="menu.childs" var="submenu">
+                                                        <a class="base-app-main-menu-list-item-link" 
+                                                           href="submenu.link" data-index-thf="submenu.name">Sub-Menu<i class="menu.icon"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                                 </ui:fragment>
+                                            </li>
+                                        </ul>-->
+                </div>
+            </div>
+        </main>
+        <!--<ui:insert name="template.foot.append" />-->
+        <div layout:fragment="template.foot.append">
+
+        </div>
+        <script src="/js/i18n.js"></script>
+        <script src="/pkg/jquery/dist/jquery.min.js"></script>
+        <script src="/assets/js/template-base-app.js"></script>
+        <script src="/pkg/popper.js/dist/umd/popper.min.js"></script>
+        <script src="/pkg/bootstrap/dist/js/bootstrap.min.js"></script>
+    </body>
+</html>
+

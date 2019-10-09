@@ -22,7 +22,7 @@ import java.io.Serializable;
  *
  * @author braully
  */
-public interface IEntity extends Serializable {
+public interface IEntity extends Serializable {//, Comparable<IEntity> {
 
     public Long getId();
 
@@ -32,4 +32,15 @@ public interface IEntity extends Serializable {
         return getId() != null && getId() > 0;
     }
 
+    default public String getToString() {
+        return toString();
+    }
+
+//    default public int compareTo(IEntity o) {
+//        try {
+//            return Long.compare(getId(), o.getId());
+//        } catch (Exception e) {
+//            return 0;
+//        }
+//    }
 }

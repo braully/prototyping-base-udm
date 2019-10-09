@@ -17,15 +17,17 @@ limitations under the License.
 package com.github.braully.util;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Braully Rocha
  */
 public class UtilPath {
-    
-    private static final Logger log = Logger.getLogger(UtilPath.class);
+
+    private static final Logger log = LogManager.getLogger(UtilPath.class);
 
     /**
      * Absolute path from relative.
@@ -36,6 +38,14 @@ public class UtilPath {
      */
     public static synchronized String getPath(ClassLoader classLoader, String relative) {
         return classLoader.getResource(relative).getPath();
+    }
+
+    public static synchronized URL getUrl(ClassLoader classLoader, String relative) {
+        return classLoader.getResource(relative);
+    }
+
+    public static synchronized URL getUrl(String relative) {
+        return getUrl(Thread.currentThread().getContextClassLoader(), relative);
     }
 
     /**

@@ -3,17 +3,27 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "sale")
+@Getter
+@Setter
 public class PurchaseOrderItem extends AbstractEntity implements Serializable {
+
+    @Basic
+    private String attribute;
+
+    @Basic
+    private String observation;
 
     @Basic
     private BigDecimal priceUnit;
@@ -21,56 +31,17 @@ public class PurchaseOrderItem extends AbstractEntity implements Serializable {
     @Basic
     private Double quantity;
 
-    @Basic
-    private String observation;
-
+    @Attr({"hidden", "true"})
     @ManyToOne(targetEntity = PurchaseOrder.class)
     private PurchaseOrder purchaseOrder;
-
-    @Basic
-    private String attribute;
 
     public PurchaseOrderItem() {
 
     }
 
-    public BigDecimal getPriceUnit() {
-        return this.priceUnit;
+    @Override
+    public String toString() {
+        return "Item-" + this.id + " " + attribute + " (" + quantity + "x" + priceUnit + ')';
     }
 
-    public void setPriceUnit(BigDecimal priceUnit) {
-        this.priceUnit = priceUnit;
-    }
-
-    public Double getQuantity() {
-        return this.quantity;
-    }
-
-    public void setQuantity(Double quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getObservation() {
-        return this.observation;
-    }
-
-    public void setObservation(String observation) {
-        this.observation = observation;
-    }
-
-    public PurchaseOrder getPurchaseOrder() {
-        return this.purchaseOrder;
-    }
-
-    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
-    }
-
-    public String getAttribute() {
-        return this.attribute;
-    }
-
-    public void setAttribute(String attribute) {
-        this.attribute = attribute;
-    }
 }

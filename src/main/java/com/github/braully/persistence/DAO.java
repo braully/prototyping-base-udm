@@ -1,5 +1,6 @@
 package com.github.braully.persistence;
 
+import com.github.braully.interfaces.ISystemEntity;
 import com.github.braully.util.UtilComparator;
 import com.github.braully.util.UtilReflection;
 import java.io.Serializable;
@@ -11,22 +12,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Parameter;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
+import org.springframework.transaction.annotation.Transactional;
 
 @SuppressWarnings("rawtypes")
 public abstract class DAO implements ICrudEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(UtilComparator.class);
+    private static final Logger log = LogManager.getLogger(UtilComparator.class);
 
     /* */
     protected abstract EntityManager getEntityManager();
@@ -46,6 +53,15 @@ public abstract class DAO implements ICrudEntity, Serializable {
     protected void saveEntitysImpl(Iterable<? extends IEntity> entidades) {
         if (entidades != null) {
             for (IEntity e : entidades) {
+                if (e instanceof ISystemEntity) {
+                    Boolean systemLock = ((ISystemEntity) e).getSystemLock();
+                    log.debug("Entity is not be saved (systemLocked)");
+                    log.debug(e);
+                    if (systemLock != null && systemLock) {
+                        continue;
+                    }
+                }
+
                 if (e.isPersisted()) {
                     this.update(e);
                 } else {
@@ -111,10 +127,19 @@ public abstract class DAO implements ICrudEntity, Serializable {
         getEntityManager().merge(entity);
     }
 
+    @Transactional
+    @Override
     public void delete(Object entity) {
-        EntityManager em = this.getEntityManager();
-        em.merge(entity);
-        em.remove(entity);
+        if (entity instanceof IEntity) {
+            IEntity tmp = (IEntity) entity;
+            Query query = this.getEntityManager().createQuery("DELETE FROM " + entity.getClass().getSimpleName() + " WHERE id = :id");
+            query.setParameter("id", tmp.getId());
+            int executeUpdate = query.executeUpdate();
+        } else {
+            EntityManager em = this.getEntityManager();
+            em.merge(entity);
+            em.remove(entity);
+        }
     }
 
     public <T> void delete(Object id, Class<T> classe) {
@@ -126,9 +151,12 @@ public abstract class DAO implements ICrudEntity, Serializable {
         return getEntityManager().find(classe, id);
     }
 
-
     /* */
-    PagedQueryResult buildPagedQuery(Query query, int size, int page) {
+    public PagedQueryResult buildPagedQuery(Query query, int size, int page) {
+        return buildPagedQuery(query, size, page, null);
+    }
+
+    public PagedQueryResult buildPagedQuery(Query query, int size, int page, Map extraPaged) {
         PagedQueryResult pagedQueryResult = new PagedQueryResult(size, page);
         if (query != null) {
             Set<Parameter<?>> setparams = query.getParameters();
@@ -137,15 +165,41 @@ public abstract class DAO implements ICrudEntity, Serializable {
             }
             String queryString = query.unwrap(org.hibernate.query.Query.class).getQueryString();
             pagedQueryResult.queryString = queryString;
-            String queryCountString = queryString.replaceFirst("SELECT ", "SELECT COUNT(");
-            queryCountString = queryCountString.replaceFirst(" FROM ", ") FROM ");
+            String queryCountString = countQueryString(queryString, extraPaged);
             pagedQueryResult.queryCountString = queryCountString;
         }
         return pagedQueryResult;
     }
 
-    public PagedQueryResult queryPaged(Query query, int size, int page) {
-        PagedQueryResult pagedQueryResult = buildPagedQuery(query, size, page);
+    public String countQueryString(String queryString, Map extraPaged) throws IllegalStateException {
+        String extraCount = null;
+        if (extraPaged != null) {
+            extraCount = (String) extraPaged.get("countExtra");
+            if (extraCount != null && !extraCount.isBlank()) {
+                extraCount = ", " + extraCount;
+            }
+        }
+        if (extraCount == null) {
+            extraCount = "";
+        }
+        String queryCountString = queryString.replaceFirst("SELECT ", "SELECT COUNT(");
+        queryCountString = queryCountString.replaceFirst(" FROM ", ") as count " + extraCount + " FROM ");
+        queryCountString = queryCountString.replaceFirst("LEFT JOIN FETCH .*? WHERE", "WHERE");
+        //
+        if (queryCountString.contains("LEFT JOIN FETCH")) {
+            throw new IllegalStateException("A consulta possui mais de um carregamento");
+        }
+        //
+        queryCountString = queryCountString.replaceFirst("ORDER BY .*?\n", "");
+        return queryCountString;
+    }
+
+    public PagedQueryResult queryPaged(Query query, Map extraPaged) {
+        return queryPaged(query, DEFAULT_PAGE_SIZE, 0, extraPaged);
+    }
+
+    public PagedQueryResult queryPaged(Query query, int size, int page, Map extraPaged) {
+        PagedQueryResult pagedQueryResult = buildPagedQuery(query, size, page, extraPaged);
         count(pagedQueryResult);
         query.setFirstResult(page * size);
         query.setMaxResults(size);
@@ -156,7 +210,7 @@ public abstract class DAO implements ICrudEntity, Serializable {
     }
 
     public PagedQueryResult queryPaged(Query query) {
-        return queryPaged(query, DEFAULT_PAGE_SIZE, 0);
+        return queryPaged(query, DEFAULT_PAGE_SIZE, 0, null);
     }
 
 //    @Override
@@ -183,7 +237,25 @@ public abstract class DAO implements ICrudEntity, Serializable {
     private void count(PagedQueryResult queryResult) {
         Query query = this.getEntityManager().createQuery(queryResult.queryCountString);
         setParameters(queryResult, query);
-        queryResult.count = ((Number) query.getSingleResult()).intValue();
+        List resultList = query.getResultList();
+        queryResult.count = 0;
+        queryResult.infoExtra.clear();
+        //
+        if (resultList != null && !resultList.isEmpty()) {
+            Object rcount = resultList.get(0);
+            if (rcount instanceof Number) {
+                queryResult.count = ((Number) rcount).intValue();
+            } else if (rcount instanceof Object[]) {
+                Object[] arr = (Object[]) rcount;
+                queryResult.count = ((Number) arr[0]).intValue();
+                //
+                if (arr.length > 1) {
+                    for (int i = 1; i < arr.length; i++) {
+                        queryResult.infoExtra.put(i, arr[i]);
+                    }
+                }
+            }
+        }
     }
 
     private void setParameters(PagedQueryResult queryResult, Query query) {
@@ -286,7 +358,9 @@ public abstract class DAO implements ICrudEntity, Serializable {
         if (classe != null) {
             StringBuilder hql = new StringBuilder();
             try {
-                hql.append("SELECT DISTINCT e FROM ").append(classe.getSimpleName()).append(" e ");
+                hql.append("SELECT DISTINCT e ")
+                        .append("FROM ")
+                        .append(classe.getSimpleName()).append(" e \n");
                 Query q = null;
                 if (args != null && args.length > 0) {
                     hql.append(" ORDER BY ");
@@ -296,6 +370,7 @@ public abstract class DAO implements ICrudEntity, Serializable {
                             hql.append(", ");
                         }
                     }
+                    hql.append(" \n");
                     q = getEntityManager().createQuery(hql.toString());
                 }
                 lista = (List<T>) q.getResultList();
@@ -322,11 +397,27 @@ public abstract class DAO implements ICrudEntity, Serializable {
         return loadCollectionWhere(classe, args);
     }
 
+    public <T> T loadEntityWhere(Class<T> classe, Object... args) {
+        T result = null;
+        if (classe != null) {
+//            try {
+            String hql = "SELECT e FROM " + classe.getSimpleName() + " e ";
+            Query q = null;
+            if (args != null && args.length > 0 && (args.length % 2) == 0) {
+                q = buildGeneriQuery(hql, args);
+            }
+            result = (T) q.getSingleResult();
+//            } catch (Exception e) {
+//                log.error("Erro ao busar", e);
+//            }
+        }
+        return result;
+    }
+
     @Override
     public <T> List<T> loadCollectionWhere(Class<T> classe, Object... args) {
         List<T> lista = null;
         if (classe != null) {
-
             try {
                 String hql = "SELECT DISTINCT e FROM " + classe.getSimpleName() + " e ";
                 Query q = null;
@@ -344,7 +435,7 @@ public abstract class DAO implements ICrudEntity, Serializable {
     protected Query buildGeneriQuery(String hql, Object... args) {
         String where = whereClause(args);
         Query q = getEntityManager().createQuery(hql + where);
-        whereCluaseParameters(args, q);
+        clauseSetParameters(args, q);
         return q;
     }
 
@@ -359,7 +450,7 @@ public abstract class DAO implements ICrudEntity, Serializable {
         return hql.toString();
     }
 
-    protected void whereCluaseParameters(Object[] args, Query q) {
+    protected void clauseSetParameters(Object[] args, Query q) {
         int j = 1;
         for (int i = 1; i < args.length; i = i + 2) {
             q.setParameter(j++, args[i]);
@@ -383,6 +474,8 @@ public abstract class DAO implements ICrudEntity, Serializable {
         return lista;
     }
 
+    //TODO: Imporv for this public Object queryObject(String strquery, Object... args) {
+    @Override
     public Object queryObject(Object... args) {
         Object result = null;
         if (args != null && args.length > 0) {
@@ -402,6 +495,17 @@ public abstract class DAO implements ICrudEntity, Serializable {
 
     protected <T> Query genericFullTextSearchQuery(Class<T> cls, String searchString,
             Map<String, Object> extraSearchParams) {
+        Map<String, Object> mapSanitizedParameter = sanitizeParameters(extraSearchParams);
+
+        String strquery = buildGenericQueryFullTextSearch(cls, searchString, mapSanitizedParameter);
+        log.debug("genericFullSearch");
+        log.debug(strquery);
+        Query query = this.getEntityManager().createQuery(strquery);
+        parameterGenericQueryFullTextSearch(cls, searchString, mapSanitizedParameter, query);
+        return query;
+    }
+
+    protected Map<String, Object> sanitizeParameters(Map<String, Object> extraSearchParams) {
         Map<String, Object> mapSanitizedParameter = new HashMap<>();
         if (extraSearchParams != null) {
             extraSearchParams.forEach((k, v) -> {
@@ -410,60 +514,130 @@ public abstract class DAO implements ICrudEntity, Serializable {
                 }
             });
         }
+        return mapSanitizedParameter;
+    }
 
-        String strquery = buildGenericQueryFullTextSearch(cls, searchString, mapSanitizedParameter);
-        log.debug("genericFullSearch");
-        log.debug(strquery);
-        Query query = this.getEntityManager().createQuery(strquery);
+    protected <T> void parameterGenericQueryFullTextSearch(Class<T> cls, String searchString,
+            Map<String, Object> mapSanitizedParameter, Query query) {
         if (isValidString(searchString)) {
             query.setParameter("searchString", "%" + searchString.toLowerCase().trim() + "%");
         }
         mapSanitizedParameter.forEach((k, v) -> {
-            if (isValid(v)) {
-                query.setParameter(k.replace('.', '_'), v);
+            if (isValid(v) && !isCommand(v.toString()) && !isCommand(k)) {
+                if (v instanceof String) {
+                    String vlw = v.toString().toLowerCase();
+                    if (!vlw.endsWith("%")) {
+                        vlw = vlw + "%";
+                    }
+                    query.setParameter(k.replace('.', '_'), vlw);
+                } else {
+                    query.setParameter(k.replace('.', '_'), v);
+                }
             }
         });
-        return query;
     }
 
-    public String buildGenericQueryFullTextSearch(Class<?> cls, String searchString, Map<String, Object> extraSearchParams) {
+    public String buildGenericQueryFullTextSearch(Class<?> cls, String searchString,
+            Map<String, Object> extraSearchParams) {
         StringBuilder where = new StringBuilder();
-        String[] extraProps = null;
+        String[] fetchProps = null;
+        boolean firstWhere = true;
+        String orderby = "e.id";
+
         if (!extraSearchParams.isEmpty()) {
             List<String> extraPorperties = new ArrayList<>();
-            extraSearchParams.forEach((k, v) -> {
-                if (isValid(v)) {
-//                    extraPorperties.add(k);
-                    where.append("lower(e.");
-                    where.append(k);
-                    where.append(")  like :");
-                    where.append(k.replace('.', '_'));
+            //int numParametros = 0;
+
+            for (Entry<String, Object> e : extraSearchParams.entrySet()) {
+                Object v = e.getValue();
+                String k = e.getKey();
+                //IGNORE commands
+                if (k.equalsIgnoreCase("fetch") || k.equalsIgnoreCase("where")) {
+                    continue;
                 }
-            });
+
+                if (isValid(v)) {
+                    //IF ORDER BY
+                    if (k.equalsIgnoreCase("order by")) {
+                        orderby = v.toString();
+                        continue;
+                    }
+
+                    //Param property
+                    if (!firstWhere) {
+                        where.append(" AND");
+                    }
+                    boolean comand = false;
+                    boolean string = v instanceof String;
+                    if (string) {
+                        //IF command
+                        if (isCommand(v.toString())) {
+                            comand = true;
+                        } else {
+                            //IF Value
+                            where.append(" lower(");
+                        }
+                    }
+
+                    where.append(" e.");
+                    where.append(k);
+
+                    if (comand) {
+                        where.append(" ").append(v);
+                    } else {
+                        if (string) {
+                            where.append(")  like ");
+                        } else {
+                            where.append(" = ");
+                        }
+                        where.append(":");
+                        where.append(k.replace('.', '_'));
+                    }
+
+                    firstWhere = false;
+                }
+            }
+
+            if (extraSearchParams.containsKey("fetch")) {
+                fetchProps = (String[]) extraSearchParams.get("fetch");
+            }
+
             if (!extraPorperties.isEmpty()) {
-                extraProps = extraPorperties.toArray(new String[0]);
+
             }
         }
 
-        StringBuilder sbquery = gerarQueryLoadFetch(cls.getSimpleName(), extraProps);
+        StringBuilder sbquery = gerarQueryLoadFetch(cls.getSimpleName(), fetchProps);
+
         List<Field> fieldsPersisted = UtilReflection.getAllFieldsAssinableFrom(cls, String.class, Number.class);
 
         if (fieldsPersisted != null && fieldsPersisted.size() > 0 && isValidString(searchString)) {
             fieldsPersisted.removeIf(fld -> fld.isAnnotationPresent(Transient.class));
+            if (!firstWhere) {
+                where.append(" AND ");
+            }
+            where.append(" (");
             for (int i = 0; i < fieldsPersisted.size(); i++) {
                 Field fld = fieldsPersisted.get(i);
-                where.append("lower(e.");
+                where.append(" lower(e.");
                 where.append(fld.getName());
-                where.append(")  like :");
-                where.append("searchString");
+                where.append(")  like :searchString");
                 if (i < fieldsPersisted.size() - 1) {
                     where.append(" OR ");
                 }
             }
+            where.append(") ");
+        }
+
+        if (extraSearchParams.containsKey("where")) {
+            where.append(extraSearchParams.get("where"));
         }
 
         if (where.length() > 0) {
             sbquery.append(" WHERE ").append(where);
+        }
+        if (isValid(orderby)) {
+            sbquery.append(" ORDER BY ").append(orderby).append(" \n");
         }
         String strquery = sbquery.toString();
         return strquery;
@@ -500,14 +674,92 @@ public abstract class DAO implements ICrudEntity, Serializable {
         return getEntityManager().createQuery(ql);
     }
 
+    protected List<Field> lazyAttributes(Class clz) {
+        Field[] fields = clz.getDeclaredFields();
+        List<Field> lzfields = new ArrayList<>();
+        if (fields != null) {
+            for (Field fld : fields) {
+                if (fld.isAnnotationPresent(ManyToOne.class)
+                        || fld.isAnnotationPresent(OneToMany.class)
+                        || fld.isAnnotationPresent(ManyToMany.class)) {
+                    lzfields.add(fld);
+                }
+            }
+        }
+        return lzfields;
+    }
+
+    protected String[] lazyAttributesInString(Class clz) {
+        List<Field> lazys = this.lazyAttributes(clz);
+        List<String> lazystrs = new ArrayList<>();
+        if (lazys != null) {
+            for (Field fld : lazys) {
+                lazystrs.add(fld.getName());
+            }
+        }
+        return lazystrs.toArray(new String[0]);
+    }
+
     @Override
     public <T> T loadEntity(T entidade) {
         try {
-            return (T) this.getEntityManager().find(entidade.getClass(), PropertyUtils.getProperty(entidade, "id"));
+            //this.getEntityManager().find(entidade.getClass(), PropertyUtils.getProperty(entidade, "id"));
+            return (T) this.loadEntity(entidade.getClass(), PropertyUtils.getProperty(entidade, "id"));
         } catch (Exception ex) {
             log.error("error load entity", ex);
         }
         return null;
+    }
+
+    public <T> T loadEntity(Class<T> clz, Object id) {
+        try {
+            return (T) this.loadEntityFetch(clz, id, lazyAttributesInString(clz));
+        } catch (Exception ex) {
+            log.error("error load entity", ex);
+        }
+        return null;
+    }
+
+    public <T> T loadEntityFetch(Class clz, Object id, String... propriedades) {
+        if (clz == null || id == null) {
+            return null;
+        }
+        return this.loadEntityFetch(clz.getSimpleName(), id, propriedades);
+    }
+
+    public int updateEntityQuery(IEntity entity, Object... propvalue) {
+        if (propvalue == null || propvalue.length == 0 || entity == null || !entity.isPersisted()) {
+            return 0;
+        }
+        String sql = null;
+        int result = 0;
+        try {
+            String simpleName = entity.getClass().getSimpleName();
+            StringBuilder query = new StringBuilder("UPDATE ");
+            query.append(simpleName);
+            query.append(" ");
+
+            int countind = 1;
+            query.append(" SET ").append(propvalue[0]).append(" = ?").append(countind++);
+
+            for (int i = 2; i < propvalue.length; i = i + 2) {
+                query.append(", ").append(propvalue[i]).append(" = ?").append(countind++);
+            }
+            query.append(" WHERE id = :id");
+            EntityManager em = this.getEntityManager();
+            sql = query.toString();
+
+            log.debug(sql);
+
+            Query q = em.createQuery(sql);
+            clauseSetParameters(propvalue, q);
+            q.setParameter("id", entity.getId());
+            result = q.executeUpdate();
+        } catch (RuntimeException ex) {
+            log.debug(sql);
+            log.error("Falha ao load entidade", ex);
+        }
+        return result;
     }
 
     @Override
@@ -633,5 +885,24 @@ public abstract class DAO implements ICrudEntity, Serializable {
             return isValidString((String) value);
         }
         return value != null;
+    }
+
+    private boolean isCommand(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        str = str.trim();
+        if (str.equalsIgnoreCase("is null")) {
+            return true;
+        } else if (str.equalsIgnoreCase("is not null")) {
+            return true;
+        } else if (str.equalsIgnoreCase("order by")) {
+            return true;
+        } else if (str.equalsIgnoreCase("fetch")) {
+            return true;
+        } else if (str.equalsIgnoreCase("where")) {
+            return true;
+        }
+        return false;
     }
 }

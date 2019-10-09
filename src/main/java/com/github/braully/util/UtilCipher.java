@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -21,8 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UtilCipher {
 
-    static final org.apache.log4j.Logger log4j = org.apache.log4j.Logger.getLogger(UtilCipher.class);
-    static final Logger log = Logger.getLogger(UtilCipher.class.getName());
+    static final org.apache.log4j.Logger log4j = org.apache.log4j.LogManager.getLogger(UtilCipher.class);
     /* */
     private static char[] MD5_HEX = "0123456789abcdef".toCharArray();
     private static final byte[] encoding = {65, 66, 67, 68, 69, 70, 71, 72,
@@ -69,7 +66,7 @@ public class UtilCipher {
                 }
             }
         } catch (UnsupportedEncodingException uee) {
-            log.log(Level.SEVERE, "charset " + hashCharset
+            log4j.error("charset " + hashCharset
                     + " not found. Using platform default.", uee);
             passBytes = strMessage.getBytes();
             if (salt != null) {
@@ -90,11 +87,11 @@ public class UtilCipher {
             } else if (hashEncoding.equalsIgnoreCase("RFC2617")) {
                 strMessageHash = encodeRFC2617(hash);
             } else {
-                log.log(Level.SEVERE, "Unsupported hash encoding format "
+                log4j.error("Unsupported hash encoding format "
                         + hashEncoding);
             }
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Password hash calculation failed ", e);
+            log4j.error("Password hash calculation failed ", e);
         }
         return strMessageHash;
     }
@@ -326,9 +323,18 @@ public class UtilCipher {
         String strEncoding = DEFAULT_HASH_ENCODING;
         String strCharset = DEFAULT_HASH_CHARSET;
 //        String hashMessage = hashMessage(strAlgorithm, strEncoding, strCharset, strMsg, strSalt);
-        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-        strMsg = "user";
-        String hashMessage = bcrypt.encode(strMsg);
+        strMsg = "qG67HDxL";
+        String hashMessage = defaultPasswordEncode(strMsg);
         System.out.println(hashMessage);
+    }
+
+    public static String defaultPasswordEncode(String strMsg) {
+        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+        String hashMessage = bcrypt.encode(strMsg);
+        return hashMessage;
+    }
+
+    public static String defaultPasswordType() {
+        return "BCryptPasswordEncoder";
     }
 }

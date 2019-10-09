@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ClassDiscover {
 
-    private static final Logger log = Logger.getLogger(ClassDiscover.class);
+    private static final Logger log = LogManager.getLogger(ClassDiscover.class);
 
     public synchronized static Class[] getClasses(String packageName,
             Class classe) throws ClassNotFoundException, IOException {

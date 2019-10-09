@@ -3,62 +3,83 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
+import com.github.braully.interfaces.IMigrableEntity;
+import com.github.braully.interfaces.INameComparable;
+import com.github.braully.util.UtilDate;
+import com.github.braully.util.UtilValidation;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import static javax.persistence.TemporalType.DATE;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
+@Setter
+@Getter
 @Entity
 @Table(schema = "base")
-public class Partner extends AbstractMigrableEntity implements Serializable {
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
+public class Partner extends AbstractGlobalEntity implements Serializable, IMigrableEntity, INameComparable {
+
+    @Basic(optional = false)
+    protected String name;
 
     @Basic
-    private String phoneticName;
+    protected String phoneticName;
 
     @Basic
-    private String name;
+    protected String fiscalCode;
 
     @Basic
-    private String attribute;
+    protected String attribute;
+
+    @ManyToOne(fetch = FetchType.LAZY)//(cascade = CascadeType.ALL)
+    protected InfoExtra infoExtra;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private InfoExtra infoExtra;
+    protected Contact contact;
 
+    //TODO: Move to infoExtra
     @Basic
     @Temporal(DATE)
     protected Date birthDate;
+    //TODO: Importante só para motivos contratuais, tirar daqui
+    @ManyToOne
+    protected City birthCity;
+
+    @Basic
+    @Attr("hidden")
+    protected String uniqueCode;
+
+    @Attr("hidden")
+    @ManyToMany(mappedBy = "partnerTarget", fetch = FetchType.LAZY, targetEntity = PartnerPartner.class)
+    protected Set<PartnerPartner> partners;
 
     public Partner() {
 
     }
 
-    public String getPhoneticName() {
-        return this.phoneticName;
+    public Address getAddress() {
+        return this.contact.getMainAddress();
     }
 
-    public void setPhoneticName(String phoneticName) {
-        this.phoneticName = phoneticName;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAttribute() {
-        return this.attribute;
-    }
-
-    public void setAttribute(String attribute) {
-        this.attribute = attribute;
+    public void setAddress(Address address) {
+        this.contact.add(address);
     }
 
     public InfoExtra getInfoExtra() {
@@ -69,11 +90,88 @@ public class Partner extends AbstractMigrableEntity implements Serializable {
         this.infoExtra = infoExtra;
     }
 
-    public Date getBirthDate() {
-        return birthDate;
+    public void setContactSeNull(Contact contact) {
+        if (this.contact == null) {
+            this.contact = contact;
+        }
     }
 
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
+    public void setInfoExtraSeNull(InfoExtra infoExtra) {
+        if (this.infoExtra == null) {
+            this.infoExtra = infoExtra;
+        }
+    }
+
+    public String capitalizedName() {
+        return StringUtils.capitalize(name);
+    }
+
+    //Temp
+    public String getNome() {
+        return name;
+    }
+
+    public void setNome(String nome) {
+        this.name = nome;
+    }
+
+    @Override
+    public String toString() {
+        return name + (this.fiscalCode != null ? " (" + this.fiscalCode + ")" : "");
+    }
+
+    public void setNumeroComprovantePessoa(String fiscalCode) {
+        this.fiscalCode = fiscalCode;
+    }
+
+    public void setDataNascimento(Date dataNascimento) {
+        this.birthDate = dataNascimento;
+    }
+
+    public void setNaturalidade(City nat) {
+        this.birthCity = nat;
+    }
+
+    public Set<Phone> getTelefones() {
+        return this.contact.extraPhones;
+    }
+
+    public Contact contact() {
+        if (this.contact == null) {
+            this.contact = new Contact();
+        }
+        return this.contact;
+    }
+
+    public InfoExtra infoExtra() {
+        if (this.infoExtra == null) {
+            this.infoExtra = new InfoExtra();
+        }
+        return this.infoExtra;
+    }
+
+    public String getUniqueCode() {
+        return this.uniqueCode;
+    }
+
+    public void setUniqueCode(String uniqueCode) {
+        this.uniqueCode = uniqueCode;
+    }
+
+    public PartnerPartner partner(String tipo) {
+        PartnerPartner partner = null;
+        try {
+            if (UtilValidation.isStringValid(tipo)) {
+                for (PartnerPartner pp : this.getPartners()) {
+                    if (tipo.equalsIgnoreCase(pp.getType())) {
+                        partner = pp;
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return partner;
     }
 }

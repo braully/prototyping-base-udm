@@ -17,6 +17,8 @@ package com.github.braully.domain.util;
 
 import com.github.braully.domain.AbstractEntity;
 import com.github.braully.persistence.Status;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -26,6 +28,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import com.github.braully.constant.Attr;
+import com.github.braully.constant.Attrs;
 
 /**
  * Class for test only
@@ -49,6 +53,14 @@ public class EntityDummy extends AbstractEntity {
     private Boolean checked;
     @Enumerated
     private Status statusType;
+    @Basic
+    private Date date;
+    @Basic
+    @Attrs({
+        @Attr({"converter", "monetaryAmountBigDecimal"}),
+        @Attr({"pattern", "0,00"})
+    })
+    private BigDecimal decimal;
     @ManyToOne
     private EntityDummy parent;
     @OneToMany(mappedBy = "parent")

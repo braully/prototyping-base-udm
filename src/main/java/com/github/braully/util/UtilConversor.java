@@ -1,6 +1,10 @@
 package com.github.braully.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.braully.domain.Menu;
 import java.util.Date;
+import java.util.List;
 
 public class UtilConversor {
 
@@ -16,6 +20,7 @@ public class UtilConversor {
         }
         return ret;
     }
+
 
     public float convertePX2MM(int pixels) {
         return pixels / FATOR_CONVERSAO_PX_MM;

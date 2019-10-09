@@ -1,24 +1,29 @@
 package com.github.braully.domain;
 
+import com.github.braully.interfaces.IFormatable;
+import com.github.braully.util.UtilValidation;
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "base")
-public class Address extends AbstractEntity implements Serializable {
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
+@Getter
+@Setter
+public class Address extends AbstractEntity implements Serializable, IFormatable {
 
     @Basic
     private String zip;
-
-    @OneToMany(targetEntity = Partner.class)
-    @JoinTable(schema = "base")
-    private List<Partner> partner;
 
     @ManyToOne(targetEntity = City.class)
     City city;
@@ -35,9 +40,13 @@ public class Address extends AbstractEntity implements Serializable {
     @Basic
     private String addressLine2;
 
-    @Basic
-    private String type;
+    /*@Basic
+    @Enumerated
+    private AddressType type = AddressType.Main;
 
+    public static enum AddressType {
+        Main
+    }*/
     @Basic
     private String number;
 
@@ -45,75 +54,79 @@ public class Address extends AbstractEntity implements Serializable {
 
     }
 
-    public String getZip() {
-        return this.zip;
+    public City getCidade() {
+        return city;
     }
 
-    public void setZip(String zip) {
-        this.zip = zip;
-    }
-
-    public List<Partner> getPartner() {
-        return this.partner;
-    }
-
-    public void setPartner(List<Partner> partner) {
-        this.partner = partner;
-    }
-
-    public City getCity() {
-        return this.city;
-    }
-
-    public void setCity(City city) {
-        this.city = city;
-    }
-
-    public String getStreet() {
-        return this.street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public String getDistrict() {
+    public String getBairro() {
         return this.district;
     }
 
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
-    public String getAddressLine1() {
+    public String getComplemento() {
         return this.addressLine1;
     }
 
-    public void setAddressLine1(String addressLine1) {
-        this.addressLine1 = addressLine1;
+    @Override
+    public String toString() {
+        return format();
     }
 
-    public String getAddressLine2() {
-        return this.addressLine2;
+    public void setCep(String trim) {
+        this.zip = trim;
     }
 
-    public void setAddressLine2(String addressLine2) {
-        this.addressLine2 = addressLine2;
+    public void setDescricao(String trim) {
+        this.addressLine1 = trim;
     }
 
-    public String getType() {
-        return this.type;
+    public void setBairro(String string) {
+        this.district = string;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public String getDescricaoFormatada() {
+        return format();
     }
 
-    public String getNumber() {
-        return number;
-    }
+    public String format() {
+        StringBuilder sb = new StringBuilder();
+        boolean init = false;
+        if (UtilValidation.isStringValid(this.addressLine1)) {
+            sb.append(this.addressLine1);
+            init = true;
+        }
 
-    public void setNumber(String number) {
-        this.number = number;
+        if (UtilValidation.isStringValid(this.addressLine2)) {
+            if (init) {
+                sb.append(", ");
+            }
+            sb.append(this.addressLine2);
+            init = true;
+        }
+
+        if (UtilValidation.isStringValid(this.district)) {
+            if (init) {
+                sb.append(",");
+            }
+            sb.append(" Bairro ");
+            sb.append(this.district);
+            init = true;
+        }
+        if (UtilValidation.isStringValid(this.zip)) {
+            if (init) {
+                sb.append(" -");
+            }
+            sb.append(" CEP: ");
+            sb.append(this.zip);
+            init = true;
+        }
+
+        if (this.city != null && this.city.isPersisted()) {
+            if (init) {
+                sb.append(" - ");
+            }
+            sb.append(city);
+            init = true;
+        }
+        return sb.toString();
     }
 }

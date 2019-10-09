@@ -17,8 +17,6 @@ limitations under the License.
  */
 package com.github.braully.domain;
 
-import com.github.braully.domain.AbstractAuditableEntity;
-import com.github.braully.domain.AccountTransaction;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -35,6 +33,7 @@ public class Payment extends AbstractAuditableEntity {
 
     @Basic
     protected BigDecimal amountOriginal;
+    //TODO: Refactor discount
     @Basic
     protected String descriptionDiscount;
     @Basic
@@ -93,7 +92,5 @@ public class Payment extends AbstractAuditableEntity {
     public void setAccountTransaction(AccountTransaction accountTransaction) {
         this.accountTransaction = accountTransaction;
     }
-    
-    
 
 }

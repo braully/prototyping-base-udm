@@ -1,15 +1,21 @@
 package com.github.braully.domain;
 
+import com.github.braully.interfaces.IFormatable;
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"country", "name", "state"}),
-        schema = "base")
-public class City extends AbstractEntity implements Serializable {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"country", "name", "state"}), schema = "base")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
+public class City extends AbstractGlobalEntity implements Serializable, IFormatable {
 
     @Basic
     private String country;
@@ -57,5 +63,26 @@ public class City extends AbstractEntity implements Serializable {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public boolean isValida() {
+        return true;
+    }
+
+    public String getNomeFormatado() {
+        return this.toString();
+    }
+
+    public void setNomeFormatado(String nome) {
+
+    }
+
+    @Override
+    public String toString() {
+        return format();
+    }
+
+    public String format() {
+        return name + " (" + state + ')';
     }
 }

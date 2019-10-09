@@ -15,13 +15,14 @@ import java.util.Map;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class ReportGenerator implements IRelatorioMisto {
 
     public static final String PACOTE_BUSCA_GERADORES = "br.com.github.braully.report";
 
-    private static final Logger log = Logger.getLogger(ReportGenerator.class);
+    private static final Logger log = LogManager.getLogger(ReportGenerator.class);
     /**
      *
      */
@@ -46,6 +47,8 @@ public abstract class ReportGenerator implements IRelatorioMisto {
         byte[] saida = pdfStream.toByteArray();
         return saida;
     }
+
+    public abstract InputStream generate(GenericDataReport datareport);
 
     @Override
     public byte[] gerarRelatorioByte(ReportTemplate relatorio, Map paramSimples, Map paramBean, Collection colecao) {
@@ -119,4 +122,5 @@ public abstract class ReportGenerator implements IRelatorioMisto {
         }
         return path;
     }
+
 }

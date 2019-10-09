@@ -1,0 +1,307 @@
+/* 
+ * References:  
+ * https://sass-lang.com/guide
+ * https://uxplanet.org/how-to-customize-bootstrap-b8078a011203
+ * https://getbootstrap.com.br/docs/4.1/getting-started/theming
+ * https://getbootstrap.com/docs/4.1/components/navbar
+ * https://getbootstrap.com/docs/4.1/examples/dashboard/
+ * https://fontawesome.com/v4.7.0/icon
+ * https://stackoverflow.com/questions/48816716/bootstrap-4-navbar-not-collapsing-or-expanding
+*/
+
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/forms";
+@import "../node_modules/bootstrap/scss/custom-forms";
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+/*Form content*/
+.autogen-form-row, .af-row {
+    @extend .form-row;
+}
+
+.autogen-form-group, .afg {
+    @extend .form-group;
+}
+
+.autogen-input-group, .aig {
+    @extend .input-group;
+}
+
+.autogen-input-group-prepend-text, .aigpt {
+    /*    @extend .input-group-prepend;*/
+    @extend .input-group-text;
+}
+
+.autogen-input-group-append, .aiga {
+    @extend .input-group-append;
+}
+
+.autogen-input-group-append-button, .aiga-button {
+    /*    @extend .input-group-append;
+        @extend .btn;
+        @extend .btn-outline-secondary;*/
+}
+
+//.autogen-form-group-2, 
+.afg-2 {
+    //@extend .form-group;
+    @extend .col-md-2;
+    padding-left: 0;
+}
+
+//.autogen-form-group-3, 
+.afg-3 {
+    //@extend .form-group;
+    @extend .col-md-3;
+    padding-left: 0;
+}
+
+
+//.autogen-form-group-4, 
+.afg-4 {
+    //@extend .form-group;
+    @extend .col-md-4;
+    padding-left: 0;
+}
+
+//.autogen-form-group-6, 
+.afg-6 {
+    //@extend .form-group;
+    @extend .col-md-6;
+    padding-left: 0;
+}
+
+//.autogen-form-group-8, 
+.afg-8 {
+    //@extend .form-group;
+    @extend .col-md-8;
+    padding-left: 0;
+}
+
+.autogen-form-group-select, .afg-select {
+    @extend .custom-select;
+}
+
+.autogen-form-group-input, .afg-input {
+    @extend .form-control;
+}
+
+.autogen-form-group-check, .afg-check {
+    @extend .form-check;
+}
+
+.autogen-form-group-input-check, .afg-i-check {
+    @extend .form-check-input;
+}
+
+.autogen-form-group-label-check, .afg-l-check {
+    @extend .form-check-label;
+}
+
+//.autogen-form-group-button, .afg-butto
+
+.autogen-button, .ab {
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-primary;
+}
+
+.autogen-button-alt, .ab-alt {
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-outline-dark;
+}
+
+/* Filter */
+.autogen-filter-group, .arg {
+    /*    @extend .input-group;
+        @extend .input-group-sm;*/
+}
+
+.autogen-filter-group-button-search, .arg-b-search {
+    /*    @extend .input-group-append;
+        @extend .btn;
+        @extend .btn-sm;
+        @extend .btn-primary;*/
+}
+
+/*.autogen-filter-group-button-search {
+    @extend .input-group-append;
+    @extend .btn;
+    @extend .btn-sm;
+    @extend .btn-primary;
+    @extend .float-right;
+}*/
+
+.autogen-button, .ab {
+    /*    @extend .btn;
+        @extend .btn-sm;
+        @extend .btn-outline-dark;*/
+}
+
+.autogen-button-default-raw, .abd-raw {
+    /*    @extend .btn;
+        @extend .btn-sm;*/
+}
+
+
+.autogen-button-info, .ab-info {
+    /*    @extend .btn-outline-primary;*/
+}
+
+.autogen-button-warn, .ab-warn {
+    /*    @extend .btn-outline-danger;*/
+}
+
+/* List content */
+//https://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-tables.php
+.autogen-list-responsive, .alr {
+    /*    @extend .table-responsive-sm;*/
+    @extend .table-responsive-sm;
+}
+
+.autogen-list-table, .alt {
+    @extend .table;
+    @extend .table-sm;
+    @extend .table-striped;
+    @extend .w-auto;
+}
+
+.autogen-list-table-body-col-input, .alt-b-c-input  {
+    /*    @extend .btn;
+        @extend .btn-outline-primary;*/
+}
+
+.autogen-list-table-body-col-input-group, .alt-b-c-i-group {
+    /*    @extend .btn-group;
+        @extend .btn-group-sm;*/
+}
+
+.autogen-list-group, .alg-group, .autogen-row-flex {
+    @extend .d-flex;
+    @extend .flex-row;
+}
+
+.autogen-list-group-button, .alg-button {
+    /*    @extend .btn;
+        @extend .btn-sm;
+        @extend .btn-outline-dark;*/
+}
+
+.autogen-list-group-button-raw, .alg-b-raw {
+    /*    @extend .btn;
+        @extend .btn-sm;*/
+}
+
+.autogen-list-group-col, .alg-col {
+    @extend .col;
+}
+
+.autogen-button-extra, .alg-b-extra {
+    @extend .dropdown-menu;
+}
+
+.autogen-button-extra-button, .alg-b-e-button {
+    @extend .dropdown-item;
+}
+
+.autogen-button-col, .ab-col  {
+    @extend .btn-group;
+    @extend .btn-group-sm;
+}
+
+.autogen-list-group-pagination-col, .alg-p-col {
+    @extend .ml-auto;
+    @extend .pagination;
+    @extend .pagination-sm;
+    @extend .justify-content-end;
+}
+
+.autogen-list-group-button-prev, .alg-b-prev, 
+.autogen-list-group-pagination-button-prev, .alg-p-b-prev {
+    /*    @extend .page-item;
+        @extend .page-link;*/
+}
+
+.autogen-list-group-button-next, .alg-b-next, 
+.autogen-list-group-pagination-button-next, .alg-p-b-next {
+    /*    @extend .page-item;
+        @extend .page-link;*/
+}
+
+.autogen-button-page, .ab-page {
+    @extend .page-item;
+    @extend .page-link;
+}
+
+.autogen-button-page-active, .abp-active {
+    @extend .active;
+    //@extend .page-item;
+    //@extend .page-link;
+    /*z-index: 1;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    @extend .page-item, .active;
+    @extend .page-link;*/
+}
+
+.autogen-message-error, .a-m-error {
+    @extend .alert;
+    @extend .alert-danger;
+    list-style-type: none;
+}
+
+.autogen-message-warning, .a-m-warn {
+    @extend .alert;
+    @extend .alert-warning;
+    list-style-type: none;
+}
+
+.autogen-message-info, .a-m-info {
+    @extend .alert;
+    @extend .alert-info;
+    list-style-type: none;
+}
+
+/*https://getbootstrap.com/docs/4.0/utilities/colors/#color*/
+/*https://getbootstrap.com.br/docs/4.1/utilities/borders/*/
+
+.enum-active, .enum-ativo, 
+.enum-lancada {
+    @extend .bg-info;
+    @extend .text-white;
+    @extend .rounded;
+    @extend .border;
+    @extend .small;
+}
+
+.enum-vencido, .enum-vencida {
+    @extend .bg-warning;
+    /*@extend .text-white;*/
+    @extend .rounded;
+    @extend .border;
+    @extend .small;
+}
+
+.enum-nova, .enum-novo,
+.enum-transferido, .enum-remanejado, 
+.enum-fechado, .enum-previsto {
+    @extend .bg-secondary;
+    @extend .text-white;
+    @extend .rounded;
+    @extend .border;
+    @extend .small;
+}
+
+.enum-blocked, .enum-inactive, 
+.enum-canceled, .enum-cancelado, .enum-excluido,
+.enum-bloqueado {
+    @extend .bg-danger;
+    @extend .text-white;
+    @extend .rounded;
+    @extend .border;
+    @extend .small;
+}

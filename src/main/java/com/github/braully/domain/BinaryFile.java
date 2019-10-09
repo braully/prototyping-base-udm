@@ -4,111 +4,132 @@
 package com.github.braully.domain;
 
 import com.github.braully.constant.StatusExecutionCycle;
+import com.github.braully.util.UtilIO;
+import com.github.braully.util.UtilValidation;
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(schema = "base")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
 public class BinaryFile extends AbstractStatusEntity implements Serializable {
 
-    @Basic
-    private String name;
+    @ManyToOne
+    protected Organization organization;
+
+    @ManyToOne
+    protected UserLogin userLogin;
 
     @Basic
-    private String type;
+    protected String description;
+
+    @Basic
+    protected String name;
+
+    @Basic
+    protected String type;
+
+    @Basic
+    protected String subtype;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
-    private Date date;
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    protected Date date;
 
     @Basic(fetch = FetchType.LAZY)
-    private byte[] fileBinary;
+    @Column(columnDefinition = "bytea")
+    protected byte[] fileBinary;
 
     @Basic
-    private String md5;
+    protected String md5;
 
     @Basic
-    private String pathCloud;
+    protected String pathLocal;
 
     @Basic
-    private String pathLog;
+    protected String pathCloud;
+
+    @Basic
+    protected String pathLog;
 
     @Enumerated
     @Basic
-    private StatusExecutionCycle statusExecution;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public byte[] getFileBinary() {
-        return fileBinary;
-    }
-
-    public void setFileBinary(byte[] fileBinary) {
-        this.fileBinary = fileBinary;
-    }
-
-    public String getMd5() {
-        return md5;
-    }
-
-    public void setMd5(String md5) {
-        this.md5 = md5;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getPathCloud() {
-        return pathCloud;
-    }
-
-    public void setPathCloud(String pathCloud) {
-        this.pathCloud = pathCloud;
-    }
-
-    public String getPathLog() {
-        return pathLog;
-    }
-
-    public void setPathLog(String pathLog) {
-        this.pathLog = pathLog;
-    }
-
-    public StatusExecutionCycle getStatusExecution() {
-        return statusExecution;
-    }
-
-    public void setStatusExecution(StatusExecutionCycle statusExecution) {
-        this.statusExecution = statusExecution;
-    }
+    protected StatusExecutionCycle statusExecution;
 
     public boolean isReady() {
         return this.statusExecution == StatusExecutionCycle.READY;
+    }
+
+    public String getExtensaoArquivo() {
+        String ret = null;
+        if (this.name != null) {
+            String name = this.name.toLowerCase();
+            ret = name.substring(name.lastIndexOf('.') + 1, name.length());
+        }
+        return ret;
+    }
+
+    public byte[] getArquivo() {
+        return fileBinary;
+    }
+
+    public void setNome(String nomeArquivo) {
+        this.name = nomeArquivo;
+    }
+
+    public String getNome() {
+        return this.name;
+    }
+
+    @Override
+    protected String preToString() {
+        if (UtilValidation.isStringValid(description)) {
+            return description;
+        }
+        return this.name;
+    }
+
+    public InputStream getStream() {
+        InputStream stream = null;
+        if (pathLocal != null) {
+            try {
+                stream = UtilIO.loadStreamFromFilePath(pathLocal);
+            } catch (FileNotFoundException e) {
+                throw new IllegalStateException("Não é possível abrir o arquivo: " + pathLocal, e);
+            }
+        } else if (fileBinary != null) {
+            stream = new ByteArrayInputStream(fileBinary);
+        }
+        return stream;
+    }
+
+    public String getSubtype() {
+        return subtype;
+    }
+
+    public void setSubtype(String type) {
+        this.subtype = type;
     }
 }

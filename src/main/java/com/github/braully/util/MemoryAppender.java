@@ -21,11 +21,22 @@ package com.github.braully.util;
 /* (c) 2013 randomnoun. All Rights Reserved. This work is licensed under a
  * BSD Simplified License. (http://www.randomnoun.com/bsd-simplified.html)
  */
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginElement;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
 /**
  * Log4j appender to capture logging events in an in-memory List. I'm amazed
@@ -65,8 +76,9 @@ import org.apache.log4j.spi.LoggingEvent;
  * @version $Id: MemoryAppender.java,v 1.3 2013-09-24 02:37:09 knoxg Exp $
  * @author knoxg
  */
+@Plugin(name = "MemoryAppender", category = "Core", elementType = "appender", printObject = true)
 public class MemoryAppender
-        extends AppenderSkeleton {
+        extends AbstractAppender {
 
     /**
      * A revision marker to be used in exception stack traces.
@@ -75,26 +87,11 @@ public class MemoryAppender
 
     public final static long DEFAULT_LOG_SIZE = 500;
     private long maximumLogSize = DEFAULT_LOG_SIZE;
-    private LinkedList<LoggingEvent> loggingEvents;
+    private LinkedList<LoggingEvent> loggingEvents = new LinkedList<>();
+    private LinkedList<LogEvent> logEvents = new LinkedList<>();
 
-    /**
-     * Create a new MemoryAppender object
-     */
-    public MemoryAppender() {
-        // this should be a LinkList since we use this data structure as a queue
-        loggingEvents = new LinkedList<LoggingEvent>();
-    }
-
-    /**
-     * Create a new MemoryAppender with the specified log size
-     *
-     * @param logSize The maximum number of logging events to store in this
-     * class
-     */
-    public MemoryAppender(int logSize) {
-        this.maximumLogSize = logSize;
-        // this should be a LinkList since we use this data structure as a queue
-        loggingEvents = new LinkedList<LoggingEvent>();
+    public MemoryAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions, Property[] properties) {
+        super(name, filter, layout, ignoreExceptions, properties);
     }
 
     /**
@@ -143,6 +140,16 @@ public class MemoryAppender
      * <p>
      * The format of the output will depend on this appender's layout.
      */
+    @Override
+    public void append(LogEvent event) {
+        synchronized (logEvents) {
+            if (logEvents.size() >= maximumLogSize) {
+                logEvents.removeLast();
+            }
+            logEvents.addFirst(event);
+        }
+    }
+
     public void append(LoggingEvent event) {
         // Reminder: the nesting of calls is:
         //
@@ -226,5 +233,25 @@ public class MemoryAppender
      */
     public List<LoggingEvent> getLoggingEvents() {
         return new ArrayList<LoggingEvent>(loggingEvents);
+    }
+
+    public LinkedList<LogEvent> getLogEvents() {
+        return logEvents;
+    }
+
+    @PluginFactory
+    public static MemoryAppender createAppender(
+            @PluginAttribute("name") String name,
+            @PluginElement("Layout") Layout<? extends Serializable> layout,
+            @PluginElement("Filter") final Filter filter,
+            @PluginAttribute("otherAttribute") String otherAttribute) {
+        if (name == null) {
+            LOGGER.error("No name provided for MemoryAppender");
+            return null;
+        }
+        if (layout == null) {
+            layout = PatternLayout.createDefaultLayout();
+        }
+        return new MemoryAppender(name, filter, layout, true, null);
     }
 }

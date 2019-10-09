@@ -17,6 +17,9 @@ limitations under the License.
  */
 package com.github.braully.domain;
 
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -27,6 +30,9 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(schema = "sale")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
 public class InventoryItemTransaction extends AbstractEntity {
 
     @ManyToOne

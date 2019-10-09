@@ -9,12 +9,13 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class UtilSimpleCrypt {
 
-    static final Logger log = Logger.getLogger(UtilSimpleCrypt.class);
+    static final Logger log = LogManager.getLogger(UtilSimpleCrypt.class);
 
     private static char[] MD5_HEX = "0123456789abcdef".toCharArray();
 

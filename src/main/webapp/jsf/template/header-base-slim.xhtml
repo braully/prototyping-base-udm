@@ -1,0 +1,89 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <ui:composition>
+        <div class="container-fluid">
+            <div class="slim-header-left">
+                <h2 class="base-app-brand">
+                    <a href="/index">MaxGe</a>
+                </h2>
+                <a href="" id="slimSidebarMenu" class="slim-sidebar-menu">
+                    <span></span>
+                </a>
+                <!--
+                <div class="search-box">
+                     <input type="text" class="form-control" placeholder="Busca" />
+                     <button class="btn btn-primary">
+                         <i class="fa fa-search"></i>
+                     </button>
+                 </div>
+                -->
+                <!-- search-box -->
+            </div>
+            <!-- slim-header-left -->
+            <div class="slim-header-right">
+                <!-- dropdown -->
+                <div class="dropdown dropdown-b" data-toggle="tooltip" title="Notificações">
+                    <a href="" class="header-notification" data-toggle="dropdown">
+                        <i class="icon ion-ios-bell-outline"></i>
+                        <span class="indicator"></span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-menu-header">
+                            <h6 class="dropdown-menu-title">Notificações</h6>
+                            <div>
+                                <!--<a href="">Marcar como lidas</a>-->
+                                <a href="">Configurações</a>
+                            </div>
+                        </div><!-- dropdown-menu-header -->
+                        <div class="dropdown-list">
+                            <!-- loop starts here -->
+                            <a href="" class="dropdown-link">
+                                <div class="media">
+                                    <img src="/tmp/avatars/admin.png" alt=""/>
+                                    <div class="media-body">
+                                        <p>
+                                            <strong>Usuario 1</strong> notificação.
+                                        </p>
+                                        <span>01/01/2019 05:08</span>
+                                    </div>
+                                </div>
+                            </a>
+                            <!-- loop ends here -->
+                            <a href="" class="dropdown-link read">
+                                <div class="media">
+                                    <img src="/tmp/avatars/admin.png" alt=""/>
+                                    <div class="media-body">
+                                        <p>
+                                            <strong>Usuario 2</strong> notificação.
+                                        </p>
+                                        <span>01/01/2019 6:08</span>
+                                    </div>
+                                </div><!-- media -->
+                            </a>
+                            <div class="dropdown-list-footer">
+                                <a href="page-notifications.html">
+                                    <i class="fa fa-angle-down"></i> Vert todas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown dropdown-c">
+                    <a href="#" class="logged-user" data-toggle="dropdown">
+                        <img src="/tmp/avatars/admin.png" alt="" />
+                        <span>#{genericMB.userName}</span>
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <nav class="nav">
+                            <a href="/system/profile" class="nav-link">
+                                <i class="icon ion-person"></i>Alterar perfil
+                            </a>
+                            <a href="/logout" class="nav-link"><i class="icon ion-forward"></i>Sair</a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:composition>
+</html>

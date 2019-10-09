@@ -25,7 +25,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class UtilIO {
 
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UtilComparator.class);
+    private static final org.apache.log4j.Logger log = org.apache.log4j.LogManager.getLogger(UtilComparator.class);
 
     /* */
     private static final int DEFAULT_BUFFER_SIZE = 1024;
@@ -36,18 +36,18 @@ public class UtilIO {
         File file = new File(pathImagem);
         if (file.exists()) {
             FileInputStream fis = new FileInputStream(file);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        int l;
-        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+            int l;
+            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
 
-        while ((l = fis.read(buffer)) > 0) {
-            baos.write(buffer, 0, l);
-        }
-        fis.close();
-        baos.flush();
+            while ((l = fis.read(buffer)) > 0) {
+                baos.write(buffer, 0, l);
+            }
+            fis.close();
+            baos.flush();
             buffSaida = baos.toByteArray();
-        baos.close();
+            baos.close();
         } else if (pathImagem.contains("jar!")) {
             String jarurl = "jar:" + pathImagem;
             System.out.println("Url: " + pathImagem);
@@ -173,7 +173,16 @@ public class UtilIO {
     }
 
     public static InputStream loadStreamFromFilePath(String string) throws FileNotFoundException {
-        return new FileInputStream(UtilPath.getPath(string));
+        String path = string;
+
+        try {
+            path = UtilPath.getPath(string);
+        } catch (Exception e) {
+            log.debug("File not found on path " + string, e);
+        }
+
+        return new FileInputStream(path);
+
     }
 
     public static void copy(InputStream stream, OutputStream out) throws IOException {
@@ -194,5 +203,9 @@ public class UtilIO {
 
     public static String homeUserDir() {
         return System.getProperty("user.home");
+    }
+
+    public static InputStream outputStreamToInput(ByteArrayOutputStream baos) {
+        return new ByteArrayInputStream(baos.toByteArray());
     }
 }

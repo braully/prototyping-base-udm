@@ -17,7 +17,11 @@ limitations under the License.
  */
 package com.github.braully.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,5 +45,47 @@ public class UtilCollection {
         } catch (Exception e) {
         }
         return map;
+    }
+
+    public static Map merge(Map... props) {
+        Map<String, Object> mapAllProps = new HashMap<>();
+        if (props != null) {
+            for (Map pps : props) {
+                mapAllProps.putAll(pps);
+            }
+        }
+        return mapAllProps;
+    }
+
+    public static boolean sortIfComparable(Collection colection) {
+        try {
+            Collections.sort((List) colection);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static String printArray(Object[] arr) {
+        StringBuilder sb = new StringBuilder();
+        if (arr != null) {
+            sb.append("| ");
+            for (Object o : arr) {
+                try {
+                    sb.append(o).append(" | ");
+                } catch (Exception e) {
+
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    public synchronized static List<Integer> list(int windowIni, int windowEnd) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = windowIni; i < windowEnd; i++) {
+            list.add(i);
+        }
+        return list;
     }
 }

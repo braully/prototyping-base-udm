@@ -12,14 +12,15 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Braully Rocha
  */
 public class UtilClassLoader {
 
-    private static final Logger log = Logger.getLogger(UtilClassLoader.class);
+    private static final Logger log = LogManager.getLogger(UtilClassLoader.class);
 
     public synchronized static Class[] getClasses(String packageName,
                                                   Class classe) throws ClassNotFoundException, IOException {

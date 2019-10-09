@@ -21,6 +21,9 @@ import com.github.braully.constant.FactorType;
 import com.github.braully.constant.TypePeriodInterest;
 import com.github.braully.domain.AbstractStatusEntity;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,25 +35,29 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(schema = "financial")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
+
 public class FinancialCharge extends AbstractStatusEntity {
 
     @Basic
     protected String description;
     @Basic
     protected String instructions;
-    @Basic
-    protected Long factorTrafficTicket;
-    @Enumerated
+    @Enumerated(EnumType.ORDINAL)
     @Basic
     protected FactorType typeFactorTrafficTicket;
     @Basic
-    protected Long factorInterestRating;
-    @Enumerated(EnumType.ORDINAL)
-    @Basic
-    protected FactorType typeFactorInterestRating;
+    protected Long factorTrafficTicket;
     @Enumerated(EnumType.ORDINAL)
     @Basic
     protected TypePeriodInterest typePeriodInterest;
+    @Enumerated(EnumType.ORDINAL)
+    @Basic
+    protected FactorType typeFactorInterestRating;
+    @Basic
+    protected Long factorInterestRating;
 
     public String getDescription() {
         return description;
@@ -108,4 +115,28 @@ public class FinancialCharge extends AbstractStatusEntity {
         this.typePeriodInterest = typePeriodInterest;
     }
 
+    @Override
+    public String toString() {
+        return description + " (" + typeFactorTrafficTicket + "/" + factorTrafficTicket + " e " + typePeriodInterest + " " + typeFactorInterestRating + " " + factorInterestRating + ')';
+    }
+
+    public Long getFatorMulta() {
+        return this.factorTrafficTicket;
+    }
+
+    public FactorType getTipoFatorMulta() {
+        return this.typeFactorTrafficTicket;
+    }
+
+    public Long getFatorJuros() {
+        return this.factorInterestRating;
+    }
+
+    public FactorType getTipoFatorJuros() {
+        return this.typeFactorInterestRating;
+    }
+
+    public TypePeriodInterest getTipoPeriodoJuros() {
+        return this.typePeriodInterest;
+    }
 }

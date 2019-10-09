@@ -25,7 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import javax.annotation.Resource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("binaryFileProcessorBC")
 public class BinaryFileProcessorBC {
 
-    private static final Logger log = Logger.getLogger(BinaryFileProcessorBC.class);
+    private static final Logger log = LogManager.getLogger(BinaryFileProcessorBC.class);
 
     @Autowired(required = false)
     private List<BinaryFileProcessor> binaryFileProcessors;
@@ -49,7 +50,8 @@ public class BinaryFileProcessorBC {
 
     @Scheduled(cron = "0 0 0 * * *")
     public void processReadiesFile() {
-        List<BinaryFile> arquivosPendentes = this.genericDAO.loadCollectionWhere(BinaryFile.class, "statusExecution", StatusExecutionCycle.READY);
+        List<BinaryFile> arquivosPendentes = this.genericDAO.loadCollectionWhere(BinaryFile.class,
+                "statusExecution", StatusExecutionCycle.READY);
         if (arquivosPendentes != null) {
             for (BinaryFile arquivo : arquivosPendentes) {
                 processFile(arquivo);
@@ -57,20 +59,33 @@ public class BinaryFileProcessorBC {
         }
     }
 
+    @Async
+    public void processFileAsync(BinaryFile arquivo) {
+        processFile(arquivo);
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private void processFile(BinaryFile arquivo) {
+    public void processFile(BinaryFile arquivo) {
         if (arquivo == null || arquivo.isReady()) {
             return;
         }
-        arquivo = genericDAO.loadEntity(arquivo);
         if (binaryFileProcessors != null) {
+            arquivo = genericDAO.loadEntity(arquivo);
             for (BinaryFileProcessor processador : binaryFileProcessors) {
                 try {
-                    if (processador.getType().equals(arquivo.getType())) {
+                    String arquivoType = arquivo.getSubtype();
+                    String processorType = processador.getType();
+                    if (arquivoType != null) {
+                        if (arquivoType.toLowerCase().startsWith(processorType.toLowerCase())) {
+                            processador.processFile(arquivo);
+                            arquivo.setStatusExecution(StatusExecutionCycle.DONE);
+                            break;
+                        }
+                    } else if (processador.isProcessable(arquivo)) {
                         processador.processFile(arquivo);
                         arquivo.setStatusExecution(StatusExecutionCycle.DONE);
+                        break;
                     }
-
                 } catch (Exception e) {
                     arquivo.setStatusExecution(StatusExecutionCycle.BLOCKED);
                     log.error("Falha ao processar arquivo: " + arquivo.getName(), e);
@@ -86,8 +101,15 @@ public class BinaryFileProcessorBC {
     }
 
     public void saveBinaryFile(String fileName, InputStream inputStream) throws IOException {
+        saveBinaryFile(fileName, inputStream, null, null);
+    }
+
+    public void saveBinaryFile(String fileName, InputStream inputStream, String type, String description) throws IOException {
         BinaryFile binaryFile = new BinaryFile();
+        binaryFile.setType(type);
         binaryFile.setName(fileName);
+        binaryFile.setDescription(description);
+        binaryFile.setStatusExecution(StatusExecutionCycle.DONE);
         //TODO: Save on storage. Avoid database
         binaryFile.setFileBinary(UtilIO.loadStream(inputStream));
         this.genericDAO.saveEntity(binaryFile);

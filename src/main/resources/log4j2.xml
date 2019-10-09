@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        <!-- File Appender -->
+        <File name="File" fileName="maxge.log">
+            <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+    
+        <WebConsoleAppender name="WebConsole">
+            <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n" />
+        </WebConsoleAppender>    
+        
+        <MemoryAppender name="Memory">
+            <PatternLayout pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n" />
+        </MemoryAppender>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="WEBCONSOLE" 
+                level="info" additivity="false">
+            <AppenderRef ref="Memory" /> 
+            <!--<AppenderRef ref="Console" />
+            <AppenderRef ref="WebConsole" />-->
+        </Logger>
+        
+        <!-- Log everything in custom package -->
+        <Logger name="com.github.braully" additivity="false"
+                level="info" >
+            <!--level="info" >-->
+            <!--level="debug" >-->
+            <AppenderRef ref="Memory" /> 
+            <AppenderRef ref="Console" />
+            <!--<AppenderRef ref="WebConsole" />-->
+            <!--<AppenderRef ref="File" />-->
+        </Logger>
+
+        <!-- Log everything in Spring Core -->
+        <Logger name="org.springframework.core" additivity="false"
+                level="warn" >
+            <!--level="debug" >-->
+            <AppenderRef ref="Console" />
+            <!--<AppenderRef ref="File" />-->
+        </Logger>
+
+        <Root level="error">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="Memory" />            
+            <!--<AppenderRef ref="WebConsole" />-->
+            <AppenderRef ref="File" />
+        </Root>
+    </Loggers>
+</Configuration>

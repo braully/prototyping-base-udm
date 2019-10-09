@@ -9,6 +9,11 @@ buildNumber.properties
 .mvn/timing.properties
 
 # Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
+maxge.log
+*maxge.log
+**/maxge.log
+
+# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
 
 #builds directories
@@ -18,3 +23,9 @@ buildNumber.properties
 
 #secret project files
 /src/main/resources/application-prod.properties
+/legado/projetos/arquitetura-comum/trunk/target/
+/legado/projetos/arquitetura-web/trunk/target/
+/legado/projetos/financeiro/trunk/target/
+/legado/projetos/escola/trunk/.idea/
+/nb-configuration.xml
+/src/main/resources/keystore-prod.p12

@@ -1,10 +1,13 @@
 package com.github.braully.persistence;
 
+import java.util.Map;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import org.hibernate.Session;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -28,6 +31,12 @@ public class GenericDAO extends DAO {
 
     @Transactional
     @Override
+    public void saveEntityFlyWeigth(IEntity entidade, String... namePropriedades) {
+        super.saveEntityFlyWeigth(entidade, namePropriedades); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Transactional
+    @Override
     public void saveEntity(IEntity... e) {
         super.saveEntity(e);
     }
@@ -36,6 +45,11 @@ public class GenericDAO extends DAO {
     @Override
     public void update(Object entity) {
         super.update(entity);
+    }
+
+    @Transactional
+    public int updateEntityQuery(IEntity entity, Object... propvalue) {
+        return super.updateEntityQuery(entity, propvalue);
     }
 
     @Transactional
@@ -93,12 +107,29 @@ public class GenericDAO extends DAO {
     }
 
     @Transactional
+    @Override
     public int count(Class entiClass) {
         return super.count(entiClass);
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void flush() {
         this.getEntityManager().flush();
+    }
+
+    @Override
+    public <T> Query genericFullTextSearchQuery(Class<T> cls, String searchString, Map<String, Object> extraSearchParams) {
+        return super.genericFullTextSearchQuery(cls, searchString, extraSearchParams); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public <T> void parameterGenericQueryFullTextSearch(Class<T> cls, String searchString, Map<String, Object> mapSanitizedParameter, Query query) {
+        super.parameterGenericQueryFullTextSearch(cls, searchString, mapSanitizedParameter, query); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Map<String, Object> sanitizeParameters(Map<String, Object> extraSearchParams) {
+        return super.sanitizeParameters(extraSearchParams); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

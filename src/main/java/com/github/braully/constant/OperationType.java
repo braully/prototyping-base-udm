@@ -6,7 +6,9 @@ package com.github.braully.constant;
  */
 public enum OperationType {
 //TODO: Translate and unify 
-    ABRIR("Abrir", "Abertura"), FECHAR("Fechar", "Fechamento"), TRANSFERIR("Transferir", "Transferência");
+    ABRIR("Abrir", "Abertura"), 
+    FECHAR("Fechar", "Fechamento"), 
+    TRANSFERIR("Transferir", "Transferência");
     final String nome, operacao;
 
     private OperationType(String nome, String operacao) {
@@ -22,4 +24,8 @@ public enum OperationType {
         return nome;
     }
 
+    @Override
+    public String toString() {
+        return this.nome;
+    }
 }

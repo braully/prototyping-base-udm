@@ -1,5 +1,6 @@
 package com.github.braully.domain;
 
+import com.github.braully.interfaces.INameComparable;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -7,29 +8,35 @@ import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import com.github.braully.interfaces.VisualIdentity;
+import javax.persistence.CascadeType;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(schema = "base")
-public class Organization extends AbstractEntity implements VisualIdentity {
+public class Organization extends AbstractGlobalEntity 
+        implements VisualIdentity, INameComparable {
 
     /*
      *
      */
     @Basic
-    private String name;
+    protected String name;
     @Basic
-    private String description;
+    protected String description;
     @Basic
-    private String oficialName;
+    protected String oficialName;
     @Basic
-    private String fiscalCode;
+    protected String fiscalCode;
     @ManyToOne
-    private BinaryFile logo;
+    protected BinaryFile logo;
+    @ManyToOne(cascade = CascadeType.ALL)
+    protected Contact contact;
     @ManyToOne
-    private Phone phone;
-    @ManyToOne
-    private Address address;
+    protected Organization parent;
 
     public Organization() {
     }
@@ -66,20 +73,12 @@ public class Organization extends AbstractEntity implements VisualIdentity {
         this.fiscalCode = fiscalCode;
     }
 
-    public Phone getPhone() {
-        return phone;
+    public BinaryFile getLogo() {
+        return logo;
     }
 
-    public void setPhone(Phone phone) {
-        this.phone = phone;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setLogo(BinaryFile logo) {
+        this.logo = logo;
     }
 
     @Override
@@ -90,5 +89,43 @@ public class Organization extends AbstractEntity implements VisualIdentity {
     @Override
     public String getVisualDescription() {
         return "Logo";
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + fiscalCode + ')';
+    }
+
+    //Temporario
+    public String getNome() {
+        return name;
+    }
+
+    public String getCnpj() {
+        return fiscalCode;
+    }
+
+    public String getRazaoSocial() {
+        return oficialName;
+    }
+
+    public String getCnpjFormatado() {
+        return fiscalCode;
+    }
+
+    public String getAddressDescription() {
+        try {
+            return this.contact.getMainAddress().getDescricaoFormatada();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public Address getMainAddress() {
+        try {
+            return this.contact.getMainAddress();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

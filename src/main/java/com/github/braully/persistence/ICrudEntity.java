@@ -24,6 +24,8 @@ public interface ICrudEntity {
 
     <T> T loadEntity(T entity);
 
+    <T> T loadEntity(Class<T> clz, Object id);
+
     <T> T loadEntityFetch(IEntity e, String... props);
 
     <T> T loadEntityFetch(String nameEntity, Object id, String... props);
@@ -52,7 +54,7 @@ public interface ICrudEntity {
 //    public <T> PagedQueryResult loadCollectionPagedQuery(Class<T> classe);
 //
 //    public void next(PagedQueryResult queryResult);
-    public static final int DEFAULT_PAGE_SIZE = 10;
+    public static final int DEFAULT_PAGE_SIZE = 15;
 
     /*
      *
@@ -67,7 +69,8 @@ public interface ICrudEntity {
 
     public PagedQueryResult queryListPagedQuery(Object... args);
 
-    public <T> PagedQueryResult genericFulltTextSearchPagedQuery(Class<T> entityClass, String searchString, Map<String, Object> extraSearchParams);
+    public <T> PagedQueryResult genericFulltTextSearchPagedQuery(Class<T> entityClass,
+            String searchString, Map<String, Object> extraSearchParams);
 
     void paginate(PagedQueryResult queryResult);
 }

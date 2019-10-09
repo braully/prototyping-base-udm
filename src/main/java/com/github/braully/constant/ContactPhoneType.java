@@ -6,7 +6,11 @@ import java.util.List;
 public enum ContactPhoneType {
 
     //TODO: Translate and unify 
-    CELULAR("Celular"), RESIDENCIAL("Residencial"), COMERCIAL("Comercial"), RECADO("Recado"), GERAL("Geral");
+    CELULAR("Celular"), 
+    RESIDENCIAL("Residencial"), 
+    COMERCIAL("Comercial"), 
+    RECADO("Recado"), 
+    GERAL("Geral");
 
     private final String descricao;
 

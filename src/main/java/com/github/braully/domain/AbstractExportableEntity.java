@@ -9,10 +9,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.validator.routines.checkdigit.CUSIPCheckDigit;
 import org.apache.commons.validator.routines.checkdigit.CheckDigitException;
 
-@Data
+@Getter
+@Setter
 @MappedSuperclass
 public abstract class AbstractExportableEntity implements IEntity, IExportableEntity {
 
@@ -32,7 +35,7 @@ public abstract class AbstractExportableEntity implements IEntity, IExportableEn
 
     @Column(unique = true)
     @Basic
-    private String uniqueCode;
+    protected String uniqueCode;
 
     @Override
     public String getUniqueCode() {
@@ -93,5 +96,10 @@ public abstract class AbstractExportableEntity implements IEntity, IExportableEn
             throw new IllegalArgumentException("Falha ao calcular digito verificador para o codigo: " + codigo, ex);
         }
         return dv;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " (" + "#" + id + ')';
     }
 }

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ps="http://xmlns.jcp.org/jsf/passthrough">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">Blank</ui:define>
+        <ui:define name="template.body.append"></ui:define>
+
+        <ui:define name="template.app.header">
+            <ui:include src="/jsf/template/header-base-slim.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.menu">
+            <ui:include src="/jsf/template/menu-base-app.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content">  </ui:define>
+    </ui:composition>
+</html>

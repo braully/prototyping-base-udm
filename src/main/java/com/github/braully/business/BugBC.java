@@ -21,8 +21,8 @@ import com.github.braully.constant.StatusBug;
 import com.github.braully.domain.App;
 import com.github.braully.domain.Task;
 import com.github.braully.domain.util.Bug;
-import com.github.braully.domain.util.LogEntry;
-import com.github.braully.domain.util.ViewLog;
+import com.github.braully.domain.util.LogEntryError;
+import com.github.braully.domain.util.LogEntryErrorView;
 import java.util.*;
 import javax.annotation.Resource;
 import org.hibernate.Criteria;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author braullyrocha
  */
 @Service
-public class BugBC implements IBugBC {
+public class BugBC {
 
     @Resource(name = "genericDAO")
     private GenericDAO genericoDAO;
@@ -48,9 +48,9 @@ public class BugBC implements IBugBC {
     //@Override
     public List<Bug> pesquisarErros(App projeto, StatusBug statusBug, Date dataInicio, Date dataFim) {
         List<Bug> bugs = new ArrayList<Bug>();
-        List<ViewLog> visoes = this.pesquisarVisoes(projeto, dataInicio, dataFim);
+        List<LogEntryErrorView> visoes = this.pesquisarVisoes(projeto, dataInicio, dataFim);
         if (visoes != null) {
-            for (ViewLog vis : visoes) {
+            for (LogEntryErrorView vis : visoes) {
                 Bug bug = pesquisarBug(vis.getId());
                 if (bug == null) {
                     bug = new Bug(vis);
@@ -110,8 +110,8 @@ public class BugBC implements IBugBC {
         return bugs;
     }
 
-    private List<ViewLog> pesquisarVisoes(App projeto, Date dataInicio, Date dataFim) {
-        Criteria criteria = genericoDAO.getSession().createCriteria(ViewLog.class);
+    private List<LogEntryErrorView> pesquisarVisoes(App projeto, Date dataInicio, Date dataFim) {
+        Criteria criteria = genericoDAO.getSession().createCriteria(LogEntryErrorView.class);
         if (projeto != null && projeto.isPersisted()) {
             criteria.add(Restrictions.ilike("aplicacao", projeto.getName()));
         }
@@ -166,7 +166,7 @@ public class BugBC implements IBugBC {
     //@Override
     public Bug carregarBug(Bug bugTmp) {
         Bug bug = this.genericoDAO.loadEntityFetch(bugTmp, "projeto", "visaoLog", "pai", "tarefa");
-        List<LogEntry> mensagens = this.genericoDAO.queryList("SELECT e FROM EntradaLog e "
+        List<LogEntryError> mensagens = this.genericoDAO.queryList("SELECT e FROM EntradaLog e "
                 + "WHERE e.localizacao = ?1 ORDER BY e.dataOcorrencia DESC", bugTmp.getVisaoLog().getLocation());
         bug.setMensagens(mensagens);
         return bug;

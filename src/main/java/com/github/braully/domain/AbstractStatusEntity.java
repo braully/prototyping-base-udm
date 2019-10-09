@@ -7,39 +7,24 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @MappedSuperclass
-public abstract class AbstractStatusEntity implements IEntity, IEntityStatus, Serializable {
+public abstract class AbstractStatusEntity extends AbstractEntity implements IEntity, IEntityStatus, Serializable {
 
     @Column(name = "status",
             columnDefinition = "integer default '0'")
     @Enumerated(EnumType.ORDINAL)
     protected Status status = Status.ACTIVE;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
-
     @Transient
 //    @Basic
     private Boolean removed;
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Boolean getRemoved() {
         return this.removed;
@@ -63,4 +48,5 @@ public abstract class AbstractStatusEntity implements IEntity, IEntityStatus, Se
     public void setStatus(Status status) {
         this.status = status;
     }
+
 }

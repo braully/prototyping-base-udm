@@ -3,185 +3,239 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.app.logutil;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import com.github.braully.constant.Attr;
+import com.github.braully.constant.Attrs;
+import com.github.braully.constant.SituacaoTransaction;
+import com.github.braully.interfaces.IOrganiztionEntityDependent;
+import com.github.braully.domain.util.Money;
+import com.github.braully.util.UtilDate;
+import com.github.braully.util.UtilValidation;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
+import javax.money.MonetaryAmount;
+import javax.persistence.CascadeType;
+import javax.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(schema = "financial")
-public class AccountTransaction extends AbstractMigrableEntity implements Serializable {
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
+public class AccountTransaction extends AbstractMigrableEntity
+        implements Serializable, Comparable<AccountTransaction>, IOrganiztionEntityDependent {
 
-    @Basic
-    BigDecimal creditTotal;
+    public static final CurrencyUnit CURRENCY_DEFAULT = Money.CURRENCY_DEFAULT;
 
-    @Basic
-    String observation;
-
-    @Basic
-    String typeOperation;
-
-    @Basic
-    String memo;
-
-    @Basic
-    Date datePrevist;
-
-    @Basic
-    Date dateExecuted;
-
-    @Basic
-    BigDecimal debitTotal;
-
-    @Basic
-    String typeTransaction;
-
-    @Basic
-    BigDecimal actualBalance;
-
-    @Basic
-    String typeMethod;
-
-    @ManyToOne(targetEntity = Partner.class)
-    Partner partner;
+    //    @ManyToOne(targetEntity = Organization.class)
+    //    protected Organization organization;
+    @ManyToOne(targetEntity = FinancialAccount.class)
+    protected FinancialAccount financialAccount;
 
     @ManyToOne(targetEntity = Account.class)
-    Account account;
+    protected Account account;
 
-    @ManyToOne(targetEntity = FinancialAccount.class)
-    FinancialAccount financialAccount;
-
-    @ManyToOne(targetEntity = AccountTransaction.class)
-    AccountTransaction parentTransaction;
-
-    @OneToMany(mappedBy = "parentTransaction")
-    Set<AccountTransaction> childTransactions;
+    @ManyToOne(targetEntity = Partner.class)
+    protected Partner partner;
 
     @Basic
-    String status;
+    protected String observation;
+
+    @Basic
+    protected String memo;
+
+    @Basic
+    protected Date datePrevist;
+
+    @Basic
+    protected Date dateExecuted;
+
+    @Basic
+    protected BigDecimal debitTotal;
+
+    @Basic
+    @Attrs({
+        @Attr({"converter", "converterMonetaryBigDecimal"})
+    })
+    protected BigDecimal creditTotal;
+
+    @Basic
+    protected String typeMethod;
+
+    @Basic
+    protected String typeOperation;
+
+    @Basic
+    protected String typeTransaction;
+
+    @Basic
+    protected BigDecimal valueExecuted;
+
+    @Basic
+    protected BigDecimal actualBalance;
+
+    @Attr("hidden")
+    @ManyToOne(targetEntity = InfoExtra.class)
+    protected InfoExtra infoExtra;
+
+    @ManyToOne(targetEntity = AccountTransaction.class)
+    protected AccountTransaction parentTransaction;
+
+    @OneToMany(mappedBy = "parentTransaction", cascade = CascadeType.ALL)
+    protected Set<AccountTransaction> childTransactions;
+
+    @Transient
+    protected MonetaryAmount total;
+
+    @Attr(name = "label", value = "Situação")
+    @Transient
+    protected SituacaoTransaction situation;
+
+    @Attr("hidden")
+    @Basic
+    protected String status;
 
     public AccountTransaction() {
 
     }
 
-    public BigDecimal getCreditTotal() {
-        return this.creditTotal;
+    public SituacaoTransaction getSituation() {
+        try {
+            if (situation == null) {
+                if (UtilValidation.isNotNull(dateExecuted, valueExecuted)) {
+                    situation = SituacaoTransaction.EXECUTADO;
+                    if (this.account.isCredit()) {
+                        situation = SituacaoTransaction.RECEBIDO;
+                    } else if (this.account.isDebit()) {
+                        situation = SituacaoTransaction.PAGO;
+                    }
+                } else if (UtilValidation.isNotNull(datePrevist)) {
+                    situation = SituacaoTransaction.PREVISTO;
+                    if (UtilDate.isAntesHoje(datePrevist)) {
+                        situation = SituacaoTransaction.VENCIDO;
+                    }
+                }
+            }
+        } catch (Exception e) {
+
+        }
+        return situation;
     }
 
-    public void setCreditTotal(BigDecimal creditTotal) {
-        this.creditTotal = creditTotal;
+    //Cached total
+    public MonetaryAmount getTotal() {
+        if (total == null) {
+            total = org.javamoney.moneta.Money.zero(CURRENCY_DEFAULT);
+            total = total.add(org.javamoney.moneta.Money.of(creditTotal, CURRENCY_DEFAULT));
+            total = total.subtract(org.javamoney.moneta.Money.of(debitTotal, CURRENCY_DEFAULT));
+            if (childTransactions != null) {
+                for (AccountTransaction at : childTransactions) {
+                    total = total.add(at.getTotal());
+                }
+            }
+        }
+        return total;
     }
 
-    public String getObservation() {
-        return this.observation;
+    @Override
+    public boolean equals(Object obj) {
+        if (super.equals(obj)) {
+            if (this.id == null) {
+                final AccountTransaction other = (AccountTransaction) obj;
+                if (!Objects.equals(this.memo, other.memo)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-    public void setObservation(String observation) {
-        this.observation = observation;
+    @Attr(name = "organization", value = "financialAccount.organization")
+    public Organization getOrganization() {
+        try {
+            if (this.financialAccount != null) {
+                return this.financialAccount.organization;
+            }
+        } catch (Exception e) {
+            logutil.warn("Fail on load organization", e);
+        }
+        return null;
     }
 
-    public String getTypeOperation() {
-        return this.typeOperation;
+    @Override
+    public int compareTo(AccountTransaction o) {
+        try {
+            return this.id.compareTo(o.id);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
-    public void setTypeOperation(String typeOperation) {
-        this.typeOperation = typeOperation;
+    public void addChildTransaction(AccountTransaction discount) {
+        if (this.childTransactions == null) {
+            this.childTransactions = new HashSet<>();
+        }
+        discount.setParentTransaction(this);
+        this.childTransactions.add(discount);
     }
 
-    public String getMemo() {
-        return this.memo;
+    public void setPartnerIfNull(Partner partner) {
+        if (this.partner == null) {
+            this.partner = partner;
+        }
     }
 
-    public void setMemo(String memo) {
+    public Map<String, Object> getMapAllProps() {
+        Map<String, Object> map = new HashMap<>();
+        map.putAll(cache().map);
+        try {
+            if (infoExtra != null) {
+                map.putAll(infoExtra.getMapAllProps());
+            }
+        } catch (Exception e) {
+            logutil.error("Fail map all properties", e);
+        }
+        return map;
+    }
+
+    //For legacy
+    public void setContaBancaria(FinancialAccount conta) {
+        this.financialAccount = conta;
+    }
+
+    public void setData(Date datePosted) {
+        this.dateExecuted = datePosted;
+    }
+
+    public void setDescricao(String memo) {
         this.memo = memo;
     }
 
-    public FinancialAccount getFinancialAccount() {
-        return this.financialAccount;
+    public void setValor(BigDecimal valor) {
+        this.valueExecuted = valor;
     }
 
-    public void setFinancialAccount(FinancialAccount financialAccount) {
-        this.financialAccount = financialAccount;
-    }
-
-    public Date getDatePrevist() {
-        return this.datePrevist;
-    }
-
-    public void setDatePrevist(Date datePrevist) {
-        this.datePrevist = datePrevist;
-    }
-
-    public Date getDateExecuted() {
-        return this.dateExecuted;
-    }
-
-    public void setDateExecuted(Date dateExecuted) {
-        this.dateExecuted = dateExecuted;
-    }
-
-    public BigDecimal getDebitTotal() {
-        return this.debitTotal;
-    }
-
-    public void setDebitTotal(BigDecimal debitTotal) {
-        this.debitTotal = debitTotal;
-    }
-
-    public String getTypeTransaction() {
-        return this.typeTransaction;
-    }
-
-    public void setTypeTransaction(String typeTransaction) {
-        this.typeTransaction = typeTransaction;
-    }
-
-    public Partner getPartner() {
-        return this.partner;
-    }
-
-    public void setPartner(Partner partner) {
-        this.partner = partner;
-    }
-
-    public BigDecimal getActualBalance() {
-        return this.actualBalance;
-    }
-
-    public void setActualBalance(BigDecimal actualBalance) {
-        this.actualBalance = actualBalance;
-    }
-
-    public String getTypeMethod() {
-        return this.typeMethod;
-    }
-
-    public void setTypeMethod(String typeMethod) {
-        this.typeMethod = typeMethod;
-    }
-
-    public Account getAccount() {
-        return this.account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
-    public String getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Set<AccountTransaction> getChildTransactions() {
-        return childTransactions;
+    public void setCodigo(String transId) {
+        this.uniqueCode = transId;
     }
 }

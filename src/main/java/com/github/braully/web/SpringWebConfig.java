@@ -1,17 +1,16 @@
 package com.github.braully.web;
 
+import com.github.braully.app.SecurityService;
 import com.github.braully.app.url;
-import com.github.braully.util.UtilIO;
 import com.github.braully.web.jsf.ViewScope;
-import freemarker.template.TemplateException;
-import java.io.File;
-import java.io.IOException;
+
 import java.util.HashMap;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.apache.catalina.connector.Connector;
+//import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.ocpsoft.rewrite.annotation.RewriteConfiguration;
 import org.ocpsoft.rewrite.config.ConfigurationBuilder;
 import org.ocpsoft.rewrite.config.ConfigurationProvider;
@@ -28,45 +27,48 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.ui.freemarker.FreeMarkerConfigurationFactory;
-import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
-import org.springframework.web.servlet.view.groovy.GroovyMarkupConfigurer;
-import org.springframework.web.servlet.view.groovy.GroovyMarkupViewResolver;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring5.view.ThymeleafViewResolver;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.ocpsoft.rewrite.servlet.RewriteFilter;
 import org.ocpsoft.rewrite.servlet.config.Forward;
 import org.ocpsoft.rewrite.servlet.config.Path;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 
-@EnableWebMvc
 @Configuration
+@EnableWebMvc
 @EnableTransactionManagement
 @RewriteConfiguration
-public class SpringWebConfig implements
-        WebMvcConfigurer, ServletContextInitializer, ConfigurationProvider<ServletContext> {
+public class SpringWebConfig
+        //extends WebSecurityConfigurerAdapter
+        implements WebMvcConfigurer, ConfigurationProvider<ServletContext>,
+        ServletContextInitializer {
 
-    public static final String WORKSPACE_DEV_DIRECTORY = UtilIO.homeUserDir() + File.separator + "workspace";
+    //@Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        servletContext.addListener(new RequestContextListener());
+    }
 
-    static {
-        try {
-            new File(WORKSPACE_DEV_DIRECTORY).mkdirs();
-        } catch (Exception e) {
-
-        }
+    //@Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        configurer.enable();
     }
 
     public static final String DEFAULT_PROP_TEMPLATE_HTML_ATTRIBUTE_APPEND = "template.html.attribute";
@@ -81,59 +83,33 @@ public class SpringWebConfig implements
     public static final String DEFAULT_PROP_APP_HEADER = "template.app.header";
     public static final String DEFAULT_PROP_APP_MENU = "template.app.menu";
     public static final String DEFAULT_PROP_APP_CONTET = "template.app.content";
+    public static final String DEFAULT_PROP_APP_MSG = "template.app.content.msg";
     public static final String DEFAULT_PROP_APP_FORM = "template.app.content.form";
     public static final String DEFAULT_PROP_APP_FILTER = "template.app.content.filter";
     public static final String DEFAULT_PROP_APP_LIST = "template.app.content.list";
 
-    private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
-        "/resources/", "classpath:/resources/", "classpath:/META-INF/resources/",
-        "/web/", "classpath:/web/"};
+    static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
+        "/", "/web/", "META-INF/resources/", "classpath:web/",
+        "classpath:META-INF/resources/"
+    };
 
-    private static final String[] CLASSPATH_ASSETS_LOCATIONS = {
-        "/assets/", "/resources/assets/", "classpath:/META-INF/resources/assets/",
-        "classpath:/resources/assets/", "classpath:/web/assets/"};
+    static final String[] CLASSPATH_PKG_LOCATIONS = {
+        "node_modules/", "classpath:node_modules/"
+    };
 
-    private static final String[] CLASSPATH_PKG_LOCATIONS = {
-        "/static/assets/", "/static/bower_components/", "/static/node_modules/",
-        "classpath:/web/assets/", "classpath:/web/node_modules/",
-        "classpath:/web/bower_components/"};
-
-    /* Option 5 - OpenEntityManagerInViewInterceptor instead of a filter (recommended):
-     * https://stackoverflow.com/questions/33056952/openentitymanagerinviewfilter-annotation-config
-     * TODO: Performance degraded openEntityManagerInView, improv this.
-     */
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    @Bean
-    public FilterRegistrationBean openEntityManagerInViewFilter() {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(new OpenEntityManagerInViewFilter());
-        registrationBean.setName("openEntityManagerInViewFilter");
-        registrationBean.addUrlPatterns("/*");
-        registrationBean.setDispatcherTypes(DispatcherType.FORWARD, DispatcherType.REQUEST);
-        return registrationBean;
-    }
-
-
-    /* Redirect and map rules Config */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         /* block the servlets? */
-        registry.addResourceHandler("/resources/**")
+        registry.addResourceHandler("/*")
                 .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
-
-        registry.addResourceHandler("/assets/**")
-                .addResourceLocations(CLASSPATH_ASSETS_LOCATIONS);
 
         registry.addResourceHandler("/pkg/**")
                 .addResourceLocations(CLASSPATH_PKG_LOCATIONS);
     }
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        /* Exemplo: registry.addRedirectViewController("/home", "/index");  */
-        url.redirect.forEach((k, v) -> registry.addRedirectViewController(k, v));
-    }
+    /* Redirect and map rules Config */
 
-    /*
+ /*
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @Bean
     public FilterRegistrationBean filterRegistrationBean() {
@@ -152,7 +128,10 @@ public class SpringWebConfig implements
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }
+    //Redirect
 
+    //@RewriteConfiguration
+    //public static class SpringRewrite implements ConfigurationProvider<ServletContext> {
     @Override
     public org.ocpsoft.rewrite.config.Configuration getConfiguration(ServletContext context) {
         ConfigurationBuilder config = ConfigurationBuilder.begin();
@@ -172,6 +151,29 @@ public class SpringWebConfig implements
     public boolean handles(final Object payload) {
         return payload instanceof ServletContext;
     }
+    //}
+
+
+    /* Option 5 - OpenEntityManagerInViewInterceptor instead of a filter (recommended):
+     * https://stackoverflow.com/questions/33056952/openentitymanagerinviewfilter-annotation-config
+     * TODO: Performance degraded openEntityManagerInView, improv this.
+     */
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        /* Exemplo: registry.addRedirectViewController("/home", "/index");  */
+        url.redirect.forEach((k, v) -> registry.addRedirectViewController(k, v));
+    }
+
+    //Open entity manager
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Bean
+    public FilterRegistrationBean openEntityManagerInViewFilter() {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean(new OpenEntityManagerInViewFilter());
+        registrationBean.setName("openEntityManagerInViewFilter");
+        registrationBean.addUrlPatterns("/*");
+        registrationBean.setDispatcherTypes(DispatcherType.FORWARD, DispatcherType.REQUEST);
+        return registrationBean;
+    }
 
     /* JSF */
     @Bean
@@ -182,20 +184,6 @@ public class SpringWebConfig implements
         servletRegistrationBean.setLoadOnStartup(1);
         return servletRegistrationBean;
     }
-
-//    /* Git:
-//    http://m3y3r.de/post/2014-07-09-git-server-with-jetty-and-jgit/ 
-//    https://github.com/onexus/onexus/tree/develop/org.onexus.resource.manager/src/main/java/org/onexus/resource/manager/internal/ws/git
-//    https://github.com/centic9/jgit-cookbook/tree/master/httpserver
-//    https://github.com/centic9/jgit-cookbook/blob/master/httpserver/src/main/java/org/dstadler/jgit/server/Main.java
-//     */
-//    @Bean
-//    public ServletRegistrationBean gitServlet() {
-//        ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new org.eclipse.jgit.http.server.GitServlet(), "/app/git/*");
-//        servletRegistrationBean.addInitParameter("base-path", WORKSPACE_DEV_DIRECTORY);
-//        servletRegistrationBean.addInitParameter("export-all", "false");
-//        return servletRegistrationBean;
-//    }
 
     /*
     * https://www.baeldung.com/spring-mvc-content-negotiation-json-xml
@@ -216,94 +204,13 @@ public class SpringWebConfig implements
         return csc;
     }
 
-    @Bean
-    public ViewResolver thymeleafViewResolver() {
-        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-        viewResolver.setCharacterEncoding("UTF-8");
-        viewResolver.setTemplateEngine(thymeleafTemplateEngine());
-        viewResolver.setViewNames(new String[]{"*.thf", "/thf/*"});
-        viewResolver.setOrder(0);
-        return viewResolver;
-    }
-
-    @Bean
-    public SpringTemplateEngine thymeleafTemplateEngine() {
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        //templateEngine.setTemplateResolver(thymeleafTemplateResolver());
-        templateEngine.setTemplateResolver(thymeleafSpringTemplateResolver());
-        templateEngine.setEnableSpringELCompiler(true);
-        /* 
-         * https://www.thymeleaf.org/doc/articles/layouts.html 
-         */
-        templateEngine.addDialect(new LayoutDialect());
-        return templateEngine;
-    }
-
-    @Bean
-    public SpringResourceTemplateResolver thymeleafSpringTemplateResolver() {
-        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
-        templateResolver.setPrefix("");
-        templateResolver.setSuffix("");
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setCacheable(false);
-        return templateResolver;
-    }
-
-    @Bean
-    public ITemplateResolver thymeleafTemplateResolver() {
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("/thf/");
-        templateResolver.setCacheable(false);
-        templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setCharacterEncoding("UTF-8");
-        return templateResolver;
-    }
-
-    @Bean
-    public GroovyMarkupConfigurer groovyMarkupConfigurer() {
-        GroovyMarkupConfigurer configurer = new GroovyMarkupConfigurer();
-        configurer.setResourceLoaderPath("/grv/");
-        return configurer;
-    }
-
-    @Bean
-    public GroovyMarkupViewResolver GroovyViewResolver() {
-        GroovyMarkupViewResolver viewResolver = new GroovyMarkupViewResolver();
-        viewResolver.setSuffix(".html");
-        viewResolver.setOrder(1);
-        return viewResolver;
-    }
-
-    @Bean
-    public ViewResolver freemarkerViewResolver() {
-        FreeMarkerViewResolver viewResolver = new FreeMarkerViewResolver();
-        viewResolver.setCache(true);
-        viewResolver.setPrefix("/frmk/");
-        viewResolver.setSuffix(".ftl");
-        viewResolver.setViewNames(new String[]{"/frmk/*", "*.ftl"});
-        viewResolver.setOrder(1);
-        return viewResolver;
-    }
-
-    @Bean
-    public FreeMarkerConfigurer freemarkerConfig() throws IOException, TemplateException {
-        FreeMarkerConfigurer config = new FreeMarkerConfigurer();
-        FreeMarkerConfigurationFactory factory = new FreeMarkerConfigurationFactory();
-        factory.setTemplateLoaderPath("classpath:/frmk/");
-        // Folder containing FreeMarker templates.
-        // config.setTemplateLoaderPath("classpath:/templates");
-        config.setConfiguration(factory.createConfiguration());
-        return config;
-    }
-
     /* Spring REST Config */
     @Bean
     public RepositoryRestConfigurer repositoryRestConfigurer() {
         return new RepositoryRestConfigurer() {
-            @Override
+            //@Override
             public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-                config.setBasePath("/app");
+                config.setBasePath("/repo");
             }
         };
     }
@@ -329,9 +236,13 @@ public class SpringWebConfig implements
         return servletContext -> {
             servletContext.setInitParameter("com.sun.faces.forceLoadConfiguration", Boolean.TRUE.toString());
             servletContext.setInitParameter("javax.faces.PARTIAL_STATE_SAVING_METHOD", "true");
+            servletContext.setInitParameter("javax.faces.PROJECT_STAGE", "Production");
             //TODO: Automate Production or Development parameter
-            servletContext.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
-            servletContext.setInitParameter("facelets.DEVELOPMENT", "true");
+            /*if (config.isDevlopment(env)) {
+                servletContext.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
+                servletContext.setInitParameter("facelets.DEVELOPMENT", "true");
+            }*/
+
             servletContext.setInitParameter("javax.faces.FACELETS_REFRESH_PERIOD", "1");
             servletContext.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
             /* */
@@ -341,14 +252,108 @@ public class SpringWebConfig implements
         };
     }
 
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        servletContext.addListener(new RequestContextListener());
+    //Security
+    @Configuration
+    @EnableWebSecurity
+    public static class SpringWebSecurityConfig
+            extends WebSecurityConfigurerAdapter {
+
+        @Bean
+        public UserDetailsService userDetailsService() {
+            return new SecurityService();
+        }
+
+        @Bean
+        public BCryptPasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+        @Bean
+        public DaoAuthenticationProvider authenticationProvider() {
+            DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+            authProvider.setUserDetailsService(userDetailsService());
+            authProvider.setPasswordEncoder(passwordEncoder());
+            return authProvider;
+        }
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.authenticationProvider(authenticationProvider());
+        }
+
+        /*  https://stackoverflow.com/questions/44064346/spring-security-filter-authenticates-sucessfuly-but-sends-back-403-response */
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring()
+                    .antMatchers(
+                            "/pkg/**", "/assets/**", "/*resource/**", "/favicon.ico",
+                            "/error**", "/error/**"
+                    );
+        }
+
+        protected void configure(HttpSecurity http) throws Exception {
+            http.csrf().disable()
+                    .authorizeRequests()//Login urls
+                    .antMatchers(
+                            "/login**", "/enter**",
+                            "/logout**"
+                    ).permitAll()
+                    .and()
+                    .authorizeRequests()
+                    .anyRequest().authenticated()
+                    .and()
+                    .formLogin()
+                    .loginPage("/enter")
+                    .loginProcessingUrl("/login")
+                    .defaultSuccessUrl("/index")
+                    .permitAll()
+                    .and().logout().deleteCookies("JSESSIONID")
+                    .invalidateHttpSession(true).permitAll();
+
+            //Permit iframes from same origin;
+            //https://stackoverflow.com/questions/28647136/how-to-disable-x-frame-options-response-header-in-spring-security
+            http.headers()
+                    .frameOptions()
+                    .sameOrigin();
+
+        }
     }
 
-    @Override
-    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-        configurer.enable();
-    }
+    //Tomcat conector
+    @Component
+    public static class SpringWebConnectorConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
 
+        private final static String CONNECTOR_PROTOCOL = TomcatServletWebServerFactory.DEFAULT_PROTOCOL; //"org.apache.coyote.http11.Http11NioProtocol";
+        private final static String CONNECTOR_SCHEME = "http";
+
+        @Value("${http.port:8080}")
+        Integer httpPort;
+
+        @Value("${server.port:8443}")
+        Integer serverPort;
+
+        @Value("${security.require-ssl:false}")
+        Boolean requireSsl;
+
+        @Override
+        public void customize(TomcatServletWebServerFactory factory) {
+            factory.setPort(serverPort);
+            if (!httpPort.equals(serverPort)) {
+                factory.addAdditionalTomcatConnectors(getHttpConnector());
+            }
+        }
+
+        //https://stackoverflow.com/questions/30896234/how-set-up-spring-boot-to-run-https-http-ports
+        private Connector getHttpConnector() {
+            Connector connector = new Connector(CONNECTOR_PROTOCOL);
+            connector.setPort(httpPort);
+            connector.setScheme(CONNECTOR_SCHEME);
+            connector.setSecure(false);
+            //If redirect, uncoment
+            if (requireSsl != null && requireSsl) {
+                connector.setRedirectPort(serverPort);
+            }
+            return connector;
+        }
+    }
 }

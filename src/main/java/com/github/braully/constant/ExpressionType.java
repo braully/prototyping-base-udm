@@ -38,4 +38,9 @@ public enum ExpressionType {
     public String getDescricao() {
         return label;
     }
+
+    @Override
+    public String toString() {
+        return this.label;
+    }
 }

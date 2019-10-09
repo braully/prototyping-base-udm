@@ -1,11 +1,8 @@
 package com.github.braully.web.jsf;
 
-import java.util.List;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.application.ViewResource;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
 /**

@@ -5,10 +5,12 @@ import java.io.Serializable;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
-@Data
+@Getter
+@Setter
 @MappedSuperclass
 public abstract class AbstractGlobalEntity
         implements IEntity, Serializable {
@@ -37,5 +39,10 @@ public abstract class AbstractGlobalEntity
     @Override
     public boolean isPersisted() {
         return this.id != null && this.id > 0;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " (" + "#" + id + ')';
     }
 }

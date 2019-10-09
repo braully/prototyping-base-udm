@@ -1,6 +1,8 @@
 package com.github.braully.web;
 
+import com.github.braully.util.UtilParse;
 import com.github.braully.util.UtilReflection;
+import com.github.braully.util.UtilValidation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -17,10 +19,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.WordUtils;
+import javax.persistence.Transient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  *
@@ -41,6 +42,7 @@ public class DescriptorExposedEntity {
         hiddenFormProperties = new HashSet<>();
         hiddenListProperties = new HashSet<>();
         hiddenFilterProperties = new HashSet<>();
+        excludeProperties = new HashSet<>();
         Arrays.stream(DEFAULT_HIDDEN_FILTER_FIELDS).forEach(s -> hiddenFilterProperties.add(s));
         Arrays.stream(DEFAULT_HIDDEN_FORM_FIELDS).forEach(s -> hiddenFormProperties.add(s));
     }
@@ -56,6 +58,12 @@ public class DescriptorExposedEntity {
 
     public Class getClassExposed() {
         return classExposed;
+    }
+
+    public DescriptorExposedEntity hidden(String... hiddenProperties) {
+        this.hiddenForm(hiddenProperties);
+        this.hiddenList(hiddenProperties);
+        return this;
     }
 
     public DescriptorExposedEntity hiddenForm(String... hiddenProperties) {
@@ -78,8 +86,8 @@ public class DescriptorExposedEntity {
             for (Map.Entry<String, String> ent : params.entrySet()) {
                 String key = ent.getKey();
                 String value = ent.getValue();
-                value = StringEscapeUtils.escapeJava(value);
-                key = StringEscapeUtils.escapeJava(key);
+                //value = StringUtils.escapeJava(value);
+                //key = StringUtils.escapeJava(key);
                 key = removeCharctersUnsafe(key);
                 if (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(value)) {
                     sanitized.put(key, value);
@@ -106,12 +114,26 @@ public class DescriptorExposedEntity {
         return new DescriptorHtmlEntity(this);
     }
 
+    public boolean hasField(String fieldName) {
+        boolean ret = false;
+        if (excludeProperties != null && excludeProperties.contains(fieldName)) {
+            return false;
+        }
+        try {
+            ret = null != classExposed.getDeclaredField(fieldName);
+        } catch (Exception e) {
+
+        }
+        return ret;
+    }
+
     public static class ActionHtmlEntity {
 
         String name;
         String action;
         String actionUrl;
         boolean bulk;
+
     }
 
     public DescriptorHtmlEntity getDescriptorHtmlEntity(Map<String, String> extraParameter) {
@@ -129,6 +151,7 @@ public class DescriptorExposedEntity {
         private boolean sortElementsList = false;
         /* */
         DescriptorHtmlEntity parent;
+        Map<String, DescriptorHtmlEntity> cacheElementsForm = new HashMap<>();
         List<DescriptorHtmlEntity> elementsForm;
         List<DescriptorHtmlEntity> elementsFilter;
         List<DescriptorHtmlEntity> elementsList;
@@ -136,6 +159,7 @@ public class DescriptorExposedEntity {
         Set<String> hiddenFilterProperties;
         Set<String> hiddenListProperties;
         Set<String> exclude = new HashSet<>();
+        Set<String> allFieldsName = new HashSet<>();
 
         String id;
         String label;
@@ -148,8 +172,13 @@ public class DescriptorExposedEntity {
         Class classe;
 
         Map<String, String> attributes = new HashMap<>();
+        Set<String> tmpIncluset;
 
         public DescriptorHtmlEntity() {
+        }
+
+        public DescriptorHtmlEntity(DescriptorHtmlEntity parent) {
+            this.parent = parent;
         }
 
         public DescriptorHtmlEntity(String model,
@@ -161,8 +190,11 @@ public class DescriptorExposedEntity {
             parseFieldClass(classe);
         }
 
-        public DescriptorHtmlEntity(DescriptorHtmlEntity parent) {
-            this.parent = parent;
+        public DescriptorHtmlEntity(DescriptorExposedEntity descriptorExposedEntity) {
+            this(descriptorExposedEntity.classExposed);
+            this.hiddenForm(descriptorExposedEntity.hiddenFormProperties);
+            this.hiddenList(descriptorExposedEntity.hiddenListProperties);
+            this.hiddenFilter(descriptorExposedEntity.hiddenFilterProperties);
         }
 
         public DescriptorHtmlEntity(DescriptorExposedEntity descriptorExposedEntity, Map<String, String> extraParams) {
@@ -172,22 +204,24 @@ public class DescriptorExposedEntity {
                 String strexcluces = extraParams.get("exclude");
                 //process excludes
                 if (strexcluces != null) {
-                    String[] excludes = new String[]{strexcluces};
-                    if (strexcluces.contains(",")) {
-                        excludes = strexcluces.split(",");
-                    }
-                    List<String> excluList = Arrays.asList(excludes);
+                    List<String> excluList = UtilParse.parseList(strexcluces, ",");
                     this.hiddenForm(excluList);
                     this.hiddenList(excluList);
                 }
+                String strincludes = extraParams.get("include");
+                if (strincludes != null) {
+                    Set<String> incluset = new HashSet<>(UtilParse.parseList(strincludes, ","));
+                    Set<String> exclude = new HashSet<>();
+                    for (String str : allFieldsName) {
+                        if (!incluset.contains(str)) {
+                            exclude.add(str);
+                        }
+                    }
+                    this.tmpIncluset = incluset;
+                    this.hiddenForm(exclude);
+                    this.hiddenList(exclude);
+                }
             }
-        }
-
-        public DescriptorHtmlEntity(DescriptorExposedEntity descriptorExposedEntity) {
-            this(descriptorExposedEntity.classExposed);
-            this.hiddenForm(descriptorExposedEntity.hiddenFormProperties);
-            this.hiddenList(descriptorExposedEntity.hiddenListProperties);
-            this.hiddenFilter(descriptorExposedEntity.hiddenFilterProperties);
         }
 
         public DescriptorHtmlEntity(Class classe) {
@@ -200,6 +234,10 @@ public class DescriptorExposedEntity {
         }
 
         private void parseFieldClass(Class classe1) {
+            ReflectionUtils.doWithFields(classe1, (Field field) -> {
+                addField(field);
+            });
+
             parseFormFieldClass(classe1);
             parseFilterFieldClass(classe1);
             parseListFieldClass(classe1);
@@ -218,6 +256,11 @@ public class DescriptorExposedEntity {
             ReflectionUtils.doWithFields(classe1, (Field field) -> {
                 addHtmlFormElement(field);
             });
+
+            cacheElementsForm.clear();
+            for (DescriptorHtmlEntity el : elementsForm) {
+                cacheElementsForm.put(el.property, el);
+            }
 
             if (sortFormElemts) {
                 Collections.sort(elementsForm, new Comparator<DescriptorHtmlEntity>() {
@@ -286,12 +329,40 @@ public class DescriptorExposedEntity {
             }
         }
 
+        private void addField(Field field) {
+            this.allFieldsName.add(field.getName());
+        }
+
         private void addHtmlListElement(Field field) {
             final int modifiers = field.getModifiers();
+            String fieldName = field.getName();
             if (!Modifier.isStatic(modifiers)
-                    && !hiddenListProperties.contains(field.getName())
+                    && !hiddenListProperties.contains(fieldName)
                     && !UtilReflection.isExtraAttribute(field, "hidden")) {
-                elementsList.add(buildDescriptorHtmlEntity(field));
+                if (field.getAnnotation(Transient.class) == null) {
+                    elementsList.add(buildDescriptorHtmlEntity(field));
+                } else if (this.tmpIncluset != null) {
+                    if (this.tmpIncluset.contains(fieldName)) {
+                        elementsList.add(buildDescriptorHtmlEntity(field));
+                    }
+                }
+            }
+
+            Field type = field;
+            if (this.tmpIncluset != null) {
+                for (String strInclude : this.tmpIncluset) {
+                    String prop = strInclude;
+                    String offset = strInclude;
+                    if (strInclude.startsWith(fieldName + ".")) {
+                        int indexOf = strInclude.indexOf(".");
+                        offset = strInclude.substring(indexOf + 1);
+                        prop = strInclude.substring(0, indexOf);
+                        type = UtilReflection.getDeclaredFieldAscending(field.getType(), offset);
+                        if (type != null) {
+                            elementsList.add(buildDescriptorHtmlEntity(type, fieldName));
+                        }
+                    }
+                }
             }
         }
 
@@ -307,6 +378,7 @@ public class DescriptorExposedEntity {
         private void addHtmlFormElement(Field field) {
             final int modifiers = field.getModifiers();
             if (!Modifier.isStatic(modifiers)
+                    && field.getAnnotation(Transient.class) == null
                     && !hiddenFormProperties.contains(field.getName())
                     && !UtilReflection.isExtraAttribute(field, "hidden")) {
                 DescriptorHtmlEntity htmlElement = buildDescriptorHtmlEntity(field);
@@ -324,9 +396,16 @@ public class DescriptorExposedEntity {
         }
 
         DescriptorHtmlEntity buildDescriptorHtmlEntity(Field field) {
+            return buildDescriptorHtmlEntity(field, "");
+        }
+
+        DescriptorHtmlEntity buildDescriptorHtmlEntity(Field field, String propoffset) {
             String ltype = field.getType().getSimpleName();
             ltype = ltype.substring(0, 1).toLowerCase() + ltype.substring(1);
             String lproperty = field.getName();
+            if (UtilValidation.isStringValid(propoffset)) {
+                lproperty = propoffset + "." + field.getName();
+            }
             String lpattern = null;
             if (field.getAnnotation(OneToOne.class) != null
                     || field.getAnnotation(ManyToOne.class) != null) {
@@ -339,8 +418,8 @@ public class DescriptorExposedEntity {
                 lpattern = ltype;
                 ltype = "collection";
             }
-            String llabel = lproperty.replaceAll("(\\p{Ll})(\\p{Lu})", "$1 $2");
-            llabel = WordUtils.capitalize(llabel);
+            String llabel = field.getName().replaceAll("(\\p{Ll})(\\p{Lu})", "$1 $2");
+            llabel = StringUtils.capitalize(llabel);
 
             DescriptorHtmlEntity he = new DescriptorHtmlEntity(this);
             he.classe = field.getType();
@@ -378,6 +457,11 @@ public class DescriptorExposedEntity {
             return ret;
         }
 
+        public String getAttribute(String att) {
+            String ret = this.attributes.get(att);
+            return ret;
+        }
+
         private void hiddenForm(Collection<String> hiddenFormProperties) {
             if (this.hiddenFormProperties == null) {
                 this.hiddenFormProperties = new HashSet<String>();
@@ -400,6 +484,18 @@ public class DescriptorExposedEntity {
             }
             this.hiddenFilterProperties.addAll(hiddenFilterProperties);
             this.parseFilterFieldClass(classe);
+        }
+
+        public String getAttributeAscending(String str) {
+            String attribute = getAttribute(str);
+            if (attribute == null && parent != null) {
+                attribute = parent.getAttribute(str);
+            }
+            return attribute;
+        }
+
+        public DescriptorHtmlEntity getElementForm(String name) {
+            return cacheElementsForm.get(name);
         }
     }
 }

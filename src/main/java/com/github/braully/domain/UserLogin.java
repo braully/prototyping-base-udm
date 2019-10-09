@@ -1,5 +1,6 @@
 package com.github.braully.domain;
 
+import com.github.braully.constant.SysRole;
 import com.github.braully.interfaces.IGlobalEntity;
 import java.util.Collection;
 import java.util.Date;
@@ -7,12 +8,13 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -49,12 +51,17 @@ public class UserLogin extends AbstractGlobalEntity implements IGlobalEntity, Us
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastLogin;
 
-    @ManyToOne(targetEntity = Partner.class)
-    private Partner partner;
+    @Column(columnDefinition = "smallint default '0'")
+    @Enumerated(EnumType.ORDINAL)
+    private SysRole sysRole;
 
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
     @JoinTable(name = "user_login_role", schema = "security")
     private Set<Role> roles;
+
+    @ManyToMany(targetEntity = OrganizationRole.class, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_login_organization_role", schema = "security")
+    private Set<OrganizationRole> organizationRole;
 
     @ManyToMany(targetEntity = Menu.class)
     @JoinTable(schema = "security")

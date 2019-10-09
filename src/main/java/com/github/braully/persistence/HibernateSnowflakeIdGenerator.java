@@ -5,7 +5,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.Random;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -22,7 +23,7 @@ import org.hibernate.type.Type;
  */
 public class HibernateSnowflakeIdGenerator implements IdentifierGenerator, Configurable {
 
-    protected static final Logger LOG = Logger.getLogger(HibernateSnowflakeIdGenerator.class);
+    protected static final Logger LOG = LogManager.getLogger(HibernateSnowflakeIdGenerator.class);
 
     /* 2019-01-01 00:00:00.0000 */
     protected final long EPOCH_START = 1546308000000L;

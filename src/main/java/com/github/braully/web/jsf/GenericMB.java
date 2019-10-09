@@ -1,17 +1,13 @@
 package com.github.braully.web.jsf;
 
 import com.github.braully.app.CRUDGenericController;
-import com.github.braully.app.EntityRESTfulWS;
 import com.github.braully.persistence.GenericDAO;
-import com.github.braully.app.SecurityDAO;
+import com.github.braully.app.SecurityService;
 import com.github.braully.domain.Menu;
 import com.github.braully.persistence.ICrudEntity;
 import com.github.braully.persistence.IEntity;
-import com.github.braully.web.DescriptorExposedEntity;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.faces.context.ExternalContext;
@@ -37,17 +33,17 @@ public class GenericMB extends CRUDGenericController {
     public static final String NOME_PROPRIEDADE_INDICE_TAB = "tabIndex";
 
     @Resource(name = "genericDAO")
-    private GenericDAO genericDAO;
-    @Resource(name = "securityDAO")
-    private SecurityDAO securityDAO;
+    protected GenericDAO genericDAO;
+    @Resource(name = "securityService")
+    protected SecurityService securityDAO;
 
-    private int index;
+    protected int index;
 
     @PostConstruct
     public void init() {
         super.init();
         try {
-            String value = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get(NOME_PROPRIEDADE_INDICE_TAB);
+            String value = (String) this.getAtributeFromRequest(NOME_PROPRIEDADE_INDICE_TAB);
             if (value != null && !value.trim().isEmpty()) {
                 Integer i = getInt(value);
                 if (i != null && i > 0) {
@@ -75,28 +71,6 @@ public class GenericMB extends CRUDGenericController {
     /*
         Codigo ficou duplicando com Generic Controller, inevitavel
      */
-    private final Map<String, CRUDGenericController> CACHE_CRUDS = new HashMap<String, CRUDGenericController>();
-
-    public CRUDGenericController crud(String entityName) {
-        CRUDGenericController tmp = null;
-        String entityNameLower = entityName.toLowerCase();
-        tmp = CACHE_CRUDS.get(entityNameLower);
-        if (tmp == null) {
-            DescriptorExposedEntity desc = EntityRESTfulWS.EXPOSED_ENTITY.get(entityName);
-            if (desc != null) {
-                Class classExposed = desc.getClassExposed();
-                tmp = new CRUDGenericController(classExposed) {
-                    @Override
-                    protected ICrudEntity getGenericoBC() {
-                        return genericDAO;
-                    }
-                };
-                CACHE_CRUDS.put(entityNameLower, tmp);
-            }
-        }
-        return tmp;
-    }
-
     public List<Menu> getUserMenus() {
         List<Menu> menusUser = (List<Menu>) this.getAtributeFromSession("menus");
         if (menusUser == null) {
@@ -126,5 +100,20 @@ public class GenericMB extends CRUDGenericController {
     public void reload() throws IOException {
         ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
         ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+    }
+
+    @Override
+    public void addAlerta(String msg) {
+        MessageUtilJSF.addAlertaMensagem(msg);
+    }
+
+    @Override
+    public void addErro(String msg) {
+        MessageUtilJSF.addErroMensagem(msg);
+    }
+
+    @Override
+    public void addMensagem(String mensagem) {
+        MessageUtilJSF.addMensagem(mensagem);
     }
 }

@@ -1,30 +1,41 @@
 package com.github.braully.web.jsf;
 
 import com.github.braully.util.MemoryAppender;
+import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilProperty;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
-import org.apache.log4j.Appender;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.spi.ThrowableInformation;
-import org.springframework.context.annotation.Scope;
+import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.util.Throwables;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Component(value = "appMB")
-@Scope("singleton")
+@Qualifier("appMB")
+@Component("appMB")
+@RestController
+//@Controller
+//@RequestMapping(path = "/system/app")
 public class AppMB {
 
     //TODO: Refactor and Translate
-    private static final String CODIGO_DEFAULT_GOOGLE_ANALYTICS = "000000";
-    private static final String NOME_EMPRESA_DEFAULT = "Empresa";
-    private static final String DESCRICAO_EMPRESA_DEFAULT = "SA/LTDA";
+    static final String CODIGO_DEFAULT_GOOGLE_ANALYTICS = "000000";
+    static final String NOME_EMPRESA_DEFAULT = "Empresa";
+    static final String DESCRICAO_EMPRESA_DEFAULT = "SA/LTDA";
     /* */
-    private static final Logger log = Logger.getLogger(AppMB.class);
+    static final Logger log = LogManager.getLogger(AppMB.class);
+    static final Logger logWebConsole = LogManager.getLogger("WEBCONSOLE");
     public static final String codigoGoogleAnalytics;
-    private static String nomeEmpresa;
-    private static String descricaoEmpresa;
+    static String nomeEmpresa;
+    static String descricaoEmpresa;
 
     static {
         String codigoGa = CODIGO_DEFAULT_GOOGLE_ANALYTICS;
@@ -37,8 +48,9 @@ public class AppMB {
         codigoGoogleAnalytics = codigoGa;
     }
 
-    private MemoryAppender appender;
-    private LoggingEvent logAtual;
+    MemoryAppender appender;
+    LogEvent logAtual;
+    protected Process process;
 
     public AppMB() {
     }
@@ -84,19 +96,8 @@ public class AppMB {
     public MemoryAppender getAppender() {
         try {
             if (appender == null) {
-                Logger logger = Logger.getRootLogger();
-                this.appender = (MemoryAppender) logger.getAppender("memory");
-                if (this.appender == null) {
-                    for (Enumeration loggers = LogManager.getCurrentLoggers(); loggers.hasMoreElements();) {
-                        Logger logger1 = (Logger) loggers.nextElement();
-                        for (Enumeration appenders = logger1.getAllAppenders(); appenders.hasMoreElements();) {
-                            Appender appender = (Appender) appenders.nextElement();
-                            if (appender != null && "memory".equalsIgnoreCase(appender.getName())) {
-                                this.appender = (MemoryAppender) appender;
-                            }
-                        }
-                    }
-                }
+                LoggerContext lc = (LoggerContext) LogManager.getContext(false);
+                appender = lc.getConfiguration().getAppender("Memory");
             }
         } catch (Exception e) {
             log.error("Falha ao recuperar appender", e);
@@ -104,29 +105,66 @@ public class AppMB {
         return appender;
     }
 
-    public List<LoggingEvent> getLoggingEvents() {
-        MemoryAppender appender1 = getAppender();
-        if (appender1 != null) {
-            return appender1.getLoggingEvents();
+    @RequestMapping(path = "/system/app/console")
+    @ResponseBody
+    public List<LogEvent> getLoggingEvents() {
+        List logs = new ArrayList();
+        try {
+            MemoryAppender appender1 = getAppender();
+            if (appender1 != null) {
+                LinkedList<LogEvent> logEvents = appender1.getLogEvents();
+                for (LogEvent log : logEvents) {
+                    String msg = "";
+                    StringBuilder msgT = new StringBuilder();
+
+                    String source = "";
+                    String level = "";
+                    String time = "";
+                    try {
+                        level = "" + log.getLevel();
+                        time = "" + UtilDate.formatData("yyyy-MM-dd HH:mm:ss", new Date(log.getTimeMillis()));
+                        msg = "" + log.getMessage().getFormattedMessage();
+                        Throwable thrown = log.getThrown();
+                        if (thrown != null) {
+                            for (String s : Throwables.toStringList(thrown)) {
+                                msgT.append("<br />").append(s);
+                            }
+                        }
+
+                        source = "" + log.getSource();
+                    } catch (Exception e) {
+
+                    }
+
+                    logs.add(Map.of("msg", msg,
+                            "throw", msgT.toString(),
+                            "time", time,
+                            "level", level,
+                            "source", source
+                    ));
+                }
+            }
+        } catch (Exception e) {
+
         }
-        return null;
+        return logs;
     }
 
-    public LoggingEvent getLogAtual() {
+    public LogEvent getLogAtual() {
         return logAtual;
     }
 
-    public void setLogAtual(LoggingEvent logAtual) {
+    public void setLogAtual(LogEvent logAtual) {
         this.logAtual = logAtual;
     }
 
-    public void poupLogAtual(LoggingEvent logAtual) {
+    public void poupLogAtual(LogEvent logAtual) {
         this.logAtual = logAtual;
     }
 
     public String getStackTraceLogAtual() {
         StringBuilder sb = new StringBuilder();
-        if (logAtual != null) {
+        /*if (logAtual != null) {
             String[] throwableStrRep = this.logAtual.getThrowableStrRep();
             if (throwableStrRep != null) {
                 for (String str : throwableStrRep) {
@@ -146,7 +184,7 @@ public class AppMB {
                     }
                 }
             }
-        }
+        }*/
         return sb.toString();
     }
 }

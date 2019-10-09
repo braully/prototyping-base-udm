@@ -6,15 +6,11 @@ package com.github.braully.domain;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "base")
-public class Email extends AbstractEntity implements Serializable {
-
-    @ManyToOne(targetEntity = Partner.class)
-    private Partner partner;
+public class Email extends AbstractLightRemoveEntity implements Serializable {
 
     @Basic
     private String type;
@@ -24,14 +20,6 @@ public class Email extends AbstractEntity implements Serializable {
 
     public Email() {
 
-    }
-
-    public Partner getPartner() {
-        return this.partner;
-    }
-
-    public void setPartner(Partner partner) {
-        this.partner = partner;
     }
 
     public String getType() {
@@ -48,5 +36,10 @@ public class Email extends AbstractEntity implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 }

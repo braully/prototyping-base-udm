@@ -9,9 +9,10 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang.text.StrBuilder;
-import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.text.StrBuilder;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -19,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 public class DynamicVirtualTemplateFile {
 
-    static final Logger log = Logger.getLogger(DynamicVirtualTemplateFile.class);
+    static final Logger log = LogManager.getLogger(DynamicVirtualTemplateFile.class);
 
     /* */
     public static final String DEFAULT_PREFIX = "<!--{";

@@ -48,7 +48,7 @@ public class Bug extends AbstractStatusEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private App app;
     @OneToOne(fetch = FetchType.LAZY)
-    private ViewLog viewLog;
+    private LogEntryErrorView viewLog;
     @ManyToOne(fetch = FetchType.LAZY)
     private Bug parent;
     @Column(columnDefinition = "TEXT")
@@ -56,14 +56,14 @@ public class Bug extends AbstractStatusEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Task task;
     @Transient
-    private List<LogEntry> messages;
+    private List<LogEntryError> messages;
 
     public Bug() {
         this.statusBug = StatusBug.ABERTO;
         this.dateCreated = new Date();
     }
 
-    public Bug(ViewLog vis) {
+    public Bug(LogEntryErrorView vis) {
         this();
         this.viewLog = vis;
     }
@@ -84,11 +84,11 @@ public class Bug extends AbstractStatusEntity implements Serializable {
         this.statusBug = statusBug;
     }
 
-    public ViewLog getVisaoLog() {
+    public LogEntryErrorView getVisaoLog() {
         return viewLog;
     }
 
-    public void setVisaoLog(ViewLog visaoLog) {
+    public void setVisaoLog(LogEntryErrorView visaoLog) {
         this.viewLog = visaoLog;
     }
 
@@ -172,11 +172,11 @@ public class Bug extends AbstractStatusEntity implements Serializable {
         this.app = projeto;
     }
 
-    public List<LogEntry> getMensagens() {
+    public List<LogEntryError> getMensagens() {
         return messages;
     }
 
-    public void setMensagens(List<LogEntry> mensagens) {
+    public void setMensagens(List<LogEntryError> mensagens) {
         this.messages = mensagens;
     }
 

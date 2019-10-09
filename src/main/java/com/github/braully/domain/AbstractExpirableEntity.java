@@ -11,10 +11,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @MappedSuperclass
 public abstract class AbstractExpirableEntity implements IEntity, Serializable {
 
@@ -61,5 +62,10 @@ public abstract class AbstractExpirableEntity implements IEntity, Serializable {
     @Override
     public boolean isPersisted() {
         return this.id != null && this.id > 0;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " (" + "#" + id + ')';
     }
 }

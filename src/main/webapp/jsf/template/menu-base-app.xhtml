@@ -2,24 +2,26 @@
       xmlns:ui="http://java.sun.com/jsf/facelets">
     <ui:composition>
         <nav class="base-app-main-menu" role="navigation" id="base-app-main-menu">
+            <ui:insert name="before"> </ui:insert>
             <ul class="base-app-main-menu-list">
                 <li class="base-app-main-menu-list-item" rendered="#{menu.parent == null}"
                     jsfc="ui:repeat" value="#{genericMB.userMenus}" var="menu">
-                    <a class="base-app-main-menu-list-item-link" href="#{menu.link}">
-                        #{menu.name}<i class="#{menu.icon}"></i> 
-                    </a>
+                    <a class="base-app-main-menu-list-item-link" 
+                       href="#{menu.link}" data-i18n="#{menu.name}">#{menu.name}<i class="#{menu.icon}"></i> </a>
                     <ui:fragment rendered="#{not empty menu.childs}">
                         <ul class="base-app-main-menu-sublist">
                             <li class="base-app-main-menu-sublist-item" 
                                 jsfc="ui:repeat" value="#{menu.childs}" var="submenu">
-                                <a class="base-app-main-menu-list-item-link" href="#{submenu.link}">
-                                    #{submenu.name}<i class="#{menu.icon}"></i>
+                                <a class="base-app-main-menu-sublist-item-link" 
+                                   href="#{submenu.link}" data-i18n="#{submenu.name}">#{submenu.name}
+                                    <i class="#{menu.icon}"></i>
                                 </a>
                             </li>
                         </ul>
                     </ui:fragment>
                 </li>
             </ul>
+            <ui:insert> </ui:insert>
         </nav>
     </ui:composition>
 </html>

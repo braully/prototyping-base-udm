@@ -4,6 +4,9 @@ import com.github.braully.domain.AbstractStatusEntity;
 import com.github.braully.interfaces.IValorParametroSistema;
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -15,41 +18,44 @@ import javax.persistence.Transient;
  * @author braully
  */
 @Entity
-@Table(schema = "base", name = "valor_parametro_sistema")
+@Table(schema = "legacy", name = "valor_parametro_sistema")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
 public class ValueSystemParameter extends AbstractStatusEntity implements IValorParametroSistema {
 
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ValueSystemParameter.class);
+    protected static final org.apache.log4j.Logger log = org.apache.log4j.LogManager.getLogger(ValueSystemParameter.class);
     /**
      */
 
     @Temporal(TemporalType.DATE)
-    private Date inicioVigencia;
+    protected Date inicioVigencia;
     @Temporal(TemporalType.DATE)
-    private Date fimVigencia;
+    protected Date fimVigencia;
 
     @Column(name = "nome_classe_parametro")
-    private String nomeClasseParametro;
+    protected String nomeClasseParametro;
     @Column(name = "grupo_parametro")
-    private String grupoParametro;
+    protected String grupoParametro;
     @Column(name = "nome_parametro")
-    private String nomeParametro;
+    protected String nomeParametro;
     @Column(name = "descricao_parametro")
-    private String descricaoParametro;
+    protected String descricaoParametro;
     @Column(name = "nome_classe_valor_parametro")
-    private String nomeClasseValorParametro;
+    protected String nomeClasseValorParametro;
     @Column(name = "valor_boolean")
-    private Boolean valorBoolean;
+    protected Boolean valorBoolean;
     @Column(name = "valor_string")
-    private String valorString;
+    protected String valorString;
     @Column(name = "valor_inteiro")
-    private Integer valorInteiro;
+    protected Integer valorInteiro;
     @Column(name = "valor_fracionario")
-    private Double valorFracionario;
+    protected Double valorFracionario;
     /*
     
      */
     @Transient
-    private IParameterSystem cacheParametroSistema;
+    protected IParameterSystem cacheParametroSistema;
 
     public ValueSystemParameter() {
     }

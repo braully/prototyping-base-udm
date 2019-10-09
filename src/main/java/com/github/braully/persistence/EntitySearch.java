@@ -5,9 +5,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.beanutils.MethodUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.aop.framework.Advised;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +21,7 @@ import org.springframework.util.StringUtils;
 @Service
 public class EntitySearch {
 
-    private static final Logger log = Logger.getLogger(EntitySearch.class.getName());
+    private static final Logger log = LogManager.getLogger(EntitySearch.class.getName());
     /**/
 
     @Autowired
@@ -56,7 +56,7 @@ public class EntitySearch {
                     beanClass = cls;
                 }
             } catch (Exception e) {
-                log.log(Level.WARNING, "Bean original type not found", e);
+                log.warn("Bean original type not found", e);
             }
 
             /* Search for Default Method with Map as parameter */
@@ -94,15 +94,15 @@ public class EntitySearch {
                 paramObjects[i] = value;
                 paramTypes[i] = p.getType();
                 if (p.isNamePresent()) {
-                    log.log(Level.SEVERE, "Parameter: name not present in parameter reflection");
+                    log.error("Parameter: name not present in parameter reflection");
                 }
                 if (value == null) {
-                    log.log(Level.INFO, "Parameter: ''{0}'' not found in query", name);
+                    log.info("Parameter: ''{0}'' not found in query", name);
                 }
             }
             ret = MethodUtils.invokeMethod(bean, splits[1], paramObjects, paramTypes);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            Logger.getLogger(EntitySearch.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("", ex);
         }
         return (List) ret;
     }

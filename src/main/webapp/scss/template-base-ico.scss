@@ -1,0 +1,58 @@
+/* 
+ * References:  
+ * https://sass-lang.com/guide
+ * https://uxplanet.org/how-to-customize-bootstrap-b8078a011203
+ * https://getbootstrap.com.br/docs/4.1/getting-started/theming
+ * https://getbootstrap.com/docs/4.1/components/navbar
+ * https://getbootstrap.com/docs/4.1/examples/dashboard/
+ * https://fontawesome.com/v4.7.0/icon
+ * https://stackoverflow.com/questions/48816716/bootstrap-4-navbar-not-collapsing-or-expanding
+*/
+
+@import '../node_modules/font-awesome/scss/font-awesome';
+@import '../node_modules/font-awesome/scss/variables';
+@import '../node_modules/font-awesome/scss/icons';
+@import '../node_modules/font-awesome/scss/mixins';
+
+// icones
+
+.ico-caixa, .ico-caixa {
+    @extend .fa;
+    @extend .fa-calculator;
+}
+
+.ico-opcoes, .ico-options {
+    @extend .fa;
+    @extend .fa-ellipsis-v
+}
+
+.ico-excluir, .ico-remove {
+    @extend .fa;
+    @extend .fa-trash;    
+}
+
+
+.ico-excluir, .ico-remove {
+    @extend .fa;
+    @extend .fa-trash;    
+}
+
+.ico-cancelar, .ico-cancel {
+    @extend .fa;
+    @extend .fa-remove;
+}
+
+.ico-buscar, .ico-search {
+    @extend .fa;
+    @extend .fa-search;
+}
+
+.ico-adicionar, .ico-add {
+    @extend .fa;
+    @extend .fa-plus;
+}
+
+.ico-download {
+    @extend .fa;
+    @extend .fa-download;
+}

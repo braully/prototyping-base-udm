@@ -6,6 +6,9 @@
         <ui:define name="template.app.title">entityName</ui:define>
         <ui:define name="template.head.append"></ui:define>
         <ui:define name="template.body.append"></ui:define>
+        <ui:define name="template.app.header">
+            <ui:include src="/jsf/template/header-base-slim.xhtml" />
+        </ui:define>
         <ui:define name="template.app.menu">
             <ui:include src="/jsf/template/menu-base-app.xhtml" />
         </ui:define>
@@ -19,13 +22,13 @@
         </ui:define>
 
         <ui:define name="template.app.content.form">
-            <ui:include src="/autogen/entityName/template-base-app/form.xhtml" />
+            <ui:include src="/autogen/entityName/form.xhtml" />
         </ui:define>
         <ui:define name="template.app.content.filter">
-            <ui:include src="/autogen/entityName/template-base-app/filter.xhtml" />
+            <ui:include src="/autogen/entityName/filter.xhtml" />
         </ui:define>
         <ui:define name="template.app.content.list">
-            <ui:include src="/autogen/entityName/template-base-app/list.xhtml" /> 
+            <ui:include src="/autogen/entityName/list.xhtml" /> 
         </ui:define>
     </ui:composition>
 </html>

@@ -28,7 +28,7 @@ import javax.persistence.MappedSuperclass;
  * @author braullyrocha
  */
 @MappedSuperclass
-@Access(AccessType.FIELD)
+//@Access(AccessType.FIELD)
 public abstract class EntityStatus
         extends EntityBasic
         implements IEntityStatus {

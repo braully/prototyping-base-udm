@@ -19,6 +19,12 @@ package com.github.braully.web.jsf;
 
 import com.github.braully.app.CRUDGenericController;
 import com.github.braully.persistence.IEntity;
+import com.github.braully.util.UtilFaces;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -51,27 +57,68 @@ public abstract class CRUDGenericMB<T extends IEntity> extends CRUDGenericContro
     }
 
     protected Long getRequestParamJSFLong(String chave) {
-        Object att = this.getAtributeFromSession(chave);
+        Object att = this.getAtributeFromRequest(chave);
         return this.parseLong(att);
     }
 
-    protected Long parseLong(Object att) {
-        Long ret = null;
-        if (att instanceof Number) {
-            if (att instanceof Long) {
-                ret = (Long) att;
-            } else {
-                ret = ((Number) att).longValue();
+    @Override
+    protected HttpSession getCurrentSession() {
+        HttpSession currentSession = super.getCurrentSession();
+        try {
+            Object session1 = null;
+            if (currentSession == null) {
+                session1 = FacesContext.getCurrentInstance()
+                        .getExternalContext().getSession(true);
+                currentSession = (HttpSession) session1;
             }
-        } else if (att != null) {
-            String parse = att.toString();
-            ret = Long.parseLong(parse);
+        } catch (Exception e) {
+            log.debug("Fail on load curresnt session", e);
+        }
+        return currentSession;
+    }
+
+    @Override
+    protected HttpServletRequest getCurrentRequest() {
+        HttpServletRequest currentRequest = super.getCurrentRequest();
+        try {
+            Object request = FacesContext.getCurrentInstance()
+                    .getExternalContext().getRequest();
+            currentRequest = (HttpServletRequest) request;
+        } catch (Exception e) {
+            log.debug("Fail on load curresnt request", e);
+        }
+        return currentRequest;
+    }
+
+    @Override
+    protected Object getAtributeFromRequest(String nomeAtt) {
+        Object ret = super.getAtributeFromRequest(nomeAtt);
+        if (ret == null) {
+            try {
+                ret = getCurrentRequest().getParameter(nomeAtt);
+                //(HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            } catch (Exception e) {
+
+            }
         }
         return ret;
     }
 
-    protected void mostrarArquivo(byte[] recibo, String reciboMatpdf) {
-        throw new UnsupportedOperationException("Recuperar esse metodo perdido");
+    protected void sendFile(InputStream stream, String nomeArquivo) {
+        try {
+            UtilFaces.mostrarArquivo(stream, nomeArquivo);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Falha ao enviar arquivo", ex);
+        }
+    }
+
+    //TODO: Refactor
+    protected void mostrarArquivo(byte[] recibo, String nomeArquivo) {
+        try {
+            UtilFaces.mostrarArquivo(recibo, nomeArquivo);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Falha ao enviar arquivo", ex);
+        }
     }
 
     protected Object popSessionJSF(String nome) {

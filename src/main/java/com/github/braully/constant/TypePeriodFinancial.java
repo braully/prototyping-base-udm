@@ -22,9 +22,9 @@ package com.github.braully.constant;
  * @author braully
  */
 public enum TypePeriodFinancial {
-//TODO: Translate and unify 
-    DIARIO("Diário"), MENSAL("Mensal"), ANUAL("Anual"), SEMESTRAL("Semestral"),
-    TRIMESTRAL("Trimestral"), BIMESTRAL("Trimestral");
+//TODO: Translate and unify and Merge in TypePeriod
+    DIARIO("Diário"), MENSAL("Mensal"), BIMESTRAL("Bimestral"),
+    TRIMESTRAL("Trimestral"), SEMESTRAL("Semestral"), ANUAL("Anual"),;
 
     String descricao;
 
@@ -33,6 +33,11 @@ public enum TypePeriodFinancial {
     }
 
     public String getDescricao() {
+        return descricao;
+    }
+
+    @Override
+    public String toString() {
         return descricao;
     }
 }

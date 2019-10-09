@@ -4,14 +4,14 @@ import com.github.braully.domain.AbstractEntity;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.MappedSuperclass;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @MappedSuperclass
 public abstract class TagAbstrata extends AbstractEntity implements Serializable, Comparable<TagAbstrata> {
 
-    private static final Logger log = Logger.getLogger(TagAbstrata.class.getName());
+    private static final Logger log = LogManager.getLogger(TagAbstrata.class.getName());
     private static final long serialVersionUID = 1L;
     /**
      *
@@ -46,7 +46,7 @@ public abstract class TagAbstrata extends AbstractEntity implements Serializable
                 desc.append("/");
             }
         } catch (Exception e) {
-            log.log(Level.WARNING, "", e);
+            log.warn("", e);
         }
         desc.append(descricao);
         return desc.toString();

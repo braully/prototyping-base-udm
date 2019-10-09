@@ -16,6 +16,8 @@ limitations under the License.
 package com.github.braully.app;
 
 import com.github.braully.persistence.GenericDAO;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,11 +27,23 @@ import org.springframework.stereotype.Component;
  * @author braully
  */
 //TODO: Implement DW for statistical entities information
+//Static or Instance?
 @Component
 public class StatisticalConsolidation {
 
-    static {
+    static StatisticalConsolidation instance;
 
+    private static Map<String, Integer> countEntites = new HashMap<>();
+
+    static {
+        countEntites.put("City", 5000);
+    }
+
+    public static StatisticalConsolidation instance() {
+        if (instance == null) {
+            instance = new StatisticalConsolidation();
+        }
+        return instance;
     }
 
     @Autowired
@@ -43,7 +57,8 @@ public class StatisticalConsolidation {
     public int countEntity(Class classe) {
         int count = 0;
         try {
-            count = genericDAO.count(classe);
+            //count = genericDAO.count(classe);
+            count = countEntites.get(classe.getSimpleName());
         } catch (Exception e) {
 
         }

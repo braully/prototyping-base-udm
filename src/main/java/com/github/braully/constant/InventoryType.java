@@ -34,4 +34,8 @@ public enum InventoryType {
         return descricao;
     }
 
+    @Override
+    public String toString() {
+        return this.descricao;
+    }
 }

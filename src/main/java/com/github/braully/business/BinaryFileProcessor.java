@@ -11,4 +11,6 @@ public abstract class BinaryFileProcessor {
     public abstract String getType();
 
     public abstract void processFile(BinaryFile arquivo);
+
+    public abstract boolean isProcessable(BinaryFile arquivo);
 }

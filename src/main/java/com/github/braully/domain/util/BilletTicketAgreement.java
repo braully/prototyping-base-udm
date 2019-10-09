@@ -1,50 +1,60 @@
 package com.github.braully.domain.util;
 
+import com.github.braully.constant.Attr;
+import com.github.braully.constant.EstrategiaCalculoDV;
 import com.github.braully.domain.AbstractStatusEntity;
+import com.github.braully.domain.Bank;
 import com.github.braully.domain.FinancialAccount;
 import com.github.braully.domain.Organization;
+import com.github.braully.interfaces.IOrganiztionEntityDependent;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(schema = "financial")
-public class BilletTicketAgreement extends AbstractStatusEntity {
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
 
-    private static final long serialVersionUID = 1L;
+public class BilletTicketAgreement extends AbstractStatusEntity implements IOrganiztionEntityDependent {
     /* */
+    protected static final long serialVersionUID = 1L;
+    public static final String CODG_REAL = "9";
 
+    /* //Really necessary?
     @ManyToOne
-    private Organization organization;
+    protected Organization organization;
+     */
     @ManyToOne
-    private FinancialAccount bankAccount;
+    protected FinancialAccount bankAccount;
     @ManyToOne
-    private FinancialCharge charge;
+    protected FinancialCharge charge;
     @Basic
-    private String codClient;
+    @Attr({"label", "Código Cedente"})
+    protected String codeClient;
     @Basic
-    private String codOperation;
+    protected String codeAgreement;
     @Basic
-    private String wallet;
+    protected String wallet;
     @Basic
-    private String maskNumber;
+    protected String maskNumber;
     @Basic
-    private String instruction;
+    protected String instruction;
     @Basic
-    private Boolean defaultAgreement;
+    protected Boolean defaultAgreement;
     @Basic
-    private Boolean registerRequeried;
+    protected Boolean registerRequeried;
     @Basic
-    private String modalidade;
-
-    public Organization getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
-    }
+    protected String modalVariant;
 
     public FinancialAccount getBankAccount() {
         return bankAccount;
@@ -63,19 +73,19 @@ public class BilletTicketAgreement extends AbstractStatusEntity {
     }
 
     public String getCodClient() {
-        return codClient;
+        return codeClient;
     }
 
     public void setCodClient(String codClient) {
-        this.codClient = codClient;
+        this.codeClient = codClient;
     }
 
     public String getCodOperation() {
-        return codOperation;
+        return codeAgreement;
     }
 
     public void setCodOperation(String codOperation) {
-        this.codOperation = codOperation;
+        this.codeAgreement = codOperation;
     }
 
     public String getWallet() {
@@ -119,11 +129,141 @@ public class BilletTicketAgreement extends AbstractStatusEntity {
     }
 
     public String getModalidade() {
-        return modalidade;
+        return modalVariant;
     }
 
     public void setModalidade(String modalidade) {
-        this.modalidade = modalidade;
+        this.modalVariant = modalidade;
     }
 
+    @Override
+    protected String preToString() {
+
+        return "Convênio " + codeAgreement;
+    }
+
+    @Override
+    protected String posToString() {
+        StringBuilder sb = new StringBuilder();
+        if (wallet != null) {
+            sb.append(" Carteira ").append(this.wallet);
+        }
+        if (this.bankAccount != null) {
+            sb.append(this.bankAccount.preToString()).append(" - ").append(this.bankAccount.posToString());
+        }
+        return sb.toString();
+    }
+
+    /* Temporario
+    TODO: Remover quando estabilizado 
+     */
+    public String getAgenciaCodCedenteFormatted() {
+        StringBuilder sb = new StringBuilder();
+        String agencia = this.getAgencia();
+        boolean ant = false;
+        if (agencia != null && !agencia.isEmpty()) {
+            sb.append(agencia);
+            ant = true;
+        }
+        String conta = this.getConta();
+        if (conta != null && !conta.isEmpty()) {
+            if (ant) {
+                sb.append("/");
+            }
+            sb.append(conta);
+            ant = true;
+        }
+        return sb.toString();
+    }
+
+    public String getNumConvenio() {
+        return codeClient;
+    }
+
+    public String getLocalPagmento() {
+        return instruction;
+    }
+
+    public String getCedente() {
+        return this.getInstituicao() != null ? this.getInstituicao().getNome() : "";
+    }
+
+    public String getCarteira() {
+        return wallet;
+    }
+
+    public String getMoeda() {
+        return CODG_REAL;
+    }
+
+    public Organization getInstituicao() {
+        if (bankAccount == null) {
+            return null;
+        }
+        return bankAccount.getOrganization();
+    }
+
+    public Boolean getRegistrado() {
+        return true;
+    }
+
+    public String getAgencia() {
+        return this.bankAccount.getAgencia();
+    }
+
+    public String getConta() {
+        return this.bankAccount.getConta();
+    }
+
+    public FinancialAccount getContaBancaria() {
+        return this.bankAccount;
+    }
+
+    public String getCodigoPessoa() {
+        return this.codeClient;
+    }
+
+    public String getMascaraNossoNumero() {
+        return this.maskNumber;
+    }
+
+    public EstrategiaCalculoDV getEstrategiaDv() {
+        return EstrategiaCalculoDV.MODULO_11;
+    }
+
+    public String getCodigoPessoaFormatado() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Bank getBanco() {
+        return this.bankAccount.getBank();
+    }
+
+    public String getNomeArquivoRemessa() {
+        return "";
+    }
+
+    public String getAgenciaSomenteNumero() {
+        return this.bankAccount.getAgenciaSomenteNumero();
+    }
+
+    public String getAgenciaSemDv() {
+        return this.bankAccount.getAgenciaSemDv();
+    }
+
+    public String getAgenciaDv() {
+        return this.bankAccount.getAgenciaDv();
+    }
+
+    public String getContaDv() {
+        return this.bankAccount.getContaDv();
+    }
+
+    @Override
+    public Organization getOrganization() {
+        if (this.bankAccount == null) {
+            return null;
+        }
+        return this.bankAccount.getOrganization();
+    }
 }

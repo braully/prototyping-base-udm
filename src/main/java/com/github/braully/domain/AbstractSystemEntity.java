@@ -3,14 +3,18 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
 import com.github.braully.interfaces.ISystemEntity;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @MappedSuperclass
 public abstract class AbstractSystemEntity extends AbstractEntity implements ISystemEntity {
 
@@ -22,7 +26,10 @@ public abstract class AbstractSystemEntity extends AbstractEntity implements ISy
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    protected Boolean editable;
+    @Attr("hidden")
+    @Column(name = "system_lock",
+            columnDefinition = "boolean default false")
+    protected Boolean systemLock;
 
     @Override
     public Long getId() {
@@ -38,4 +45,5 @@ public abstract class AbstractSystemEntity extends AbstractEntity implements ISy
     public boolean isPersisted() {
         return this.id != null && this.id > 0;
     }
+
 }

@@ -3,64 +3,55 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.util.UtilValidation;
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(schema = "base")
-public class Phone extends AbstractEntity implements Serializable {
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER,
+        name = "type_id", columnDefinition = "smallint default '0'", length = 1)
+public class Phone extends AbstractLightRemoveEntity implements Serializable {
 
     @Basic
-    private String number;
-
-    @OneToMany(targetEntity = Partner.class)
-    @JoinTable(schema = "base")
-    private List<Partner> partner;
+    protected String number;
 
     @Basic
-    private String observation;
+    protected String observation;
 
     @Basic
-    private String type;
+    protected String type;
 
     public Phone() {
 
     }
 
-    public String getNumber() {
-        return this.number;
+    public String format() {
+        return number + (UtilValidation.isStringValid(type) ? " (" + type + ")" : "");
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    @Override
+    public String toString() {
+        return format();
     }
 
-    public List<Partner> getPartner() {
-        return this.partner;
+    public Phone number(String numero) {
+        this.number = numero;
+        return this;
     }
 
-    public void setPartner(List<Partner> partner) {
-        this.partner = partner;
-    }
-
-    public String getObservation() {
-        return this.observation;
-    }
-
-    public void setObservation(String observation) {
-        this.observation = observation;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public void setType(String type) {
+    public Phone type(String type) {
         this.type = type;
+        return this;
     }
 }

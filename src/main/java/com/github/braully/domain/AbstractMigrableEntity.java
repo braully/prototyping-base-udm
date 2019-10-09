@@ -3,38 +3,25 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
 import com.github.braully.interfaces.IMigrableEntity;
 import com.github.braully.persistence.IEntity;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @MappedSuperclass
-public abstract class AbstractMigrableEntity implements IEntity, Serializable, IMigrableEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
+public abstract class AbstractMigrableEntity extends AbstractEntity implements IEntity, Serializable, IMigrableEntity {
 
     @Column(unique = true)
     @Basic
-    private String uniqueCode;
+    @Attr("hidden")
+    protected String uniqueCode;
 
     public AbstractMigrableEntity() {
 

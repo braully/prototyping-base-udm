@@ -5,21 +5,27 @@ package com.github.braully.domain;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "base")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
 public class GenericType extends AbstractEntity implements Serializable {
 
     @Basic
-    private String attribute;
+    protected String attribute;
 
     @Basic
-    private String type;
+    protected String type;
 
     @Basic
-    private String grouping;
+    protected String grouping;
 
     public GenericType() {
 
@@ -47,5 +53,9 @@ public class GenericType extends AbstractEntity implements Serializable {
 
     public void setGrouping(String grouping) {
         this.grouping = grouping;
+    }
+
+    public String getDescricao() {
+        return this.attribute;
     }
 }

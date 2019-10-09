@@ -1,17 +1,24 @@
 package com.github.braully.domain;
 
 import com.github.braully.persistence.IEntity;
+import com.github.braully.util.UtilValidation;
 import java.io.Serializable;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @MappedSuperclass
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER,
+        name = "type_id", columnDefinition = "smallint default '0'"
+)
 public abstract class AbstractEntity implements IEntity, Serializable {
 
     public AbstractEntity() {
@@ -56,7 +63,7 @@ public abstract class AbstractEntity implements IEntity, Serializable {
         if (!getClass().isAssignableFrom(obj.getClass())) {
             return false;
         }
-        AbstractEntity other = (AbstractEntity) obj;
+        IEntity other = (IEntity) obj;
         if (id == null) {
             if (other.getId() != null) {
                 return false;
@@ -65,5 +72,52 @@ public abstract class AbstractEntity implements IEntity, Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(preToString());
+        sb.append(" (#");
+        sb.append(id);
+        String posToString = "";
+
+        try {
+            posToString = posToString();
+        } catch (Exception e) {
+
+        }
+
+        try {
+            if (UtilValidation.isStringValid(posToString)) {
+                sb.append(" ").append(posToString);
+            }
+        } catch (Exception e) {
+        }
+
+        sb.append(')');
+        return sb.toString();
+    }
+
+    protected String preToString() {
+        return this.getClass().getSimpleName();
+    }
+
+    protected String posToString() {
+        return null;
+    }
+
+    @Transient
+    CacheTemporayAtrribute cache = null;
+
+    public CacheTemporayAtrribute cache() {
+        if (cache == null) {
+            cache = new CacheTemporayAtrribute();
+        }
+        return cache;
+    }
+
+    public CacheTemporayAtrribute getCache() {
+        return cache();
     }
 }

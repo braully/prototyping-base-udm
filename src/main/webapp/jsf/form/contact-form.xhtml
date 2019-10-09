@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ps="http://xmlns.jcp.org/jsf/passthrough">
+    <ui:composition>
+        #{contact.newMains()}
+        <div class="autogen-form-row">
+            <div class="afg-4">
+                <label class="autogen-form-group-label">CEP</label>
+                <h:inputText value="#{contact.mainAddress.zip}" 
+                       class="autogen-form-group-input">
+                </h:inputText>
+            </div>
+            <div class="afg-8">
+                <label class="autogen-form-group-label">Cidade</label>
+                <div class="autogen-input-group">
+                    <div class="autogen-input-group-prepend-text autogen-input-group-append">
+                        <i class="ico-search">
+                        </i>
+                    </div>
+                    <input class="autogen-form-group-input" type="text" value="#{contact.mainAddress.city}" />
+                    <input type="hidden" value="#{contact.mainAddress.city}" 
+                           jsfc="h:inputHidden" converter="#{converterEntityBD}">
+                    </input>
+                    <button class="autogen-button-alt autogen-input-group-append " type="button" 
+                            onclick="$(this).prev('input[type=hidden]').val('').prev().val('').attr('disabled', false);">
+                        <i class="ico-cancelar" />
+                    </button>
+                    <script>
+                        autocompleteInput($('script').last().closest('div').find('input[type=text]'), 'address/city');
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <div class="autogen-form-row">
+            <div class="afg-4">
+                <label class="autogen-form-group-label">Bairro</label>
+                <h:inputText type="text" value="#{contact.mainAddress.district}" 
+                       class="autogen-form-group-input">
+                </h:inputText>
+            </div>
+            <div class="afg-6">
+                <label class="autogen-form-group-label">Logradouro</label>
+                <h:inputText type="text" value="#{contact.mainAddress.street}" 
+                       class="autogen-form-group-input">
+                </h:inputText>
+            </div>
+            <div class="afg-2">
+                <label class="autogen-form-group-label">Número</label>
+                <h:inputText type="text" value="#{contact.mainAddress.number}" 
+                       class="autogen-form-group-input">
+                </h:inputText>
+            </div>
+        </div>
+
+        <div class="autogen-form-row">
+            <label class="autogen-form-group-label">Complemento</label>
+            <h:inputText value="#{contact.mainAddress.addressLine1}" 
+                   class="afg-input">
+            </h:inputText>
+        </div>
+
+        <div class="autogen-form-row">
+            <div class="col-6">
+                <!--Phone panel-->
+                <div class="autogen-form-row">
+                    <label class="autogen-form-group-label">Telefone</label>
+                </div>
+                <script id="new-phone-template" type="text/template">
+                    <div class="autogen-form-row" data-modelId="{{ model._id }}">
+                        <div class="afg-4">
+                            <input type="text" class="autogen-form-group-input" value="{{ model.type }}" onchange="updateModel(this, Phone, 'type')" />
+                        </div>
+                        <div class="afg-8">
+                        <div class="aig">
+                            <input class="autogen-form-group-input" data-type="phone-number" type="text" value="{{ model.number }}" onchange="updateModel(this, Phone, 'number')" />
+                            <button class="autogen-button-alt autogen-input-group-append " type="button" onclick="removeModel(this, Phone);">
+                                <i class="ico-remove" />
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                </script>
+
+                <input type="hidden" jsfc="h:inputHidden"
+                       value="#{phoneMB.jsonEntities}" />
+
+                <script id="Phone-script">
+                    //https://backbonejs.org/#Model-extend
+                    /*Backbone.Model.extend(properties, [classProperties])
+                     To create a Model class of your own, you extend Backbone.Model and provide instance properties, 
+                     as well as optional classProperties to be attached directly to the constructor function. */
+                    var Phone = Backbone.Model.extend(
+                            {idAttribute: '_id', defaults: {type: '', number: '', removed: false, id: ''}}, {typeName: 'Phone'}
+                    );
+                    var templateHtmlPhone = _.template($('#new-phone-template').html());
+                </script>
+                <div class="autogen-form-row">
+                    <div class="afg-4">                        
+                        <h:inputText class="autogen-form-group-input" value="#{contact.mainPhone.type}" />
+                    </div>
+                    <div class="afg-8">
+                        <div class="aig">
+                        <h:inputText class="autogen-form-group-input"
+                               value="#{contact.mainPhone.number}" ps:data-type="phone-number" />
+                        <button class="autogen-button-alt autogen-input-group-append " type="button"
+                                onclick="newRowModelTemplate(this, templateHtmlPhone, Phone)">
+                            <i class="ico-add" />
+                        </button>
+                        </div>
+                    </div>
+                </div>
+                <ui:repeat value="#{contact.extraPhones}" var="phone">
+                    <div class="autogen-form-row">
+                        <div class="afg-4">                        
+                            <h:inputText class="afg-input" 
+                                   value="#{phone.type}"/>
+                        </div>
+                        <div class="afg-8">
+                            <div class="aig">
+                                <h:inputText class="autogen-form-group-input" 
+                                       value="#{phone.number}" />
+                                <h:commandLink styleClass="autogen-button-alt aiga">
+                                    <f:ajax execute="@this" render="@none" listener="#{phone.toggleRemoved()}"
+                                            onevent="function (data) { if(data.status == 'success') { $(data.source).closest('div.autogen-form-row').hide();} }" />
+                                    <i class="ico-remove" />
+                                </h:commandLink>
+                            </div>
+                        </div>
+                    </div>
+                </ui:repeat>
+            </div>
+
+            <div class="col-6">
+                <!--Email panel-->
+                <div class="autogen-form-row">
+                    <label class="autogen-form-group-label">Email</label>
+                </div>
+
+                <script id="new-email-template" type="text/template">
+                    <div class="autogen-form-row" data-modelId="{{ model._id }}">
+                        <div class="autogen-form-group autogen-input-group">
+                            <input class="autogen-form-group-input" type="text" value="{{ model.value }}" onchange="updateModel(this, Email, 'value')" />
+                            <button class="autogen-button-alt autogen-input-group-append " type="button" onclick="removeModel(this, Email);">
+                                <i class="ico-remove" />
+                            </button>
+                        </div>
+                    </div>
+                </script>
+
+                <input type="hidden" jsfc="h:inputHidden"
+                       value="#{emailMB.jsonEntities}" />
+
+                <script id="Email-script">
+                    //https://backbonejs.org/#Model-extend
+                    /*Backbone.Model.extend(properties, [classProperties])
+                     To create a Model class of your own, you extend Backbone.Model and provide instance properties, 
+                     as well as optional classProperties to be attached directly to the constructor function. */
+                    var Email = Backbone.Model.extend(
+                            {
+                                idAttribute: '_id',
+                                defaults: {type: '', value: '', id: ''}
+                            },
+                            {typeName: 'Email'}
+                    );
+                    var templateHtmlEmail = _.template($('#new-email-template').html());
+                </script>
+
+                <div class="autogen-form-row">
+                    <div class="autogen-form-group autogen-input-group">
+                        <h:inputText class="autogen-form-group-input" type="text" ps:data-type="email"
+                                value="#{contact.mainEmail.value}"/>
+                        <button class="autogen-button-alt autogen-input-group-append " type="button"
+                                onclick="newRowModelTemplate(this, templateHtmlEmail, Email)">
+                            <i class="ico-add" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:composition>
+</html>

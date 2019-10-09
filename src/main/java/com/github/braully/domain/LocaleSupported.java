@@ -3,11 +3,13 @@ package com.github.braully.domain;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "base")
-@Data
+@Getter
+@Setter
 public class LocaleSupported extends AbstractEntity {
 
     @Basic

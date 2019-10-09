@@ -6,48 +6,30 @@ package com.github.braully.domain;
 import com.github.braully.persistence.IEntity;
 import java.io.Serializable;
 import javax.persistence.Basic;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Where;
 
-@Data
 @MappedSuperclass
-public abstract class AbstractLightRemoveEntity implements IEntity, Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Where(clause = "removed = false")//jpa hibernate soft delete
+public abstract class AbstractLightRemoveEntity extends AbstractEntity implements IEntity, Serializable {
 
     @Basic
-    private Boolean removed;
+    @Column(columnDefinition = "boolean DEFAULT false")
+    @Getter
+    @Setter
+    protected Boolean removed;
 
     public AbstractLightRemoveEntity() {
 
     }
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Boolean getRemoved() {
-        return this.removed;
-    }
-
-    public void setRemoved(Boolean removed) {
-        this.removed = removed;
-    }
-
-    @Override
-    public boolean isPersisted() {
-        return this.id != null && this.id > 0;
+    public void toggleRemoved() {
+        if (this.removed == null) {
+            this.removed = false;
+        }
+        this.removed = !this.removed;
     }
 }

@@ -1,16 +1,21 @@
 package com.github.braully.web.jsf;
 
-import com.github.braully.app.EntityRESTfulWS;
+import com.github.braully.app.StatisticalConsolidation;
 import com.github.braully.util.DynamicVirtualTemplateFile;
 import com.github.braully.util.UtilCollection;
 import com.github.braully.util.UtilIO;
+import com.github.braully.util.UtilReflection;
 import com.github.braully.web.AutoGenWebResources;
 import com.github.braully.web.DescriptorExposedEntity;
+import com.github.braully.web.DescriptorExposedEntity.DescriptorHtmlEntity;
 import static com.github.braully.web.SpringWebConfig.*;
+import j2html.tags.ContainerTag;
+import j2html.tags.DomContent;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
@@ -22,7 +27,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -30,7 +36,7 @@ import org.apache.log4j.Logger;
  */
 public class AutoGenResourceJSF extends ResourceWrapper {
 
-    private static Logger log = Logger.getLogger(AutoGenResourceJSF.class);
+    private static Logger log = LogManager.getLogger(AutoGenResourceJSF.class);
 
     /* */
     public static final String DEFAULT_AUTOGEN_PREFIX = "/autogen/";
@@ -39,11 +45,11 @@ public class AutoGenResourceJSF extends ResourceWrapper {
     public static final String DYNAMIC_BASE_TEMPLATE_RESOURC_NAME_FILE = DYNAMIC_BASE_TEMPLATE_RESOURC_NAME + ".xhtml";
 
     /* */
-    public static String DIRECTORY_DYNAMIC_TEMPLATE_HTML = "web/templates/";
+    public static String DIRECTORY_DYNAMIC_TEMPLATE_HTML = "web/templates/"; //"templates/";
     public static String FILE_DEFAULT_DYNAMIC_BASE_TEMPLATE = DIRECTORY_DYNAMIC_TEMPLATE_HTML + "template-base-app.html";
 
     /* */
-    public static String DIRECTORY_DYNAMIC_TEMPLATE_JSF = "web/jsf/template/";
+    public static String DIRECTORY_DYNAMIC_TEMPLATE_JSF = "web/jsf/template/"; //"jsf/template/";
     public static String FILE_DYNAMIC_TEMPLATE_ENTITY_CRUD = DIRECTORY_DYNAMIC_TEMPLATE_JSF + "template-base-app-entity-crud.xhtml";
 
     public static final String DEFAULT_PROP_TEMPLATE_HTML_ATTRIBUTE_APPEND_JSF = "xmlns=\"http://www.w3.org/1999/xhtml\"\n"
@@ -57,12 +63,20 @@ public class AutoGenResourceJSF extends ResourceWrapper {
     public static final String DEFAULT_PROP_TEMPLATE_HEAD_ATTRIBUTE_APPEND_JSF = "jsfc=\"h:head\"";
     public static final String DEFAULT_PROP_APP_NAME_JSF = "<ui:insert name=\"template.app.name\" />";
     public static final String DEFAULT_PROP_APP_TITTLE_JSF = "<ui:insert name=\"template.app.title\" />";
-    public static final String DEFAULT_PROP_APP_HEADER_JSF = "<ui:insert name=\"template.app.header\" />";
+    public static final String DEFAULT_PROP_APP_HEADER_JSF = "<ui:insert name=\"template.app.header\"><ui:include src=\"/jsf/template/header-base-slim.xhtml\" /></ui:insert>";
     public static final String DEFAULT_PROP_TEMPLATE_HTML_APPEND_JSF = "<f:view contentType=\"text/html\" locale=\"en\" />";
     public static final String DEFAULT_PROP_TEMPLATE_HEAD_APPEND_JSF = "<ui:insert name=\"template.head.append\" />";
     public static final String DEFAULT_PROP_TEMPLATE_BODY_APPEND_JSF = "<ui:insert name=\"template.body.append\" /> ";
     public static final String DEFAULT_PROP_APP_MENU_JSF = "<ui:insert name=\"template.app.menu\"><ui:include src=\"/jsf/template/menu-base-app.xhtml\" /></ui:insert>";
     public static final String DEFAULT_PROP_APP_CONTET_JSF = "<ui:insert name=\"template.app.content\" />";
+    public static final String DEFAULT_PROP_APP_MSG_JSF = "<ui:insert name=\"template.app.content.msg\"> "
+            + "<h:messages style=\"list-style: none;\" \n"
+            + "   infoClass=\"autogen-message-info\" "
+            + "   warnClass=\"autogen-message-warning\" "
+            + "   fatalClass=\"autogen-message-error\" "
+            + "   errorClass=\"autogen-message-error\" "
+            + "   showSummary=\"true\" showDetail=\"true\" />"
+            + " </ui:insert>";
     public static final String DEFAULT_PROP_APP_FORM_JSF = "<ui:insert name=\"template.app.content.form\" />";
     public static final String DEFAULT_PROP_APP_FILTER_JSF = "<ui:insert name=\"template.app.content.filter\" />";
     public static final String DEFAULT_PROP_APP_LIST_JSF = "<ui:insert name=\"template.app.content.list\" />";
@@ -84,6 +98,7 @@ public class AutoGenResourceJSF extends ResourceWrapper {
             DEFAULT_PROP_TEMPLATE_BODY_APPEND, DEFAULT_PROP_TEMPLATE_BODY_APPEND_JSF,
             DEFAULT_PROP_APP_MENU, DEFAULT_PROP_APP_MENU_JSF,
             DEFAULT_PROP_APP_CONTET, DEFAULT_PROP_APP_CONTET_JSF,
+            DEFAULT_PROP_APP_MSG, DEFAULT_PROP_APP_MSG_JSF,
             DEFAULT_PROP_APP_FORM, DEFAULT_PROP_APP_FORM_JSF,
             DEFAULT_PROP_APP_FILTER, DEFAULT_PROP_APP_FILTER_JSF,
             DEFAULT_PROP_APP_LIST, DEFAULT_PROP_APP_LIST_JSF,
@@ -91,8 +106,10 @@ public class AutoGenResourceJSF extends ResourceWrapper {
     );
 
     static boolean isAutoGenResource(String resourceName) {
-        return resourceName.startsWith(DEFAULT_AUTOGEN_PREFIX)
-                && resourceName.contains("html");
+        if (resourceName.startsWith(DEFAULT_AUTOGEN_PREFIX)) {
+            return resourceName.contains("html");
+        }
+        return false;
     }
 
     private DynamicVirtualTemplateFile dynamicTemplate;
@@ -102,7 +119,6 @@ public class AutoGenResourceJSF extends ResourceWrapper {
 
     AutoGenResourceJSF(String resourceName, ResourceHandler wrapped) {
         this.resourceName = resourceName;
-        this.wrapped = this.wrapped;
         try {
             URL url = new URL("http://b" + resourceName);
             String query = url.getQuery();
@@ -127,8 +143,9 @@ public class AutoGenResourceJSF extends ResourceWrapper {
         DynamicVirtualTemplateFile template = CACHE.get(resourceName);
         if (template == null) {
             try {
+                int lastbar = resourceName.lastIndexOf("/") + 1;
                 String shortResourceName = resourceName.substring(
-                        resourceName.lastIndexOf("/") + 1, resourceName.lastIndexOf("."));
+                        lastbar, resourceName.indexOf(".", lastbar));
                 if (isPageTemplate(resourceName, shortResourceName)) {
                     template = dynamicTemplatePage(resourceName, shortResourceName);
                 } else {
@@ -138,8 +155,14 @@ public class AutoGenResourceJSF extends ResourceWrapper {
                         case "filter":
                             template = generateTemplateEntityCrudElement(resourceName, shortResourceName);
                             break;
-                        default:
+                        case "crud":
                             template = dynamicTemplateEntityCrud(resourceName, shortResourceName);
+                            break;
+                        default:
+                            template = generateTemplateEntityCrudElement(resourceName, shortResourceName);
+                            if (template == null) {
+                                template = dynamicTemplateEntityCrud(resourceName, shortResourceName);
+                            }
                             break;
                     }
                 }
@@ -169,10 +192,9 @@ public class AutoGenResourceJSF extends ResourceWrapper {
 
     private DynamicVirtualTemplateFile dynamicTemplateEntityCrud(String resourceName,
             String shortResourceName) throws IOException {
-        DescriptorExposedEntity descExposedEntity = EntityRESTfulWS.EXPOSED_ENTITY.get(shortResourceName);
 
-        String fileFromPathAsString = DIRECTORY_DYNAMIC_TEMPLATE_JSF
-                + shortResourceName + ".xhtml";
+        String fileFromPathAsString = DIRECTORY_DYNAMIC_TEMPLATE_JSF + shortResourceName + ".xhtml";
+
         try {
             fileFromPathAsString = UtilIO.loadFileFromPathAsString(fileFromPathAsString);
         } catch (Exception e) {
@@ -208,15 +230,67 @@ public class AutoGenResourceJSF extends ResourceWrapper {
         DynamicVirtualTemplateFile template = null;
         int begin = resourceName.lastIndexOf(DEFAULT_AUTOGEN_PREFIX) + DEFAULT_AUTOGEN_PREFIX.length();
         int end = resourceName.indexOf("/", begin);
+        if (end < begin) {
+            return null;
+            //throw new IllegalStateException("Invalid url: " + resourceName + " and " + shortResourceName);
+        }
         String entityNameExposed = resourceName.substring(begin, end);
-        DescriptorExposedEntity descExposedEntity = EntityRESTfulWS.EXPOSED_ENTITY.get(entityNameExposed);
+        DescriptorExposedEntity descExposedEntity = autogenweb.getExposedEntity(entityNameExposed);
+        if (descExposedEntity == null) {
+            return null;
+        }
         if (shortResourceName.equals("form")) {
-            template = generateForm(resourceName, resourceName, entityNameExposed, descExposedEntity);
+            //TODO: Inject
+            //StatisticalConsolidation st = StatisticalConsolidation.instance();
+            template = generateForm(resourceName, resourceName, entityNameExposed, descExposedEntity, StatisticalConsolidation.instance());
         } else if (shortResourceName.equals("filter")) {
             template = generateFilter(resourceName, resourceName, entityNameExposed, descExposedEntity);
         } else if (shortResourceName.equals("list")) {
             template = generateEntityList(resourceName, resourceName, entityNameExposed, descExposedEntity);
+        } else if (descExposedEntity.hasField(shortResourceName)) {
+            //log.info("Gerar input form subelement");
+            template = generateElement(resourceName, shortResourceName, entityNameExposed, descExposedEntity);
         }
+        return template;
+    }
+
+    private DynamicVirtualTemplateFile generateElement(String resourceName,
+            String shortResourceName, String entityNameExposed,
+            DescriptorExposedEntity descExposedEntity)
+            throws IOException {
+        DescriptorHtmlEntity elementForm = descExposedEntity.getDescriptorHtmlEntity(extraParameter).getElementForm(shortResourceName);
+        ContainerTag entityHtmlFormInputGroup = AutoGenWebResources.JSF_ENTITY_CRUD.entityHtmlFormInputGroup(elementForm, StatisticalConsolidation.instance());
+        String renderFilter = AutoGenWebResources.JSF_ENTITY_CRUD.embraceJsfComposition(
+                entityHtmlFormInputGroup
+        ).renderFormatted();
+        DynamicVirtualTemplateFile template = new DynamicVirtualTemplateFile(resourceName,
+                renderFilter, MAP_TRANSLATE_TEMPLATE_PROPERTIES,
+                Map.of(DEFAULT_ENTITY_PROPERTIE_KEY, entityNameExposed));
+        return template;
+    }
+
+    private DynamicVirtualTemplateFile generateForm(String resourceName, String shortResourceName,
+            String entityNameExposed, DescriptorExposedEntity descExposedEntity, StatisticalConsolidation st)
+            throws IOException {
+        DescriptorExposedEntity.DescriptorHtmlEntity descriptorHtmlEntity = descExposedEntity.getDescriptorHtmlEntity(extraParameter);
+        ContainerTag htmlForm = AutoGenWebResources.JSF_ENTITY_CRUD.entityHtmlForm(descriptorHtmlEntity, st);
+        String renderForm = null;
+        var finalForm = AutoGenWebResources.JSF_ENTITY_CRUD.embraceJsfComposition(
+                htmlForm
+        );
+
+        if (descriptorHtmlEntity.isAttribute("onlychilds")) {
+            try {
+                List<DomContent> children = (List<DomContent>) UtilReflection.getPrivateField(htmlForm, "children");
+                finalForm = AutoGenWebResources.JSF_ENTITY_CRUD.embraceJsfComposition(children.toArray(new DomContent[0]));
+            } catch (Exception ex) {
+                log.debug("Falha ao obter atributo privado", ex);
+            }
+        }
+        renderForm = finalForm.renderFormatted();
+        DynamicVirtualTemplateFile template = new DynamicVirtualTemplateFile(resourceName,
+                renderForm, MAP_TRANSLATE_TEMPLATE_PROPERTIES,
+                Map.of(DEFAULT_ENTITY_PROPERTIE_KEY, entityNameExposed));
         return template;
     }
 
@@ -245,18 +319,6 @@ public class AutoGenResourceJSF extends ResourceWrapper {
         return template;
     }
 
-    private DynamicVirtualTemplateFile generateForm(String resourceName, String shortResourceName,
-            String entityNameExposed, DescriptorExposedEntity descExposedEntity)
-            throws IOException {
-        String renderForm = AutoGenWebResources.JSF_ENTITY_CRUD.embraceJsfComposition(
-                AutoGenWebResources.JSF_ENTITY_CRUD.entityHtmlForm(descExposedEntity.getDescriptorHtmlEntity(extraParameter))
-        ).renderFormatted();
-        DynamicVirtualTemplateFile template = new DynamicVirtualTemplateFile(resourceName,
-                renderForm, MAP_TRANSLATE_TEMPLATE_PROPERTIES,
-                Map.of(DEFAULT_ENTITY_PROPERTIE_KEY, entityNameExposed));
-        return template;
-    }
-
     @Override
     public Resource getWrapped() {
         return this.wrapped;
@@ -278,6 +340,9 @@ public class AutoGenResourceJSF extends ResourceWrapper {
 
     @Override
     public URL getURL() {
+        if (this.dynamicTemplate == null) {
+            throw new IllegalStateException("Fail on autogen: " + this.resourceName);
+        }
         return dynamicTemplate.getURL();
     }
 

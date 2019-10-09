@@ -64,7 +64,6 @@ public class MessageUtilJSF {
     }
 
     public void addErro(String string, String detalhe) {
-        String mensagem = string;
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
             facesContext.addMessage(null,
@@ -73,14 +72,18 @@ public class MessageUtilJSF {
     }
 
     public void addErro(String string) {
-        this.addErro(string, (String) null);
+        FacesContext facesContext = getFacesContext();
+        if (facesContext != null) {
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, string, ""));
+        }
     }
 
     public void add(String string) {
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, string, null));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, string, ""));
         }
     }
 
@@ -88,16 +91,15 @@ public class MessageUtilJSF {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (facesContext != null) {
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, string, null));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, string, ""));
         }
     }
 
     public static void addAlertaMensagem(String string) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-
         if (facesContext != null) {
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, string, null));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, string, ""));
         }
     }
 
@@ -105,7 +107,7 @@ public class MessageUtilJSF {
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, string, null));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, string, ""));
         }
     }
 

@@ -3,107 +3,154 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.app.logutil;
+import com.github.braully.constant.Attr;
+import com.github.braully.interfaces.IOrganiztionEntityDependent;
+import com.github.braully.domain.util.Money;
+import com.github.braully.util.UtilDate;
+import com.github.braully.util.UtilValidation;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "sale")
-public class PurchaseOrder extends AbstractAuditableEntity implements Serializable {
-
-    @Basic
-    private BigDecimal total;
-
-    @Basic
-    private String statusType;
-
-    @ManyToOne(targetEntity = Partner.class)
-    private Partner partner;
-
-    @Basic
-    private String observation;
-
-    @Basic
-    private String fiscalCode;
-
-    @Basic
-    private Date dateOrder;
-
-    @Basic
-    private String type;
+@Getter
+@Setter
+public class PurchaseOrder extends AbstractAuditableEntity
+        implements Serializable, IOrganiztionEntityDependent {
 
     @ManyToOne(targetEntity = Inventory.class)
-    private Inventory inventory;
+    Inventory inventory;
+
+    @ManyToOne
+    Organization organization;
+
+    @Basic
+    String description;
+
+    @ManyToOne(targetEntity = Partner.class)
+    Partner partner;
+
+    @Basic
+    String invoiceFiscalCode;
+
+    @Basic
+    String type;
+
+    @Basic
+    String statusType;
+
+    @OneToMany(mappedBy = "purchaseOrder")
+    protected Set<PurchaseOrderItem> itens;
+
+    @Basic
+    @Temporal(TemporalType.TIMESTAMP)
+    Date dateOrder;
+
+    @Basic
+    Date dataValidade;
+
+    @Basic
+    BigDecimal total;
+
+    @ManyToOne(targetEntity = AccountTransaction.class)
+    AccountTransaction accountTransaction;
+
+    @ManyToOne(fetch = FetchType.LAZY)//(cascade = CascadeType.ALL)
+    protected InfoExtra infoExtra;
+
+    @Attr("hidden")
+    @ManyToOne(fetch = FetchType.LAZY)
+    protected BinaryFile contract;
 
     public PurchaseOrder() {
 
     }
 
-    public BigDecimal getTotal() {
-        return this.total;
+    @Override
+    protected String preToString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(type);
+        if (UtilValidation.isStringValid(this.description)) {
+            sb.append(": ").append(description);
+        }
+        return sb.toString();
     }
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
+    @Override
+    public String posToString() {
+        StringBuilder sb = new StringBuilder();
+        try {
+            if (dateOrder != null) {
+                sb.append(" ");
+                sb.append(UtilDate.formatData(dateOrder));
+            }
+            if (total != null) {
+                sb.append(" ");
+                sb.append(Money.formatar(total));
+            }
+        } catch (Exception e) {
+        }
+        return sb.toString();
     }
 
-    public String getStatusType() {
-        return this.statusType;
+    public Map<String, Long> getExtraNumberValues() {
+        return getInfoExtraNullSafe().getExtraNumberValues();
     }
 
-    public void setStatusType(String statusType) {
-        this.statusType = statusType;
+    public Map<String, String> getExtraStringValues() {
+        return getInfoExtraNullSafe().getExtraStringValues();
     }
 
-    public Partner getPartner() {
-        return this.partner;
+    InfoExtra getInfoExtraNullSafe() {
+        if (this.infoExtra == null) {
+            this.infoExtra = new InfoExtra();
+        }
+        return infoExtra;
     }
 
-    public void setPartner(Partner partner) {
-        this.partner = partner;
+    public void setDateOrderIfNull(Date date) {
+        if (this.dateOrder == null) {
+            this.dateOrder = date;
+        }
     }
 
-    public String getObservation() {
-        return this.observation;
+    public void setAccountTransactionIfNull(AccountTransaction transacaoGerada) {
+        if (this.accountTransaction == null) {
+            this.accountTransaction = transacaoGerada;
+        }
     }
 
-    public void setObservation(String observation) {
-        this.observation = observation;
+    public Map<String, Object> getMapAllProps() {
+        Map<String, Object> map = new HashMap<>();
+        map.putAll(cache().map);
+        try {
+            if (infoExtra != null) {
+                map.putAll(infoExtra.getMapAllProps());
+            }
+        } catch (Exception e) {
+            logutil.error("Fail map all properties", e);
+        }
+        return map;
     }
 
-    public String getFiscalCode() {
-        return this.fiscalCode;
-    }
-
-    public void setFiscalCode(String fiscalCode) {
-        this.fiscalCode = fiscalCode;
-    }
-
-    public Date getDateOrder() {
-        return this.dateOrder;
-    }
-
-    public void setDateOrder(Date dateOrder) {
-        this.dateOrder = dateOrder;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Inventory getInventory() {
-        return this.inventory;
-    }
-
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
+    public void setInfoExtraSeNull(InfoExtra entity) {
+        if (this.infoExtra == null) {
+            this.infoExtra = entity;
+        }
     }
 }

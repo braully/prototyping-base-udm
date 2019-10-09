@@ -31,7 +31,7 @@ import javax.persistence.Table;
  * @author braullyrocha
  */
 @Entity(name = "TagItem")
-@Access(AccessType.FIELD)
+//@Access(AccessType.FIELD)
 @Table(name = "tag_item", schema = "legacy")
 public class TagItem extends TagAbstrata implements Serializable {
 

@@ -17,12 +17,14 @@ limitations under the License.
  */
 package com.github.braully.util;
 
+import com.github.braully.app.logutil;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 /**
  *
  * @author braully
  */
+//TODO: Merge with UtilCipher
 public class UtilEncode {
 
     private static final String SEED = "segredo";
@@ -45,5 +47,15 @@ public class UtilEncode {
             ret = encryptor.decrypt(str);
         }
         return ret;
+    }
+
+    public static String appendDv(String str) {
+        StringBuilder sb = new StringBuilder(str);
+        try {
+            sb.append("-").append(UtilCipher.MD5(str).charAt(0));
+        } catch (Exception ex) {
+            logutil.error("fail on check digit", ex);
+        }
+        return sb.toString();
     }
 }

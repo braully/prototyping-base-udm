@@ -1,9 +1,28 @@
 package com.github.braully.business;
 
-import static com.github.braully.business.IDescrpitorFieldLayout.GRUPO_DEFAULT;
+import com.github.braully.app.logutil;
+import com.github.braully.constant.GenericEntityType;
+import com.github.braully.domain.Account;
 import com.github.braully.domain.AccountTransaction;
+import com.github.braully.domain.FinancialAccount;
+import com.github.braully.domain.Organization;
+import com.github.braully.domain.Partner;
+import com.github.braully.persistence.GenericDAO;
+import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilEncode;
+import com.github.braully.util.UtilReflection;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Resource;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -12,12 +31,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile {
 
-    public static final String NOME_LAYOUT = "Importação de contas a receber v1";
-    public static final String CODIGO_LAYOUT = UtilEncode.encodeSimples("CONTA-RECEBER-V1.0");
-    public static final Class CLASSE = AccountTransaction.class;
+    public static final String DEFAULT_FINANCIAL_ACCOUNT_NAME = "Tesouraria";
 
-    public static enum DescritorCamposBoletoEmitido implements IDescrpitorFieldLayout {
+    @Getter
+    public final String nomeLayout = "Importação de contas a receber";
+    @Getter
+    public final String codigoLayout = UtilEncode.appendDv("CONTA-RECEBER-V1.0");
+    @Getter
+    public final Class classe = AccountTransaction.class;
 
+    @Resource(name = "genericDAO")
+    private GenericDAO genericDAO;
+
+    @Autowired
+    DescriptorFilePartner descriptorFilePartner;
+
+    /*public static enum DescritorCamposBoletoEmitido implements IDescrpitorFieldLayout {
         COD_CR("Código Recebível", "codigoExportacao", "Dados Cliente"),
         COD_PESSOA("Código Pessoa", "pessoa.id", "Dados Cliente"),
         PESSOA_NOME("Nome", "descricaoPessoa", "Dados Cliente"),
@@ -42,8 +71,11 @@ public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile
         DATA_RECEBIMENTO("Data Recebimento", "caixaRegistro.data", "Movimento Caixa"),
         VALOR_RECEBIDO("Valor Recebido", "valorBaixa", "Movimento Caixa"),;
 
+        @Getter
         private final String nomeColuna;
+        @Getter
         private final String propriedade;
+        @Getter
         private final String grupo;
 
         DescritorCamposBoletoEmitido(String label) {
@@ -65,43 +97,223 @@ public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile
         }
 
         @Override
-        public String getGrupo() {
-            return grupo;
-        }
-
-        @Override
         public int getIndice() {
             return this.ordinal();
+        }
+    }*/
+    @Override
+    public IDescrpitorFieldLayout[] getDescritorCampos() {
+        return CamposImportacaoCobranca.values();
+    }
+    Account contaReceita;
+
+    private Account contaPrincipalReceita() {
+        if (contaReceita == null) {
+            List<Account> receitas = this.genericDAO.loadCollectionWhere(Account.class, "typeGL", Account.AccountType.C);
+            if (receitas != null && !receitas.isEmpty()) {
+                contaReceita = receitas.get(0);
+            }
+        }
+        return contaReceita;
+    }
+
+    @Transactional
+    //TODO: Refactor to financialController
+    public FinancialAccount defaultFinancialAccount(Organization organization) {
+        FinancialAccount caixaPrinciapl = null;
+        try {
+            caixaPrinciapl = this.genericDAO.loadEntityWhere(FinancialAccount.class,
+                    "organization", organization, "type", GenericEntityType.DEFAULT.name());
+        } catch (Exception e) {
+            log.info("Not financial account for organization: " + organization);
+        }
+        if (caixaPrinciapl == null) {
+            caixaPrinciapl = new FinancialAccount();
+            caixaPrinciapl.setOrganization(organization);
+            caixaPrinciapl.setName(DEFAULT_FINANCIAL_ACCOUNT_NAME);
+            caixaPrinciapl.setType(GenericEntityType.DEFAULT.name());
+            this.genericDAO.saveEntity(caixaPrinciapl);
+        }
+        return caixaPrinciapl;
+    }
+
+    //
+    static enum CamposImportacaoCobranca implements IDescrpitorFieldLayout {
+
+        NOME("Nome"),
+        DATA_NASCIMENTO("Data Nascimento"),
+        CIDADE_NASCIMENTO("Cidade Nacimento"), CPF("CPF"),
+        ESTADO_CIVIL("Estado Civil"), PROFISSAO("Profissão"), RG("RG"),
+        ORGAO_EMISSOR_RG("Orgão Emissor RG"),
+        DATA_EMISSAO_RG_RESPOSNAVEL("Data Emissão RG"), E_MAIL("E-mail"), TELEFONES("Telefones"),
+        CEP("CEP"), CIDADE("Cidade"), BAIRRO("Bairro"), COMPLEMENTO("Complemento"),
+        //
+        CODIGO_COBRANCA("Código Cobrança"),
+        INSTITUICAO("Instituição"), CNPJ("CNPJ"),
+        DESCRICAO_COBRANCA("Descrição"),
+        PLANO_CONTAS("Plano Contas"),
+        DATA_VENCIMENTO("Data Vencimento"),
+        VALOR("Valor"),
+        DATA_RECEBIMENTO("Data Recebimento"),
+        VALOR_RECEBIDO("Valor Recebido"), EXTRA("Reservado");
+        private String label;
+
+        CamposImportacaoCobranca(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String toString() {
+            return label;
         }
 
         @Override
         public String getNomeColuna() {
-            return nomeColuna;
+            return label;
         }
 
         @Override
         public String getPropriedade() {
-            return propriedade;
+            return label;
         }
     }
 
-    @Override
-    public String getNomeLayout() {
-        return NOME_LAYOUT;
+    static String[] propriedadesArrayPlanilhaCobranca;
+
+    static {
+        List<String> tmp = new ArrayList<String>();
+        for (CamposImportacaoCobranca ci : CamposImportacaoCobranca.values()) {
+            tmp.add(ci.label);
+        }
+        propriedadesArrayPlanilhaCobranca = tmp.toArray(new String[0]);
+    }
+
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected void importarDadosCobranca(Object[] arr) {
+        importarAccountTransaction(arr);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    //protected EntradaCaixaPrevisto importarEntradaCaixaPrevisto(Object[] arr) {
+    protected AccountTransaction importarAccountTransaction(Object[] arr) {
+        AccountTransaction ecp = null;
+        if (arr != null && isExisteElementoNaoNulo(arr)) {
+            //preImportarEntradaCaixaPrevisto(arr);
+            String codCobranca = getString(CamposImportacaoCobranca.CODIGO_COBRANCA, arr);
+            ecp = accountTransactionByUniqueCode(codCobranca);
+            if (ecp == null) {
+                ecp = new AccountTransaction();
+                ecp.setUniqueCode(codCobranca);
+            }
+
+            UtilReflection.setPropertyIfNull(ecp, "memo",
+                    getString(CamposImportacaoCobranca.DESCRICAO_COBRANCA, arr)
+            );
+
+            UtilReflection.setPropertyIfNull(ecp, "datePrevist",
+                    UtilDate.parseData(getString(CamposImportacaoCobranca.DATA_VENCIMENTO, arr))
+            );
+            Long valLong = getLong(CamposImportacaoCobranca.VALOR, arr);
+            if (valLong != null) {
+                UtilReflection.setPropertyIfNull(ecp, "creditTotal", BigDecimal.valueOf(valLong));
+            }
+
+            UtilReflection.setPropertyIfNull(ecp, "dateExecuted",
+                    UtilDate.parseData(getString(CamposImportacaoCobranca.DATA_RECEBIMENTO, arr))
+            );
+
+            Long valRecebido = getLong(CamposImportacaoCobranca.VALOR_RECEBIDO, arr);
+
+            if (valRecebido != null) {
+                UtilReflection.setPropertyIfNull(ecp, "valueExecuted",
+                        BigDecimal.valueOf(valRecebido));
+            }
+
+            if (ecp.getAccount() == null) {
+                Account conta = accountByName(getString(CamposImportacaoCobranca.PLANO_CONTAS, arr));
+                if (conta == null) {
+                    conta = contaPrincipalReceita();
+                }
+                ecp.setAccount(conta);
+            }
+
+            FinancialAccount financialAccount = ecp.getFinancialAccount();
+
+            if (financialAccount == null) {
+                String strNome = getString(CamposImportacaoCobranca.INSTITUICAO, arr);
+                String strCpf = getString(CamposImportacaoCobranca.CNPJ, arr);
+                //TODO: Translate arr properites to subimport
+                //pessoa = descriptorFilePartner.importPartner(arr);
+                Organization organization = descriptorFilePartner.organization(strNome, strCpf);
+                financialAccount = this.defaultFinancialAccount(organization);
+                ecp.setFinancialAccount(financialAccount);
+
+            }
+
+            if (valRecebido != null && valRecebido > 0) {
+                UtilReflection.setPropertyIfNull(ecp, "financialAccount", financialAccount);
+            }
+
+            Partner pessoa = ecp.getPartner();
+            if (pessoa == null) {
+                String strNome = getString(CamposImportacaoCobranca.NOME, arr);
+                String strCpf = getString(CamposImportacaoCobranca.CPF, arr);
+                //TODO: Translate arr properites to subimport
+                //pessoa = descriptorFilePartner.importPartner(arr);
+                pessoa = descriptorFilePartner.importPartner(strCpf, strNome);
+                ecp.setPartner(pessoa);
+            }
+            genericDAO.saveEntity(ecp);
+        }
+        //genericDAO.flush();
+        return ecp;
+    }
+
+    public FinancialAccount principalFinancialAccount() {
+        FinancialAccount caixa = null;
+        List<FinancialAccount> carregarColecao = genericDAO.loadCollection(FinancialAccount.class);
+        if (carregarColecao != null && !carregarColecao.isEmpty()) {
+            caixa = carregarColecao.get(0);
+        }
+        return caixa;
+    }
+
+    //    @Transactional
+    protected AccountTransaction accountTransactionByUniqueCode(String codCobranca) {
+        AccountTransaction ecp = null;
+        try {
+            ecp = this.genericDAO.loadEntityWhere(AccountTransaction.class, "uniqueCode", codCobranca);
+        } catch (NoResultException e) {
+        } catch (EmptyResultDataAccessException e) {
+        } catch (Exception e) {
+            logutil.info("Fail on search", e);
+        }
+        return ecp;
+    }
+
+    protected Account accountByName(String strPlanoContas) {
+        Account conta = null;
+        try {
+            if (strPlanoContas != null && !(strPlanoContas = strPlanoContas.trim()).isEmpty()) {
+                Query query = genericDAO.createQuery("SELECT e FROM Account e "
+                        + "WHERE :name like lower(e.name) ");
+                query.setParameter("name", strPlanoContas.trim().toLowerCase());
+                List list = query.getResultList();
+                if (list != null && !list.isEmpty()) {
+                    conta = (Account) list.get(0);
+                }
+            }
+        } catch (NoResultException e) {
+
+        }
+        return conta;
     }
 
     @Override
-    public String getCogigoLayout() {
-        return CODIGO_LAYOUT;
-    }
-
-    @Override
-    public Class getClasse() {
-        return CLASSE;
-    }
-
-    @Override
-    public IDescrpitorFieldLayout[] getDescritorCampos() {
-        return DescritorCamposBoletoEmitido.values();
+    public void importar(Object[] arr) {
+        this.importarAccountTransaction(arr);
     }
 }

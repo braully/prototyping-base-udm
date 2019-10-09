@@ -17,40 +17,48 @@ package com.github.braully.domain.util;
 
 import com.github.braully.constant.ReportType;
 import com.github.braully.domain.AbstractEntity;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  *
  * @author braullyrocha
  */
 @Entity
-@Table(name = "relatorio_propriedade", schema = "base")
+@Table(name = "relatorio_propriedade", schema = "legacy")
 public class ReportProperty extends AbstractEntity implements Comparable<ReportProperty> {
 
     //TODO: Trocar por uma entidade
-    @Enumerated(EnumType.STRING)
+//    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_relatorio")
-    private ReportType tipoRelatorio;
+    String tipoRelatorio;
+
     @Column(name = "propriedade_relatorio")
-    private String propriedadeRelatorio;
+    String propriedadeRelatorio;
     @Column(name = "propriedade_bean")
-    private String propriedadeBean;
+    String propriedadeBean;
     @Column(name = "propriedade_alternativa_bean")
-    private String propriedadeAlternativaBean;
-    private String descricao;
+    String propriedadeAlternativaBean;
+    String descricao;
+    @Transient
+    public Set<String> apelidosPropridade = new HashSet<>();
 
     public ReportProperty() {
     }
 
     public ReportProperty(ReportType tipoRelatorio, String propriedadeRelatorio, String propriedadeBean, String descricao) {
-        this.tipoRelatorio = tipoRelatorio;
+        this.tipoRelatorio = tipoRelatorio.name();
         this.propriedadeRelatorio = propriedadeRelatorio;
         this.propriedadeBean = propriedadeBean;
         this.descricao = descricao;
+    }
+
+    ReportProperty(Class aClass) {
+        this.tipoRelatorio = aClass.getName();
     }
 
     public String getPropriedadeBean() {
@@ -70,11 +78,11 @@ public class ReportProperty extends AbstractEntity implements Comparable<ReportP
     }
 
     public ReportType getTipoRelatorio() {
-        return tipoRelatorio;
+        return ReportType.valueOf(tipoRelatorio);
     }
 
     public void setTipoRelatorio(ReportType tipoRelatorio) {
-        this.tipoRelatorio = tipoRelatorio;
+        this.tipoRelatorio = tipoRelatorio.name();
     }
 
     public String getDescricao() {
@@ -108,5 +116,30 @@ public class ReportProperty extends AbstractEntity implements Comparable<ReportP
     @Override
     public String toString() {
         return "PropRel{" + tipoRelatorio + "pR=" + propriedadeRelatorio + "->pB=" + propriedadeBean + '}';
+    }
+
+    ReportProperty propridade(String propRelatorio) {
+        this.propriedadeRelatorio = propRelatorio;
+        return this;
+    }
+
+    ReportProperty propridadeBean(String propbean) {
+        this.propriedadeBean = propbean;
+        return this;
+    }
+
+    ReportProperty propridadeAlternativaBean(String alt) {
+        this.propriedadeAlternativaBean = alt;
+        return this;
+    }
+
+    ReportProperty nome(String nome) {
+        this.descricao = nome;
+        return this;
+    }
+
+    ReportProperty apelidoPropridade(String apelido) {
+        this.apelidosPropridade.add(apelido);
+        return this;
     }
 }

@@ -2,7 +2,7 @@ package com.github.braully.persistence;
 
 public enum Status {
 
-    ACTIVE("Active"), BLOCKED("Blocked");
+    ACTIVE("Ativo"), BLOCKED("Inativo");
 
     private final String description;
 

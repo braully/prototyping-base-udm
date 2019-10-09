@@ -3,12 +3,11 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.constant.SysRole;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -23,13 +22,8 @@ import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(name = "role", schema = "security")
-@Access(AccessType.FIELD)
-public class Role extends AbstractEntity implements Serializable, GrantedAuthority {
-
-    //TODO: Refatorar
-    public static enum SysRole {
-        USER, ADM, MNG;
-    }
+//@Access(AccessType.FIELD)
+public class Role extends AbstractGlobalEntity implements Serializable, GrantedAuthority {
 
     public Role() {
 
@@ -137,5 +131,10 @@ public class Role extends AbstractEntity implements Serializable, GrantedAuthori
     //Spring security    @Override
     public String getAuthority() {
         return this.name;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + this.id + ")";
     }
 }

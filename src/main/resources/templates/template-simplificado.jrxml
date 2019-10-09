@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="template-simplificado" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="12df68d2-6a13-430a-a8fc-5b5a247003c3">
+	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+	<property name="ireport.zoom" value="1.24184264611831"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DETALHES_EMPRESA" class="java.lang.String"/>
+	<parameter name="TURMA" class="java.lang.String"/>
+	<parameter name="LOGO_INSTITUICAO" class="java.lang.Object">
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TITULO" class="java.lang.String"/>
+	<parameter name="CABECALHO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBTITULO" class="java.lang.String"/>
+	<parameter name="INTRODUCAO" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="INTRODUCAO_HTML" class="java.lang.String"/>
+	<parameter name="USUARIO" class="java.lang.String"/>
+	<parameter name="LINHA_DIVISORIA" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
+	</parameter>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="72" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="40" width="553" height="18" uuid="ec85d1c6-33f0-413a-b8f4-524f5df0d130"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SUBTITULO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="18" width="553" height="20" uuid="f2c29607-6f10-4e4c-932b-1deebce0796d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font size="16" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{TITULO}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="3" y="63" width="550" height="1" uuid="66df69bd-0e50-4f2d-9736-d5d26cc5ffe3">
+					<printWhenExpression><![CDATA[$P{INTRODUCAO} != null && !$P{INTRODUCAO}.trim().isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="styled">
+					<font size="12"/>
+					<paragraph spacingAfter="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{INTRODUCAO}.replaceAll("\n", "<br/>")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="96" y="5" width="454" height="1" uuid="a0cd74e6-6ae4-4a60-9490-86bb533f3532">
+					<printWhenExpression><![CDATA[$P{CABECALHO} != null && !$P{CABECALHO}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" markup="styled"/>
+				<textFieldExpression><![CDATA[$P{CABECALHO}.replaceAll("\n", "<br/>")]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="3" y="71" width="550" height="1" uuid="30f1d1c4-89c6-4a51-a1a9-70c7c514db98">
+					<printWhenExpression><![CDATA[$P{LINHA_DIVISORIA} != null && $P{LINHA_DIVISORIA}]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<image hAlign="Center" vAlign="Top" onErrorType="Blank">
+				<reportElement x="2" y="2" width="90" height="57" uuid="decda4b2-f14a-4813-9601-ed93da73b84f"/>
+				<graphicElement>
+					<pen lineWidth="0.0" lineStyle="Dotted"/>
+				</graphicElement>
+				<imageExpression><![CDATA[new java.io.ByteArrayInputStream((byte[])$P{LOGO_INSTITUICAO})]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<detail>
+		<band splitType="Stretch"/>
+		<band splitType="Stretch"/>
+	</detail>
+	<pageFooter>
+		<band height="12">
+			<textField evaluationTime="Report">
+				<reportElement x="519" y="2" width="36" height="10" uuid="a11c4343-cf2c-4964-b2c9-33027b3d6bd7"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/"+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="498" y="2" width="21" height="10" uuid="19fdeeb8-53e7-4401-84d9-2b5d54b81112"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="2" width="485" height="10" uuid="32f7e222-77ec-476c-bf89-d135f690628b">
+					<printWhenExpression><![CDATA[$P{USUARIO} != null && !$P{USUARIO}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Usuário emissão: " + $P{USUARIO} + ". data emissão: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date())]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="3" y="0" width="550" height="1" uuid="c66dfec6-4c11-426f-8d6f-4a5b96e06c84">
+					<printWhenExpression><![CDATA[$P{LINHA_DIVISORIA} != null && $P{LINHA_DIVISORIA}]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -6,5 +6,19 @@ package com.github.braully.constant;
  */
 public enum PriorityLevel {
 
-    LOW, NORMAL, HIGH;
+    LOW("Baixo"), NORMAL("Normal"), HIGH("Alta");
+    String descricao;
+
+    private PriorityLevel(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    @Override
+    public String toString() {
+        return descricao;
+    }
 }

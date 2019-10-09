@@ -5,11 +5,17 @@ package com.github.braully.domain;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "sale")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
 public class Inventory extends AbstractEntity implements Serializable {
 
     @Basic
@@ -58,5 +64,10 @@ public class Inventory extends AbstractEntity implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + this.id + ')';
     }
 }

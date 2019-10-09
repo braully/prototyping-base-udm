@@ -3,14 +3,15 @@ package com.github.braully.util;
 import java.util.Comparator;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Braully Rocha
  */
 public class UtilComparator<T> implements Comparator<T> {
 
-    private static final Logger log = Logger.getLogger(UtilComparator.class);
+    private static final Logger log = LogManager.getLogger(UtilComparator.class);
 
     /* */
     private final String[] props;
@@ -19,37 +20,42 @@ public class UtilComparator<T> implements Comparator<T> {
         this.props = props;
     }
 
+    public static Comparator comparator(String... props) {
+        return new UtilComparator(props);
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public int compare(T obj1, T obj2) {
+        if (props == null) {
+            return 0;
+        }
         int ret = 0;
-        if (props != null) {
-            for (String prop : props) {
-                if (ret != 0) {
-                    break;
-                }
-                try {
-                    Object property = PropertyUtils.getProperty(obj1, prop);
-                    Object property1 = PropertyUtils.getProperty(obj2, prop);
-                    if (property == null) {
-                        if (property1 != null) {
-                            ret = 1;
-                        }
-                    } else {
-                        if (property1 == null) {
-                            ret = -1;
-                        }
-                        if (property instanceof Comparable) {
-                            Comparable val1 = (Comparable) property;
-                            Comparable val2 = (Comparable) property1;
-                            ret = val1.compareTo(val2);
-                        } else {
-                            ret = property.toString().compareToIgnoreCase(property1.toString());
-                        }
+        for (String prop : props) {
+            if (ret != 0) {
+                break;
+            }
+            try {
+                Object property = PropertyUtils.getProperty(obj1, prop);
+                Object property1 = PropertyUtils.getProperty(obj2, prop);
+                if (property == null) {
+                    if (property1 != null) {
+                        ret = 1;
                     }
-                } catch (Exception e) {
-                    log.error("Sort failed", e);
+                } else {
+                    if (property1 == null) {
+                        ret = -1;
+                    }
+                    if (property instanceof Comparable) {
+                        Comparable val1 = (Comparable) property;
+                        Comparable val2 = (Comparable) property1;
+                        ret = val1.compareTo(val2);
+                    } else {
+                        ret = property.toString().compareToIgnoreCase(property1.toString());
+                    }
                 }
+            } catch (Exception e) {
+                //log.error("Sort failed", e);
             }
         }
         return ret;

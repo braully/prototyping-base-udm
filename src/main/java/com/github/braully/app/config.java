@@ -5,6 +5,8 @@ import com.github.braully.domain.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.core.env.Environment;
 
 public class config {
 
@@ -20,4 +22,18 @@ public class config {
         MENUS_APP.add(new Menu());
     }
 
+    public static synchronized boolean isProduction(Environment env) {
+        if (env == null) {
+            return false;
+        }
+        return ArrayUtils.contains(env.getActiveProfiles(), "prod") || ArrayUtils.contains(env.getActiveProfiles(), "Production");
+
+    }
+
+    public static synchronized boolean isDevlopment(Environment env) {
+        if (env == null) {
+            return false;
+        }
+        return ArrayUtils.contains(env.getActiveProfiles(), "dev") || ArrayUtils.contains(env.getActiveProfiles(), "Development");
+    }
 }

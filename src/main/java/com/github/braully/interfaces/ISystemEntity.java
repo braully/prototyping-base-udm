@@ -8,4 +8,5 @@ import com.github.braully.persistence.IEntity;
  */
 public interface ISystemEntity extends IEntity {
 
+    public Boolean getSystemLock();
 }

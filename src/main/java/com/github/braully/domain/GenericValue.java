@@ -13,6 +13,7 @@ import javax.persistence.Table;
 @Table(schema = "base")
 public class GenericValue extends AbstractEntity implements Serializable {
 
+    //TODO: Implementar Flyweight
     @ManyToOne
     private GenericType genericType;
 
@@ -20,16 +21,30 @@ public class GenericValue extends AbstractEntity implements Serializable {
     private String stringValue;
 
     @Basic
-    private Integer intValue;
-
-    @Basic
-    private Boolean booleanValue;
-
-    @Basic
-    private Double doubleValue;
+    private Long intValue;
 
     public GenericValue() {
 
+    }
+
+    public GenericValue(Object det, Object prop) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Long getIntValue() {
+        return this.intValue;
+    }
+
+    public void setIntValue(Long intValue) {
+        this.intValue = intValue;
+    }
+
+    public Boolean isBooleanValue() {
+        return Boolean.parseBoolean(stringValue);
+    }
+
+    public void setBooleanValue(Boolean booleanValue) {
+        this.stringValue = booleanValue.toString();
     }
 
     public GenericType getGenericType() {
@@ -41,34 +56,28 @@ public class GenericValue extends AbstractEntity implements Serializable {
     }
 
     public String getStringValue() {
-        return this.stringValue;
+        return stringValue;
     }
 
     public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
 
-    public Integer getIntValue() {
-        return this.intValue;
-    }
-
-    public void setIntValue(Integer intValue) {
-        this.intValue = intValue;
-    }
-
-    public Boolean isBooleanValue() {
-        return this.booleanValue;
-    }
-
-    public void setBooleanValue(Boolean booleanValue) {
-        this.booleanValue = booleanValue;
-    }
-
     public Double getDoubleValue() {
-        return this.doubleValue;
+        return Double.parseDouble(stringValue);
     }
 
     public void setDoubleValue(Double doubleValue) {
-        this.doubleValue = doubleValue;
+        this.stringValue = doubleValue.toString();
+    }
+
+    public Object getValue() {
+        Object value = null;
+        if (stringValue != null) {
+            value = stringValue;
+        } else if (intValue != null) {
+            value = intValue;
+        }
+        return value;
     }
 }

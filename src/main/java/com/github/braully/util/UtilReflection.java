@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -36,7 +38,7 @@ import org.apache.commons.beanutils.PropertyUtils;
  */
 public class UtilReflection {
 
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UtilReflection.class);
+    private static org.apache.log4j.Logger log = org.apache.log4j.LogManager.getLogger(UtilReflection.class);
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getGenericTypeArgument(final Class<?> clazz, final int idx) {
@@ -82,8 +84,49 @@ public class UtilReflection {
         return null;
     }
 
+    public static Object getPrivateField(Object bean, String name) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException {
+        Field field = bean.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        return field.get(bean);
+    }
+
+    public static void setProperty(Object bean, String name, Object value) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        PropertyUtils.setProperty(bean, name, value);
+    }
+
     public static Object getProperty(Object bean, String name) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         return PropertyUtils.getProperty(bean, name);
+    }
+
+    public static void setPropertyIfNull(Object bean, String propery, Object newValue) {
+        if (bean == null) {
+            return;
+        }
+        if (newValue == null) {
+            return;
+        }
+        Object value = null;
+        try {
+            value = PropertyUtils.getProperty(bean, propery);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Fail on getproperty: " + propery, ex);
+        }
+        if (value == null) {
+            try {
+                PropertyUtils.setProperty(bean, propery, newValue);
+            } catch (Exception ex) {
+                throw new IllegalStateException("Fail on setproperty: " + propery, ex);
+            }
+        }
+    }
+
+    public static void setPropertyIfNullIgnoreException(Object bean, String propery, Object newValue) {
+        try {
+            setPropertyIfNull(bean, propery, newValue);
+        } catch (Exception ex) {
+            //log.debug("Fail on setproperty: " + propery + " --ignored", ex);
+            log.debug("Fail on setproperty: " + propery + " --ignored");
+        }
     }
 
     public static String getPropertyText(Object bean, String name) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -111,7 +154,7 @@ public class UtilReflection {
     public static synchronized Map<String, String> getMapExtraAttributesField(Field fieldType) {
         Map<String, String> param = new HashMap<>();
 
-        if (fieldType.isAnnotationPresent(Attrs.class)
+        if (fieldType != null && fieldType.isAnnotationPresent(Attrs.class)
                 || fieldType.isAnnotationPresent(Attr.class)) {
             Annotation[] annotations = fieldType.getAnnotations();
             if (annotations != null) {
@@ -156,4 +199,15 @@ public class UtilReflection {
         return param;
     }
 
+    public static Field getDeclaredFieldAscending(Class classe, String attrib) {
+        Field field = null;
+        while (classe != null && field == null) {
+            try {
+                field = classe.getDeclaredField(attrib);
+            } catch (Exception e) {
+            }
+            classe = classe.getSuperclass();
+        }
+        return field;
+    }
 }

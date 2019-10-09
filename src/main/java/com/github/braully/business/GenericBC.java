@@ -146,4 +146,9 @@ public class GenericBC implements Serializable, ICrudEntity {
     public void paginate(PagedQueryResult queryResult) {
         this.getGenericDAO().paginate(queryResult);
     }
+
+    @Override
+    public <T> T loadEntity(Class<T> clz, Object id) {
+        return this.getGenericDAO().loadEntity(clz, id);
+    }
 }

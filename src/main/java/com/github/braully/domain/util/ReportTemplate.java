@@ -21,6 +21,9 @@ import com.github.braully.domain.AbstractStatusEntity;
 import com.github.braully.persistence.Status;
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -35,20 +38,23 @@ import javax.persistence.Transient;
  */
 @Entity
 @Table(schema = "base")
+@DiscriminatorValue("0")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
+        columnDefinition = "smallint default '0'", length = 1)
 public class ReportTemplate extends AbstractStatusEntity implements Comparable<ReportTemplate> {
 
-    protected String descricao;
-    @Column(name = "nome_arquivo")
-    protected String nomeArquivo;
-    protected String caminhoLocal;
-    protected byte[] relatorio;
+    //TODO: Migrate to BinaryFile
+    protected String description;
+    protected String name;
+    protected String localPath;
+    protected byte[] report;
     @Enumerated(EnumType.STRING)
     //Trocar por entidade
-    @Column(name = "tipo_relatorio", length = 25)
-    protected ReportType tipoRelatorio;
-    @Column(name = "data_cadastro")
+    @Column
+    protected ReportType reportType;
+    @Column
     @Temporal(TemporalType.DATE)
-    private Date dataCadastro;
+    private Date created;
     @Transient
     private boolean statico;
     @Transient
@@ -58,66 +64,66 @@ public class ReportTemplate extends AbstractStatusEntity implements Comparable<R
     }
 
     public ReportTemplate(String descricao, String nomeArquivo, byte[] relatorio, ReportType tipoRelatorio, Status status, Date dataCadastro) {
-        this.descricao = descricao;
-        this.nomeArquivo = nomeArquivo;
-        this.relatorio = relatorio;
-        this.tipoRelatorio = tipoRelatorio;
+        this.description = descricao;
+        this.name = nomeArquivo;
+        this.report = relatorio;
+        this.reportType = tipoRelatorio;
         this.status = status;
-        this.dataCadastro = dataCadastro;
+        this.created = dataCadastro;
     }
 
     public String getDescricao() {
-        return descricao;
+        return description;
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.description = descricao;
     }
 
     public String getNomeArquivo() {
-        return nomeArquivo;
+        return name;
     }
 
     public void setNomeArquivo(String nomeArquivo) {
-        this.nomeArquivo = nomeArquivo;
+        this.name = nomeArquivo;
     }
 
     public byte[] getRelatorio() {
-        return relatorio;
+        return report;
     }
 
     public void setRelatorio(byte[] relatorio) {
-        this.relatorio = relatorio;
+        this.report = relatorio;
     }
 
     public ReportType getTipoRelatorio() {
-        return tipoRelatorio;
+        return reportType;
     }
 
     public void setTipoRelatorio(ReportType tipoRelatorio) {
-        this.tipoRelatorio = tipoRelatorio;
+        this.reportType = tipoRelatorio;
     }
 
     public Date getDataCadastro() {
-        return dataCadastro;
+        return created;
     }
 
     public void setDataCadastro(Date dataCadastro) {
-        this.dataCadastro = dataCadastro;
+        this.created = dataCadastro;
     }
 
     public String getExtensaoArquivo() {
         String ret = null;
-        if (this.nomeArquivo != null) {
-            ret = this.nomeArquivo.substring(this.nomeArquivo.lastIndexOf('.'), this.nomeArquivo.length());
+        if (this.name != null) {
+            ret = this.name.substring(this.name.lastIndexOf('.'), this.name.length());
         }
         return ret;
     }
 
     public String getNomeSaida() {
-        String ret = nomeArquivo;
-        if (this.nomeArquivo != null) {
-            ret = this.nomeArquivo.replaceAll(".jasper", ".pdf");
+        String ret = name;
+        if (this.name != null) {
+            ret = this.name.replaceAll(".jasper", ".pdf");
         }
         return ret;
     }
@@ -125,10 +131,10 @@ public class ReportTemplate extends AbstractStatusEntity implements Comparable<R
     @Override
     public int compareTo(ReportTemplate t) {
         int ret = 0;
-        if (t != null && this.tipoRelatorio != null) {
-            ret = this.tipoRelatorio.compareTo(t.tipoRelatorio);
-            if (ret == 0 && this.descricao != null) {
-                ret = this.descricao.compareToIgnoreCase(t.descricao);
+        if (t != null && this.reportType != null) {
+            ret = this.reportType.compareTo(t.reportType);
+            if (ret == 0 && this.description != null) {
+                ret = this.description.compareToIgnoreCase(t.description);
             }
         }
         return ret;
@@ -151,11 +157,11 @@ public class ReportTemplate extends AbstractStatusEntity implements Comparable<R
     }
 
     public String getCaminhoLocal() {
-        return caminhoLocal;
+        return localPath;
     }
 
     public void setCaminhoLocal(String caminhoLocal) {
-        this.caminhoLocal = caminhoLocal;
+        this.localPath = caminhoLocal;
     }
 
 }

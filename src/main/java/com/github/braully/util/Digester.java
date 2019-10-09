@@ -6,11 +6,12 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Digester {
 
-    private static final Logger log = Logger.getLogger(Digester.class);
+    private static final Logger log = LogManager.getLogger(Digester.class);
 
     /**
      *

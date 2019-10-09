@@ -44,6 +44,9 @@ public class UtilDate {
      *
      */
     public static Date parseData(String texto) {
+        if (UtilValidation.isStringEmpty(texto)) {
+            return null;
+        }
         Date data = null;
         data = parseDataDMY(texto);
         if (data == null) {
@@ -110,6 +113,9 @@ public class UtilDate {
     }
 
     public static String formatData(String pattern, Date data) {
+        if (data == null) {
+            return "";
+        }
         return new SimpleDateFormat(pattern).format(data);
     }
 
