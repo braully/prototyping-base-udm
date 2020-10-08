@@ -1,5 +1,7 @@
 package com.github.braully.constant;
 
+import com.github.braully.app.logutil;
+
 public enum MimeTypeFile {
 
     PDF("application/pdf"),
@@ -22,6 +24,9 @@ public enum MimeTypeFile {
 
     public static MimeTypeFile getTipoArquivo(String string) {
         MimeTypeFile tipoArquivo = null;
+        if (string != null) {
+            string = string.toLowerCase();
+        }
         if (string.endsWith("odt")) {
             tipoArquivo = ODT;
         } else if (string.endsWith("pdf")) {

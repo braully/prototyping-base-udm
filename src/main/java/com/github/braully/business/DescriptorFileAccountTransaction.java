@@ -13,6 +13,7 @@ import com.github.braully.util.UtilEncode;
 import com.github.braully.util.UtilReflection;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.NoResultException;

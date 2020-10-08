@@ -171,16 +171,19 @@ public class SecurityService extends CRUDGenericController<UserLogin> implements
                 Collection<Menu> setMenus = p.getMenus();
                 if (setMenus != null) {
                     for (Menu menu : setMenus) {
-                        menus.add(menu);
+                        if (menu.getActive()) {
+                            menus.add(menu);
+                        }
                         //TODO: Menu superior
                         //menus.add(menu.getParent());
                     }
                 }
                 if (p.getSysRole() == SysRole.ADM || p.getSysRole() == SysRole.MNG) {
                     List<Menu> todosMenusValidos
-                            = this.genericDAO.queryList("SELECT m FROM Menu m "
+                            = this.genericDAO.queryList("SELECT DISTINCT m FROM Menu m "
                                     + "LEFT JOIN FETCH m.childs "
-                                    + "WHERE m.parent IS NULL AND (m.removed IS NULL OR m.removed = False)");
+                                    + "WHERE m.parent IS NULL"
+                                    + " AND (m.removed IS NULL OR m.removed = False)");
                     if (todosMenusValidos != null) {
                         menus.addAll(todosMenusValidos);
                     }

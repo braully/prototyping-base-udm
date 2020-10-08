@@ -12,79 +12,39 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "sale")
+@Getter
+@Setter
 public class ProductPrice extends AbstractExpirableEntity implements Serializable {
 
-    @ManyToOne(targetEntity = Product.class)
-    private Product product;
-
-    @Basic
-    private BigDecimal charge;
-
-    @Basic
-    private BigDecimal price;
+    @ManyToOne
+    Organization organization;
 
     @ManyToOne(targetEntity = Inventory.class)
-    private Inventory inventory;
+    Inventory inventory;
+
+    @ManyToOne(targetEntity = Product.class)
+    Product product;
+
+    String description;
 
     @Basic
-    private Double percent;
+    BigDecimal basePrice;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "base_value"))
-    private BigDecimal base;
+    @Basic
+    BigDecimal fixedPrice;
 
-    public ProductPrice() {
+    @Basic
+    BigDecimal charge;
 
-    }
+    @Basic
+    Double taxPercent;
 
-    public Product getProduct() {
-        return this.product;
-    }
+    @Basic
+    Double profitPercent;
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public BigDecimal getCharge() {
-        return this.charge;
-    }
-
-    public void setCharge(BigDecimal charge) {
-        this.charge = charge;
-    }
-
-    public BigDecimal getPrice() {
-        return this.price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Inventory getInventory() {
-        return this.inventory;
-    }
-
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
-    }
-
-    public Double getPercent() {
-        return this.percent;
-    }
-
-    public void setPercent(Double percent) {
-        this.percent = percent;
-    }
-
-    public BigDecimal getBase() {
-        return this.base;
-    }
-
-    public void setBase(BigDecimal base) {
-        this.base = base;
-    }
 }

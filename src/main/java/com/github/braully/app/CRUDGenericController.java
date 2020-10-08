@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static com.github.braully.app.GenericController.log;
 import com.github.braully.constant.Attr;
+import com.github.braully.domain.ILightRemoveEntity;
 import com.github.braully.domain.Organization;
 import com.github.braully.domain.OrganizationRole;
 import com.github.braully.domain.Role;
@@ -14,6 +15,7 @@ import com.github.braully.persistence.IEntity;
 import com.github.braully.persistence.IEntityStatus;
 import com.github.braully.persistence.PagedQueryResult;
 import com.github.braully.util.UtilCollection;
+import com.github.braully.util.UtilParse;
 import com.github.braully.util.UtilReflection;
 import com.github.braully.util.UtilValidation;
 import com.github.braully.web.DescriptorExposedEntity;
@@ -31,9 +33,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.annotation.PostConstruct;
@@ -44,7 +48,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +65,8 @@ public abstract class CRUDGenericController<T extends IEntity> {
     /* */
     public static final String ID = "id";
     public static final String IDS = "ids";
+    public static final String OPERATION = "operation";
+    public static final String OP = "op";
     public static final String ID_USER = "user_id";
     public static final String NAME_PROP_INDEX_TAB = "tabIndex";
     public static final String USER_NAME_VARIABLE = "username";
@@ -83,8 +91,13 @@ public abstract class CRUDGenericController<T extends IEntity> {
     @Getter
     protected Map<String, Object> extraSearchParams = new HashMap<>();
     @Getter
+    protected Map<String, Object> extraProperties = new HashMap<>();
+    @Getter
     @Setter
     protected int index;
+    @Getter
+    @Setter
+    protected String operation;
 
     protected boolean validPreSave;
 
@@ -162,6 +175,10 @@ public abstract class CRUDGenericController<T extends IEntity> {
 
     public void newEntity() {
         entity = UtilReflection.createInstance(this.getEntityClass());
+    }
+
+    public void findSilent() {
+        this.find();
     }
 
     public CRUDGenericController<T> find() {
@@ -244,9 +261,20 @@ public abstract class CRUDGenericController<T extends IEntity> {
 
     public void clearCacheLoadAllEntities() {
         //just clear cache
-        this.CACHE.clear();
+        this.clearCache();
         this.allEntities = null;
         this.loadAllEntities();
+    }
+
+    public void clearCache() {
+        //just clear cache
+        this.CACHE.clear();
+    }
+
+    public void clearCacheFind() {
+        //just clear cache
+        this.clearCache();
+        this.find();
     }
 
     public void lodEntity(Long id) {
@@ -306,6 +334,25 @@ public abstract class CRUDGenericController<T extends IEntity> {
         }
     }
 
+    public String removeEntityAndRedirect(String redirect) {
+        try {
+            if (this.remove(this.entity, "Removido com sucesso", "Falha ao remover")) {
+                this.clearCacheLoadAllEntities();
+                this.newEntity();
+                return "redirect:" + redirect;
+            }
+        } catch (Exception e) {
+            log.error("", e);
+            addErro("Falha ao tentar remover: " + this.entity, e);
+
+        }
+        return null;
+    }
+
+    public void removeEntity() {
+        this.remove(this.entity);
+    }
+
     public void remove(T entidade) {
         if (this.remove(entidade, "Removido com sucesso", "Falha ao remover")) {
             this.loadAllEntities();
@@ -315,16 +362,31 @@ public abstract class CRUDGenericController<T extends IEntity> {
 
     public boolean remove(IEntity entidade, String mensagemSuc, String mensagemErro) {
         boolean ret = true;
+        String strEntidade = "" + entidade;
         try {
             ret = CRUDGenericController.this.isValidPreSave(entidade);
             if (ret) {
                 this.getGenericoBC().delete(entidade);
-                addMensagem(mensagemSuc);
+                addMensagem(mensagemSuc + ": " + strEntidade);
             } else {
-                addAlerta(mensagemErro);
+                addAlerta(mensagemErro + ": " + strEntidade);
+            }
+        } catch (DataAccessException | ConstraintViolationException dex) {
+            log.debug("Fail on hard delete, try soft if possible");
+            try {
+                if (entidade instanceof ILightRemoveEntity) {
+                    this.getGenericoBC().deleteSoft((ILightRemoveEntity) entidade);
+                    addMensagem(mensagemSuc + ": " + strEntidade);
+                } else {
+                    addErro(mensagemErro + ": " + strEntidade, dex);
+                    ret = false;
+                }
+            } catch (RuntimeException e) {
+                addErro(mensagemErro + ": " + strEntidade, e);
+                ret = false;
             }
         } catch (RuntimeException e) {
-            addErro(mensagemErro, e);
+            addErro(mensagemErro + ": " + strEntidade, e);
             ret = false;
             log.error("erro", e);
         }
@@ -337,6 +399,53 @@ public abstract class CRUDGenericController<T extends IEntity> {
 
     public void setEntity(T entidade) {
         this.entity = entidade;
+    }
+
+    public List subAllEntities(String attribute) {
+        String nameSub = "subAll-" + attribute;
+        List list = this.CACHE.get(nameSub);
+        if (list == null || list.isEmpty()) {
+
+            List<T> collections = this.getAllEntities();
+            Collection sets = subAttributeCollection(collections, attribute);
+            list = new ArrayList(sets);
+            this.CACHE.put(nameSub, list);
+        }
+        return list;
+    }
+
+    public Collection subAttributeCollection(List<T> collections, String attribute) {
+        Set sets = new LinkedHashSet();
+        for (IEntity e : collections) {
+            try {
+                Object property = UtilReflection.getProperty(e, attribute);
+                Object var = property;
+                if (property != null) {
+                    try {
+                        if (property instanceof IEntity) {
+                            var = this.getGenericoBC().loadEntity((IEntity) property);
+                        }
+                    } catch (Exception ex) {
+                        log.debug("Fail on load fetch subentities", ex);
+                    }
+                    sets.add(var);
+                }
+            } catch (Exception ex) {
+                log.debug("Fail on load subentities", ex);
+            }
+        }
+        return sets;
+    }
+
+    public List subEntities(String attribute) {
+        String nameSub = "sub-" + attribute;
+        List list = this.CACHE.get(nameSub);
+        if (list == null || list.isEmpty()) {
+            Collection sets = subAttributeCollection(this.getEntities(), attribute);
+            list = new ArrayList(sets);
+            this.CACHE.put(nameSub, list);
+        }
+        return list;
     }
 
     public List<T> getEntities() {
@@ -724,25 +833,69 @@ public abstract class CRUDGenericController<T extends IEntity> {
         return i18n.getMessage(getUserLocale(), msg);
     }
 
+    //For future use
+    @Deprecated
+    public List<Map<String, String>> getMessages() {
+        List<Map<String, String>> mensagens = (List<Map<String, String>>) CACHE_BEAN.get("messages");
+        if (mensagens == null) {
+            mensagens = new ArrayList<>();
+            CACHE_BEAN.put("messages", mensagens);
+        }
+        //Clear previous?
+        //mensagens.clear();
+        return mensagens;
+    }
+
+    //protected abstract void addMensagem(String title, String detail, String type) ;
+    protected void addMensagem(String title, String detail, String type) {
+        //Map.of("title", title, "detail", detail, "type", type) error on any atrib null
+        this.getMessages().add(UtilCollection.mapOf("title", title, "detail", detail, "type", type));
+    }
+
     //TODO: Setar a mensagem em algum paramêtro da resposta
     public void addMensagem(String mensagem) {
-
-    }
-
-    public void addErro(String msg, Exception e) {
-
-    }
-
-    public void add(String msg) {
-
+        this.addMensagem(mensagem, null, "info");
     }
 
     public void addErro(String msg) {
+        this.addMensagem(msg, null, "error");
+    }
 
+    public void addErro(String msg, Exception e) {
+        this.addMensagem(msg, exceptionToDetailMsg(e), "error");
+    }
+
+    public void add(String msg) {
+        this.addMensagem(msg, null, "info");
     }
 
     public void addAlerta(String msg) {
+        this.addMensagem(msg, null, "warn");
+    }
 
+    /*public void loadExtraPropertiesFromRequest(String attrid, String entity) {
+        if (UtilValidation.isStringEmpty(attrid)) {
+            return;
+        }
+        //String lowatr = attr.toLowerCase();
+        //Object obj = this.extraProperties.get(lowatr);
+        Object obj = this.extraProperties.get(entity);
+
+        if (obj != null) {
+            return;
+        }
+        obj = this.getAtributeFromRequest(attrid);        
+        this.extraProperties.put(attrid, obj);
+    }*/
+
+    public void loadOperationFromRequestIfPresent() {
+        Object op = this.getAtributeFromRequest(OPERATION);
+        if (op != null) {
+            this.operation = op.toString();
+        } else if ((op = this.getAtributeFromRequest(OP))
+                != null) {
+            this.operation = op.toString();
+        }
     }
 
     public void loadEntityFromRequestIfPresent() {
@@ -753,13 +906,51 @@ public abstract class CRUDGenericController<T extends IEntity> {
         }
     }
 
-    protected T getEntityFromRequest() {
+    public void loadEntitiesFromRequestIfPresent() {
+        List<T> entitiesFromRequest = this.getEntitiesFromRequest();
+        if (entitiesFromRequest != null) {
+            log.debug("Entities Loaded From Request");
+            this.allEntities = entitiesFromRequest;
+        }
+    }
+
+    public List<T> getEntitiesFromRequest() {
+        List<T> ret = null;
+        List<Long> idsFromRequest = getIdsFromRequest();
+        if (idsFromRequest != null) {
+            ret = new ArrayList<>();
+            for (Long id : idsFromRequest) {
+                try {
+                    T loadEntity = this.getGenericoBC().loadEntity(this.getEntityClass(), id);
+                    ret.add(loadEntity);
+                } catch (Exception e) {
+                    log.debug("Falha ao carregar entidade do request", e);
+                }
+            }
+        }
+        return ret;
+    }
+
+    public T getEntityFromRequest() {
         //Object atributeFromRequest = this.getAtributeFromRequest(ID);
         T ret = null;
         Object idFromRequest = getIdFromRequest();
         if (idFromRequest != null) {
             try {
                 ret = this.getGenericoBC().loadEntity(this.getEntityClass(), idFromRequest);
+            } catch (Exception e) {
+                log.debug("Falha ao carregar entidade do request", e);
+            }
+        }
+        return ret;
+    }
+
+    protected <U extends IEntity> U loadEntityFromRequestIfPresent(Class<U> classe, String parameter) {
+        U ret = null;
+        Long id = this.parseLong(this.getAtributeFromRequest(parameter));
+        if (id != null) {
+            try {
+                ret = this.getGenericoBC().loadEntity(classe, id);
             } catch (Exception e) {
                 log.debug("Falha ao carregar entidade do request", e);
             }
@@ -1086,5 +1277,67 @@ public abstract class CRUDGenericController<T extends IEntity> {
         //TODO: Refatorar esse parametro ou protege-lo
         this.getExtraSearchParams().put("fetch", fetch);
         return this;
+    }
+
+    public static String exceptionToDetailMsg(Exception e) {
+        String message = "";
+        if (e != null) {
+            message = e.getMessage();
+        }
+        return message;
+    }
+
+    public boolean isAttr(String nameAtribute) {
+        boolean ret = false;
+        try {
+            ret = (Boolean) this.CACHE_BEAN.get(nameAtribute);
+        } catch (Exception e) {
+
+        }
+        return ret;
+    }
+
+    public Boolean isAttribute(String nameAtribute) {
+        Boolean ret = null;
+        try {
+            ret = (Boolean) this.CACHE_BEAN.get(nameAtribute);
+        } catch (Exception e) {
+
+        }
+        return ret;
+    }
+
+    public void setAttr(String nameAtribute, Object value) {
+        try {
+            this.CACHE_BEAN.put(nameAtribute, value);
+        } catch (Exception e) {
+
+        }
+    }
+
+    public Number getCount(String nameCount) {
+        Number count = 0;
+        try {
+            count = (Number) this.CACHE_BEAN.get(nameCount);
+        } catch (Exception e) {
+
+        }
+        return count;
+    }
+
+    public void addCount(String nameCount, Number incOffset) {
+        Number count = (Number) this.CACHE_BEAN.get(nameCount);
+        if (count != null) {
+            if (count instanceof Double) {
+                count = ((Double) count) + incOffset.doubleValue();
+            } else if (count instanceof Float) {
+                count = ((Float) count) + incOffset.floatValue();
+            } else {
+                count = count.longValue() + incOffset.longValue();
+            }
+        } else {
+            count = incOffset;
+        }
+        this.CACHE_BEAN.put(nameCount, count);
     }
 }

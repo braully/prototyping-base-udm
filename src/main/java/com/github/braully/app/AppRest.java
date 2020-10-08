@@ -195,7 +195,7 @@ public class AppRest {
                 PagedQueryResult pagedQuery = genericDAO.genericFulltTextSearchPagedQuery(entityClass, term, null);
                 List<IEntity> qryResult = pagedQuery.getResult();
                 Collections.sort(qryResult, UtilComparator.comparator("name", "label", "description"));
-                qryResult.forEach(e -> result.add(Map.of("label", e.toString(), "value", e.getId(), "id", e.getId())));
+                qryResult.forEach(e -> result.add(Map.of("label", e.toString(), "value", "" + e.getId(), "id", "" + e.getId())));
                 if (pagedQuery.getTotalPages() > 1) {
                     Map.of("label", " ... ", "value", "", "id", "");
                 }

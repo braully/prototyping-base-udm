@@ -1,4 +1,4 @@
-package com.github.braully.domain.util;
+package com.github.braully.util;
 
 public class Pojo {
 

@@ -69,6 +69,11 @@ public class GenericBC implements Serializable, ICrudEntity {
     }
 
     @Override
+    public void deleteSoft(ILightRemoveEntity entity) {
+        this.getGenericDAO().delete(entity);
+    }
+
+    @Override
     public void saveEntityCascade(IEntity e, Collection<? extends IEntity>... relacoes) {
         this.getGenericDAO().saveEntityCascade(e, relacoes);
     }
@@ -151,4 +156,5 @@ public class GenericBC implements Serializable, ICrudEntity {
     public <T> T loadEntity(Class<T> clz, Object id) {
         return this.getGenericDAO().loadEntity(clz, id);
     }
+
 }

@@ -179,6 +179,13 @@ public class OFXFileProcessor extends BinaryFileProcessor {
             lancamento.setDescricao(memo);
             lancamento.setObservation("Gerador por " + arquivo.getName() + " arquivo numero " + arquivo.getId());
             lancamento.setValor(valor);
+            if (valor != null) {
+                if (valor.intValue() < 0) {
+                    lancamento.setDebitTotal(valor);
+                } else {
+                    lancamento.setCreditTotal(valor);
+                }
+            }
             lancamento.setCodigo(transId);
             try {
                 lancamento.setAccount(maxGeIA.classifie(lancamento));

@@ -63,7 +63,76 @@ public class SpringMainConfig {
         return DataSourceBuilder.create().build();
     }
 
+    @Bean
+    //@Qualifier("auditorProviderUserLoginId")@Primary
+    public AuditorAware<Long> auditorProvider() {
+
+        return new AuditorAware<Long>() {
+            @Override
+            public Optional<Long> getCurrentAuditor() {
+                Long idUser = null;
+                try {
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    idUser = ((UserLogin) authentication.getPrincipal()).getId();
+                } catch (Exception e) {
+                }
+                return Optional.ofNullable(idUser);
+            }
+        };
+    }
+
+    /*@Bean
+    @Qualifier("auditorProviderUserLogin")
+    public AuditorAware<UserLogin> auditorProviderUserLogin() {
+        UserLogin user = null;
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            user = (UserLogin) authentication.getPrincipal();
+        } catch (Exception e) {
+        }
+        final UserLogin ulambda = user;
+        return () -> Optional.ofNullable(ulambda);
+    }*/
     public static void main(String... args) {
         SpringApplication.run(SpringMainConfig.class, args);
+    }
+
+    //https://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
+    public static void restartApplication() throws URISyntaxException, IOException {
+        String javabin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        logutil.info("Java-Bin: " + javabin);
+        //
+        File currentJar = new File(SpringMainConfig.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        ArrayList<String> command = new ArrayList<String>();
+
+        logutil.info("Jvmarg: ");
+        /* is it a jar file? */
+        if (!currentJar.getName().endsWith(".jar")) {
+            logutil.info(currentJar.getName() + "is not jar file, aborting");
+            return;
+        }
+
+        /* Build command: java -jar application.jar */
+        command.add("nohup");
+        command.add(javabin);
+
+        for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+            command.add(jvmArg);
+        }
+
+        command.add("-jar");
+        command.add(currentJar.getPath());
+        command.add("&");
+
+        logutil.info("Restarting app");
+        String toString = command.toString();
+        System.out.println(toString);
+        logutil.info(toString);
+
+        final ProcessBuilder builder = new ProcessBuilder(command);
+        Process start = builder.start();
+        System.out.println(start);
+        logutil.info("Process: " + start);
+        System.exit(0);
     }
 }

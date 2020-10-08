@@ -8,10 +8,12 @@ import com.github.braully.domain.Phone;
 import com.github.braully.persistence.GenericDAO;
 import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilEncode;
+import com.github.braully.util.UtilFoneticPTBR;
 import com.github.braully.util.UtilReflection;
 import com.github.braully.util.UtilString;
 import com.github.braully.util.UtilValidation;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
@@ -104,17 +106,17 @@ public class DescriptorFilePartner extends DescriptorLayoutImportFile {
     }
 
     @Override
-    public void importar(Object[] arr) {
+    public void importar(Collection arr) {
         this.importPartner(arr);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected void importData(Object[] arr) {
+    protected void importData(Collection arr) {
         importPartner(arr);
     }
 
     @Transactional
-    protected Partner importPartner(Object[] arr) {
+    protected Partner importPartner(Collection arr) {
         Partner pessoa = null;
         try {
             if (arr != null) {
@@ -130,7 +132,12 @@ public class DescriptorFilePartner extends DescriptorLayoutImportFile {
                                 "contact", "contact.extraPhones", "contact.extraAddresses");
                     }
 
-                    UtilReflection.setPropertyIfNull(pessoa, "name", getString(DescritorCamposPessoa.NOME, arr));
+                    try {
+                        String nameCapitalized = UtilFoneticPTBR.capitalize(getString(DescritorCamposPessoa.NOME, arr));
+                        UtilReflection.setPropertyIfNull(pessoa, "name", nameCapitalized.trim());
+                    } catch (Exception e) {
+
+                    }
 
                     if (pessoa.getBirthDate() == null) {
                         String strDtNascimentoAluno = getString(DescritorCamposPessoa.DATA_NASCIMENTO, arr);

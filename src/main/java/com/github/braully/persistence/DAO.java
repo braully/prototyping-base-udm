@@ -1,5 +1,6 @@
 package com.github.braully.persistence;
 
+import com.github.braully.domain.ILightRemoveEntity;
 import com.github.braully.interfaces.ISystemEntity;
 import com.github.braully.util.UtilComparator;
 import com.github.braully.util.UtilReflection;
@@ -25,7 +26,9 @@ import javax.persistence.Transient;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.transaction.annotation.Transactional;
 
 @SuppressWarnings("rawtypes")
@@ -43,6 +46,9 @@ public abstract class DAO implements ICrudEntity, Serializable {
     /* Save methods */
     @Override
     public void saveEntity(IEntity... args) {
+        if (args == null) {
+            return;
+        }
         saveEntitysImpl(Arrays.asList(args));
     }
 
@@ -53,6 +59,10 @@ public abstract class DAO implements ICrudEntity, Serializable {
     protected void saveEntitysImpl(Iterable<? extends IEntity> entidades) {
         if (entidades != null) {
             for (IEntity e : entidades) {
+                if (e == null) {
+                    continue;
+                }
+
                 if (e instanceof ISystemEntity) {
                     Boolean systemLock = ((ISystemEntity) e).getSystemLock();
                     log.debug("Entity is not be saved (systemLocked)");
@@ -139,6 +149,16 @@ public abstract class DAO implements ICrudEntity, Serializable {
             EntityManager em = this.getEntityManager();
             em.merge(entity);
             em.remove(entity);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void deleteSoft(ILightRemoveEntity entity) {
+        if (entity instanceof IEntity) {
+            Query query = this.getEntityManager().createQuery("UPDATE " + entity.getClass().getSimpleName() + " SET removed = True WHERE id = :id");
+            query.setParameter("id", entity.getId());
+            int executeUpdate = query.executeUpdate();
         }
     }
 
@@ -434,7 +454,9 @@ public abstract class DAO implements ICrudEntity, Serializable {
 
     protected Query buildGeneriQuery(String hql, Object... args) {
         String where = whereClause(args);
-        Query q = getEntityManager().createQuery(hql + where);
+        String jpql = hql + where;
+        log.debug(jpql);
+        Query q = getEntityManager().createQuery(jpql);
         clauseSetParameters(args, q);
         return q;
     }
@@ -529,9 +551,9 @@ public abstract class DAO implements ICrudEntity, Serializable {
                     if (!vlw.endsWith("%")) {
                         vlw = vlw + "%";
                     }
-                    query.setParameter(k.replace('.', '_'), vlw);
+                    query.setParameter(k.replaceAll("[^a-zA-Z0-9]", "_"), vlw);
                 } else {
-                    query.setParameter(k.replace('.', '_'), v);
+                    query.setParameter(k.replaceAll("[^a-zA-Z0-9]", "_"), v);
                 }
             }
         });
@@ -579,19 +601,42 @@ public abstract class DAO implements ICrudEntity, Serializable {
                         }
                     }
 
-                    where.append(" e.");
-                    where.append(k);
+                    String function = null;
+                    int fIdx = k.indexOf("(");
+                    String attr = k;
+                    if (fIdx > 0) {
+                        function = k.substring(0, fIdx);
+                        attr = k.substring(fIdx + 1, k.length() - 1);//Trim string name
+                    }
 
+                    //WHERE atribute
+                    where.append(" e.");
+                    where.append(attr);
+
+                    //WHERE OPERATION
                     if (comand) {
                         where.append(" ").append(v);
                     } else {
                         if (string) {
                             where.append(")  like ");
+                        } else if (function != null) {
+                            switch (function) {
+                                case "ceil":
+                                    where.append(" <= ");
+                                    break;
+                                case "floor":
+                                    where.append(" >= ");
+                                    break;
+                                default:
+                                    where.append(" = ");
+                            }
                         } else {
                             where.append(" = ");
                         }
+
+                        //PARAM NAME
                         where.append(":");
-                        where.append(k.replace('.', '_'));
+                        where.append(k.replaceAll("[^a-zA-Z0-9]", "_"));
                     }
 
                     firstWhere = false;
@@ -704,13 +749,27 @@ public abstract class DAO implements ICrudEntity, Serializable {
     public <T> T loadEntity(T entidade) {
         try {
             //this.getEntityManager().find(entidade.getClass(), PropertyUtils.getProperty(entidade, "id"));
-            return (T) this.loadEntity(entidade.getClass(), PropertyUtils.getProperty(entidade, "id"));
+            Class<? extends Object> entityClass = entidade.getClass();
+            if (entidade instanceof HibernateProxy) {
+                entityClass = entityClass.getSuperclass();
+                //LazyInitializer lazyInitializer = ((HibernateProxy) value).getHibernateLazyInitializer();
+                //classe = lazyInitializer.getPersistentClass();
+            }
+            ret = this.loadEntity((Class<T>) entityClass, PropertyUtils.getProperty(entidade, "id"));
+            if (ret instanceof HibernateProxy) {
+                //https://stackoverflow.com/questions/2216547/how-to-convert-a-hibernate-proxy-to-a-real-entity-object
+                Hibernate.initialize(ret);
+                ret = (T) Hibernate.unproxy(ret);
+//                ret = (T) ((HibernateProxy) ret).getHibernateLazyInitializer()
+//                        .getImplementation();
+            }
         } catch (Exception ex) {
             log.error("error load entity", ex);
         }
-        return null;
+        return ret;
     }
 
+    @Override
     public <T> T loadEntity(Class<T> clz, Object id) {
         try {
             return (T) this.loadEntityFetch(clz, id, lazyAttributesInString(clz));
@@ -720,6 +779,7 @@ public abstract class DAO implements ICrudEntity, Serializable {
         return null;
     }
 
+    @Transactional
     public <T> T loadEntityFetch(Class clz, Object id, String... propriedades) {
         if (clz == null || id == null) {
             return null;

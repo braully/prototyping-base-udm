@@ -129,4 +129,24 @@ public class Address extends AbstractEntity implements Serializable, IFormatable
         }
         return sb.toString();
     }
+
+    public Address addressLine1(String string) {
+        this.addressLine1 = string;
+        return this;
+    }
+
+    public Address district(String string) {
+        this.district = string;
+        return this;
+    }
+
+    public Address city(City city) {
+        this.city = city;
+        return this;
+    }
+
+    public Address cep(String string) {
+        this.zip = string;
+        return this;
+    }
 }

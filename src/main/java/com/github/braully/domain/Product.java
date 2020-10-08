@@ -3,72 +3,42 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "sale")
-public class Product extends AbstractExpirableEntity implements Serializable {
+@Getter
+@Setter
+public class Product extends AbstractEntity implements Serializable {
 
     @Basic
-    private String typeProduct;
+    String typeProduct;
 
     @Basic
-    private Double unit;
+    String name;
 
     @Basic
-    private String name;
+    String typeUnit;
 
     @Basic
-    private String typeUnit;
+    protected Long unit;
+
+    @Attr("hidden")
+    @Basic
+    protected Long scaleUnit;
 
     @ManyToOne(targetEntity = Partner.class)
-    private Partner manufacturer;
+    Partner manufacturer;
 
-    public Product() {
-
-    }
-
-    public String getTypeProduct() {
-        return this.typeProduct;
-    }
-
-    public void setTypeProduct(String typeProduct) {
-        this.typeProduct = typeProduct;
-    }
-
-    public Double getUnit() {
-        return this.unit;
-    }
-
-    public void setUnit(Double unit) {
-        this.unit = unit;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getTypeUnit() {
-        return this.typeUnit;
-    }
-
-    public void setTypeUnit(String typeUnit) {
-        this.typeUnit = typeUnit;
-    }
-
-    public Partner getManufacturer() {
-        return this.manufacturer;
-    }
-
-    public void setManufacturer(Partner manufacturer) {
-        this.manufacturer = manufacturer;
+    @Override
+    protected String preToString() {
+        return name;
     }
 }

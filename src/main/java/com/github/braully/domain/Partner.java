@@ -6,13 +6,18 @@ package com.github.braully.domain;
 import com.github.braully.constant.Attr;
 import com.github.braully.interfaces.IMigrableEntity;
 import com.github.braully.interfaces.INameComparable;
+import com.github.braully.tmp.EstadoCivil;
+import com.github.braully.tmp.Sexo;
+import com.github.braully.tmp.StatusCorPessoa;
 import com.github.braully.util.UtilDate;
+import com.github.braully.util.UtilString;
 import com.github.braully.util.UtilValidation;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
@@ -23,18 +28,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import static javax.persistence.TemporalType.DATE;
+import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Where;
 
 @Setter
 @Getter
 @Entity
-@Table(schema = "base")
+@Table(uniqueConstraints = @UniqueConstraint(name = "uk_partner.fiscal_code", columnNames = {
+    "fiscalCode"}), schema = "base")
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id", columnDefinition = "smallint default '0'", length = 1)
+@Where(clause = "removed = false") // jpa hibernate soft delete
 @DiscriminatorValue("0")
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
-        columnDefinition = "smallint default '0'", length = 1)
-public class Partner extends AbstractGlobalEntity implements Serializable, IMigrableEntity, INameComparable {
+public class Partner extends AbstractEntity
+        implements Serializable, IMigrableEntity, INameComparable, ILightRemoveEntity {
 
     @Basic(optional = false)
     protected String name;
@@ -42,36 +51,56 @@ public class Partner extends AbstractGlobalEntity implements Serializable, IMigr
     @Basic
     protected String phoneticName;
 
+    @Column(unique = true)
     @Basic
     protected String fiscalCode;
 
     @Basic
     protected String attribute;
 
-    @ManyToOne(fetch = FetchType.LAZY)//(cascade = CascadeType.ALL)
+    @Attr("hidden")
+    @ManyToOne(fetch = FetchType.LAZY) // (cascade = CascadeType.ALL)
     protected InfoExtra infoExtra;
 
     @ManyToOne(cascade = CascadeType.ALL)
     protected Contact contact;
 
-    //TODO: Move to infoExtra
+    // TODO: Move to infoExtra
     @Basic
     @Temporal(DATE)
     protected Date birthDate;
-    //TODO: Importante só para motivos contratuais, tirar daqui
+    // TODO: Importante só para motivos contratuais, tirar daqui
     @ManyToOne
     protected City birthCity;
-
-    @Basic
-    @Attr("hidden")
-    protected String uniqueCode;
 
     @Attr("hidden")
     @ManyToMany(mappedBy = "partnerTarget", fetch = FetchType.LAZY, targetEntity = PartnerPartner.class)
     protected Set<PartnerPartner> partners;
 
+    @Column(unique = true)
+    @Basic
+    @Attr("hidden")
+    protected String uniqueCode;
+
+    @Attr("hidden")
+    @Basic
+    @Column(columnDefinition = "boolean DEFAULT false", insertable = false)
+    protected Boolean removed = false;
+
     public Partner() {
 
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    //Necessary evil: update base.partner set name = initcap(name) where name ~ '[A-Z][A-Z]';
+    // Capitalize name 
+    //FIXME: Remove befor publication
+    public void setName(String name) {
+        name = UtilString.capitalize(name);
+        this.name = name;
     }
 
     public Address getAddress() {
@@ -106,7 +135,7 @@ public class Partner extends AbstractGlobalEntity implements Serializable, IMigr
         return StringUtils.capitalize(name);
     }
 
-    //Temp
+    // Temp
     public String getNome() {
         return name;
     }
@@ -118,6 +147,14 @@ public class Partner extends AbstractGlobalEntity implements Serializable, IMigr
     @Override
     public String toString() {
         return name + (this.fiscalCode != null ? " (" + this.fiscalCode + ")" : "");
+    }
+
+    @Override
+    public String toStringDetailed() {
+        String detalhes = UtilString.emptyIfNull(this.fiscalCode) + " nascimento "
+                + UtilDate.formatData(birthDate)
+                + " " + UtilString.emptyIfNull(birthCity);
+        return name + " (" + detalhes + ")";
     }
 
     public void setNumeroComprovantePessoa(String fiscalCode) {
@@ -150,12 +187,156 @@ public class Partner extends AbstractGlobalEntity implements Serializable, IMigr
         return this.infoExtra;
     }
 
+    // TODO: Mirgrar para local mais apropriado
+    // @Override
+    // @Override
+    // @Override
+    public void setCertidaoNascimento(String certidadoNascimento) {
+        this.infoExtra().setString("nasCert", certidadoNascimento);
+    }
+
+    // @Override
+    public String getCertidaoNascimento() {
+        return this.infoExtra().getString("nasCert");
+    }
+
+    // @Override
+    public void setCor(StatusCorPessoa cor) {
+        this.infoExtra().setEnumValue("cor", cor);
+    }
+
+    // @Override
+    public StatusCorPessoa getCor() {
+        return this.infoExtra().getEnumValue(StatusCorPessoa.class, "cor");
+    }
+
+    public Sexo getSexo() {
+        return this.infoExtra().getEnumValue(Sexo.class, "sexo");
+    }
+
+    // @Override
+    public void setSexo(Sexo sexo) {
+        this.infoExtra().setEnumValue("sexo", sexo);
+    }
+
+    // @Override
+    public Date getDataNascimento() {
+        return this.getBirthDate();
+    }
+
+    // @Override
+    public void setEmail(String email) {
+        this.contact().getMainEmail().setValue(email);
+    }
+
+    // @Override
+    public String getEmail() {
+        return this.contact().mains().getMainEmail().getValue();
+    }
+
+    // @Override
+    public void setEmissorIdentidade(String emissorIdentidade) {
+        this.infoExtra().setString("rgEmssOrg", emissorIdentidade);
+    }
+
+    public String getEmissorIdentidade() {
+        return this.infoExtra().getString("rgEmssOrg");
+    }
+
+    // @Override
+    public Date getDataEmissao() {
+        return this.infoExtra().getDate("rgEmssDt");
+    }
+
+    // @Override
+    public void setDataEmissao(Date dataEmissao) {
+        this.infoExtra().setDate("rgEmssDt", dataEmissao);
+    }
+
+    // @Override
+    public void setEstadoCivil(EstadoCivil estadoCivil) {
+        this.infoExtra().setEnumValue("stdCivil", estadoCivil);
+    }
+
+    // @Override
+    public EstadoCivil getEstadoCivil() {
+        return this.infoExtra().getEnumValue(EstadoCivil.class, "stdCivil");
+    }
+
+    // @Override
+    public City getNaturalidade() {
+        return this.getBirthCity();
+    }
+
+    // @Override
+    public void setNumeroIdentidade(String numeroIdentidade) {
+        this.infoExtra().setString("rg", numeroIdentidade);
+    }
+
+    public String getIdentidadeFormatada() {
+        StringBuilder sb = new StringBuilder();
+        String numeroIdentidade = this.getNumeroIdentidade();
+        if (numeroIdentidade != null) {
+            sb.append(numeroIdentidade);
+        }
+        sb.append(" (");
+        String emissorIdentidade = this.getEmissorIdentidade();
+        if (emissorIdentidade != null) {
+            sb.append(emissorIdentidade);
+        }
+        Date dataEmissao = this.getDataEmissao();
+        if (dataEmissao != null) {
+            sb.append(" em ");
+            sb.append(UtilDate.formatData(dataEmissao));
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    // @Override
+    public String getNumeroIdentidade() {
+        return this.infoExtra().getString("rg");
+    }
+
+    // @Override
+    public void setProfissao(String profissao) {
+        this.infoExtra().setString("profissao", profissao);
+    }
+
+    // @Override
+    public String getProfissao() {
+        return this.infoExtra().getString("profissao");
+    }
+
     public String getUniqueCode() {
         return this.uniqueCode;
     }
 
     public void setUniqueCode(String uniqueCode) {
         this.uniqueCode = uniqueCode;
+    }
+
+    public String getNascimentoFormatado() {
+        StringBuilder sb = new StringBuilder();
+        if (this.birthCity != null) {
+            sb.append(this.birthCity.format());
+            if (this.birthDate != null) {
+                sb.append(" ").append(UtilDate.formatData(birthDate));
+            }
+        }
+        return sb.toString();
+    }
+
+    public PartnerPartner getMae() {
+        return this.partner("Mãe");
+    }
+
+    public PartnerPartner getPai() {
+        return this.partner("Pai");
+    }
+
+    public PartnerPartner getResponsavel() {
+        return this.partner("Responsável");
     }
 
     public PartnerPartner partner(String tipo) {
@@ -173,5 +354,21 @@ public class Partner extends AbstractGlobalEntity implements Serializable, IMigr
             return null;
         }
         return partner;
+    }
+
+    // For not problem with unique constraint uk_fiscal_code
+    public void setFiscalCode(String fiscalCode) {
+        this.fiscalCode = fiscalCode;
+        if (fiscalCode != null && fiscalCode.trim().isEmpty()) {
+            this.fiscalCode = null;
+        }
+    }
+
+    public String getFiscalCodeClean() {
+        String ret = fiscalCode;
+        if (ret != null) {
+            ret = ret.replaceAll("\\D", "");
+        }
+        return ret;
     }
 }

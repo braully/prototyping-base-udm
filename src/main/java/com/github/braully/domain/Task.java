@@ -25,6 +25,12 @@ import lombok.Setter;
 @Table(schema = "base")
 public class Task extends AbstractEntity {
 
+    @ManyToOne
+    protected Partner partnerExecutor;
+
+    @ManyToOne
+    protected Partner partnerInterested;
+
     @Basic
     protected String name;
     @Column(columnDefinition = "TEXT")

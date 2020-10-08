@@ -65,17 +65,24 @@ public class AccountTransaction extends AbstractMigrableEntity
     protected String memo;
 
     @Basic
+    @Temporal(javax.persistence.TemporalType.DATE)
     protected Date datePrevist;
 
     @Basic
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     protected Date dateExecuted;
 
     @Basic
+    @Attrs({
+        @Attr({"converter", "converterMonetaryBigDecimal"}),
+        @Attr({"type", "money"})
+    })
     protected BigDecimal debitTotal;
 
     @Basic
     @Attrs({
-        @Attr({"converter", "converterMonetaryBigDecimal"})
+        @Attr({"converter", "converterMonetaryBigDecimal"}),
+        @Attr({"type", "money"})
     })
     protected BigDecimal creditTotal;
 
@@ -89,9 +96,14 @@ public class AccountTransaction extends AbstractMigrableEntity
     protected String typeTransaction;
 
     @Basic
+    @Attrs({
+        @Attr({"converter", "converterMonetaryBigDecimal"}),
+        @Attr({"type", "money"})
+    })
     protected BigDecimal valueExecuted;
 
     @Basic
+    @Attr({"converter", "converterMonetaryBigDecimal"})
     protected BigDecimal actualBalance;
 
     @Attr("hidden")

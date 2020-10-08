@@ -69,6 +69,7 @@ public class BinaryFileProcessorBC {
         if (arquivo == null || arquivo.isReady()) {
             return;
         }
+        log.info("Processing File: " + arquivo);
         if (binaryFileProcessors != null) {
             arquivo = genericDAO.loadEntity(arquivo);
             for (BinaryFileProcessor processador : binaryFileProcessors) {
@@ -77,11 +78,13 @@ public class BinaryFileProcessorBC {
                     String processorType = processador.getType();
                     if (arquivoType != null) {
                         if (arquivoType.toLowerCase().startsWith(processorType.toLowerCase())) {
+                            log.info("Processing File With: " + processador);
                             processador.processFile(arquivo);
                             arquivo.setStatusExecution(StatusExecutionCycle.DONE);
                             break;
                         }
                     } else if (processador.isProcessable(arquivo)) {
+                        log.info("Processing File With: " + processador);
                         processador.processFile(arquivo);
                         arquivo.setStatusExecution(StatusExecutionCycle.DONE);
                         break;

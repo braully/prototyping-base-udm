@@ -32,7 +32,19 @@ public interface IEntity extends Serializable {//, Comparable<IEntity> {
         return getId() != null && getId() > 0;
     }
 
+    default public boolean isPersistido() {
+        return isPersisted();
+    }
+
     default public String getToString() {
+        return toString();
+    }
+
+    default public String getToStringDetailed() {
+        return toStringDetailed();
+    }
+
+    default public String toStringDetailed() {
         return toString();
     }
 

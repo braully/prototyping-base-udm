@@ -271,9 +271,17 @@ public class ImportFileProcessor extends BinaryFileProcessor {
             if (o instanceof Object[]) {
                 Object[] arr = (Object[]) o;
                 try {
-                    descritor.importarSeTemElemento(arr);
+                    //descritor.importarSeTemElemento(arr);
                 } catch (Exception e) {
                     log.info("fail on import data: " + UtilCollection.printArray(arr), e);
+                }
+            } else if (o instanceof Collection) {
+                Collection list = null;
+                try {
+                    list = (Collection) o;
+                    descritor.importarSeTemElemento(list);
+                } catch (Exception e) {
+                    log.info("fail on import data: " + UtilCollection.printCollection(list), e);
                 }
             }
         }

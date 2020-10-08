@@ -18,7 +18,11 @@ public class logutil {
     public static void info(String strmsg, Throwable e) {
         log.info(strmsg, e);
     }
-    
+
+    public static void error(String strmsg) {
+        log.error(strmsg);
+    }
+
     public static void error(String strmsg, Throwable ex) {
         log.error(strmsg, ex);
     }

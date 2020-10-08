@@ -12,25 +12,33 @@ public class url {
     public static Map<String, String> redirect = new TreeMap<>();
 
     static {
-        redirect.put("/", "/index");
-        redirect.put("/home", "/index");
-        redirect.put("/index", "/autogen/entityDummy.xhtml");
+        redirect.put("/", "/jsf/index.xhtml");
+        redirect.put("/home", "/jsf/index.xhtml");
+        redirect.put("/index", "/jsf/index.xhtml");
     }
 
     public static Map<String, String> rewrite_forward = new TreeMap<>();
 
     static {
-        rewrite_forward.put("/enter", "/jsp/login.jsp");
+        rewrite_forward.put("/enter", "/html/login.html");
         rewrite_forward.put("/index", "/jsf/index.xhtml");
-
+        //        rewrite_forward.put("/enter", "/jsp/login.jsp");
+        //        rewrite_forward.put("/enter", "/web/jsp/login.jsp"); 
         /*
         (1, 10, 'Colaborator', 'colaborator', '/administrative/colaborator', 'ico-colab'),
         (1, 11, 'Payroll', 'payroll', '/administrative/payroll', 'ico-payroll'),
         (1, 12, 'Task', 'task', '/administrative/task', 'ico-task'),
          */
-        rewrite_forward.put("/administrative/colaborator", "/autogen/colaborator.xhtml");
-        rewrite_forward.put("/administrative/payroll", "/jsf/app/payroll.html");
-        rewrite_forward.put("/administrative/tarefa", "/autogen/task.xhtml");
+        rewrite_forward.put("/administrative/dashboard/", "/jsf/app/dashboard.xhtml");
+        rewrite_forward.put("/administrative/colaborator/", "/jsf/app/colaborator.xhtml");
+        rewrite_forward.put("/administrative/payroll/", "/jsf/app/em-construcao.xhtml");
+
+        rewrite_forward.put("/administrative/task/", "/autogen/task.xhtml");
+        rewrite_forward.put("/administrative/task/{op}/{id}", "/autogen/task/{op}.xhtml");
+
+        rewrite_forward.put("/administrative/partner/", "/jsf/app/partners.xhtml");
+        rewrite_forward.put("/administrative/partner/{op}/{id}", "/autogen/partner/{op}.xhtml");
+
         /*
         (2, 20, 'Cashier', 'cashier', '/financial/cashier', 'ico-cashier'),
         (2, 21, 'Receivable', 'receivable', '/financial/receivable', 'ico-receivable'),
