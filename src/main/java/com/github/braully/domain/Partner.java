@@ -3,12 +3,10 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.persistence.ILightRemoveEntity;
 import com.github.braully.constant.Attr;
 import com.github.braully.interfaces.IMigrableEntity;
 import com.github.braully.interfaces.INameComparable;
-import com.github.braully.tmp.EstadoCivil;
-import com.github.braully.tmp.Sexo;
-import com.github.braully.tmp.StatusCorPessoa;
 import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilString;
 import com.github.braully.util.UtilValidation;
@@ -187,43 +185,6 @@ public class Partner extends AbstractEntity
         return this.infoExtra;
     }
 
-    // TODO: Mirgrar para local mais apropriado
-    // @Override
-    // @Override
-    // @Override
-    public void setCertidaoNascimento(String certidadoNascimento) {
-        this.infoExtra().setString("nasCert", certidadoNascimento);
-    }
-
-    // @Override
-    public String getCertidaoNascimento() {
-        return this.infoExtra().getString("nasCert");
-    }
-
-    // @Override
-    public void setCor(StatusCorPessoa cor) {
-        this.infoExtra().setEnumValue("cor", cor);
-    }
-
-    // @Override
-    public StatusCorPessoa getCor() {
-        return this.infoExtra().getEnumValue(StatusCorPessoa.class, "cor");
-    }
-
-    public Sexo getSexo() {
-        return this.infoExtra().getEnumValue(Sexo.class, "sexo");
-    }
-
-    // @Override
-    public void setSexo(Sexo sexo) {
-        this.infoExtra().setEnumValue("sexo", sexo);
-    }
-
-    // @Override
-    public Date getDataNascimento() {
-        return this.getBirthDate();
-    }
-
     // @Override
     public void setEmail(String email) {
         this.contact().getMainEmail().setValue(email);
@@ -232,128 +193,6 @@ public class Partner extends AbstractEntity
     // @Override
     public String getEmail() {
         return this.contact().mains().getMainEmail().getValue();
-    }
-
-    // @Override
-    public void setEmissorIdentidade(String emissorIdentidade) {
-        this.infoExtra().setString("rgEmssOrg", emissorIdentidade);
-    }
-
-    public String getEmissorIdentidade() {
-        return this.infoExtra().getString("rgEmssOrg");
-    }
-
-    // @Override
-    public Date getDataEmissao() {
-        return this.infoExtra().getDate("rgEmssDt");
-    }
-
-    // @Override
-    public void setDataEmissao(Date dataEmissao) {
-        this.infoExtra().setDate("rgEmssDt", dataEmissao);
-    }
-
-    // @Override
-    public void setEstadoCivil(EstadoCivil estadoCivil) {
-        this.infoExtra().setEnumValue("stdCivil", estadoCivil);
-    }
-
-    // @Override
-    public EstadoCivil getEstadoCivil() {
-        return this.infoExtra().getEnumValue(EstadoCivil.class, "stdCivil");
-    }
-
-    // @Override
-    public City getNaturalidade() {
-        return this.getBirthCity();
-    }
-
-    // @Override
-    public void setNumeroIdentidade(String numeroIdentidade) {
-        this.infoExtra().setString("rg", numeroIdentidade);
-    }
-
-    public String getIdentidadeFormatada() {
-        StringBuilder sb = new StringBuilder();
-        String numeroIdentidade = this.getNumeroIdentidade();
-        if (numeroIdentidade != null) {
-            sb.append(numeroIdentidade);
-        }
-        sb.append(" (");
-        String emissorIdentidade = this.getEmissorIdentidade();
-        if (emissorIdentidade != null) {
-            sb.append(emissorIdentidade);
-        }
-        Date dataEmissao = this.getDataEmissao();
-        if (dataEmissao != null) {
-            sb.append(" em ");
-            sb.append(UtilDate.formatData(dataEmissao));
-        }
-        sb.append(")");
-        return sb.toString();
-    }
-
-    // @Override
-    public String getNumeroIdentidade() {
-        return this.infoExtra().getString("rg");
-    }
-
-    // @Override
-    public void setProfissao(String profissao) {
-        this.infoExtra().setString("profissao", profissao);
-    }
-
-    // @Override
-    public String getProfissao() {
-        return this.infoExtra().getString("profissao");
-    }
-
-    public String getUniqueCode() {
-        return this.uniqueCode;
-    }
-
-    public void setUniqueCode(String uniqueCode) {
-        this.uniqueCode = uniqueCode;
-    }
-
-    public String getNascimentoFormatado() {
-        StringBuilder sb = new StringBuilder();
-        if (this.birthCity != null) {
-            sb.append(this.birthCity.format());
-            if (this.birthDate != null) {
-                sb.append(" ").append(UtilDate.formatData(birthDate));
-            }
-        }
-        return sb.toString();
-    }
-
-    public PartnerPartner getMae() {
-        return this.partner("Mãe");
-    }
-
-    public PartnerPartner getPai() {
-        return this.partner("Pai");
-    }
-
-    public PartnerPartner getResponsavel() {
-        return this.partner("Responsável");
-    }
-
-    public PartnerPartner partner(String tipo) {
-        PartnerPartner partner = null;
-        try {
-            if (UtilValidation.isStringValid(tipo)) {
-                for (PartnerPartner pp : this.getPartners()) {
-                    if (tipo.equalsIgnoreCase(pp.getType())) {
-                        partner = pp;
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            return null;
-        }
-        return partner;
     }
 
     // For not problem with unique constraint uk_fiscal_code

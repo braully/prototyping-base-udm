@@ -1,6 +1,7 @@
 package com.github.braully.domain;
 
 import com.github.braully.interfaces.IExportableEntity;
+import com.github.braully.interfaces.IMigrableEntity;
 import com.github.braully.persistence.IEntity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -17,21 +18,8 @@ import org.apache.commons.validator.routines.checkdigit.CheckDigitException;
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class AbstractExportableEntity implements IEntity, IExportableEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
+public abstract class AbstractExportableEntity extends AbstractEntity implements IEntity,
+        IExportableEntity, IMigrableEntity {
 
     @Column(unique = true)
     @Basic
@@ -98,8 +86,8 @@ public abstract class AbstractExportableEntity implements IEntity, IExportableEn
         return dv;
     }
 
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + " (" + "#" + id + ')';
-    }
+//    @Override
+//    public String toString() {
+//        return this.getClass().getSimpleName() + " (" + "#" + id + ')';
+//    }
 }

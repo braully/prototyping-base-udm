@@ -10,6 +10,8 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.valves.RemoteIpValve;
+import org.apache.coyote.ajp.AbstractAjpProtocol;
 //import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.ocpsoft.rewrite.annotation.RewriteConfiguration;
 import org.ocpsoft.rewrite.config.ConfigurationBuilder;
@@ -325,12 +327,16 @@ public class SpringWebConfig
 
         private final static String CONNECTOR_PROTOCOL = TomcatServletWebServerFactory.DEFAULT_PROTOCOL; //"org.apache.coyote.http11.Http11NioProtocol";
         private final static String CONNECTOR_SCHEME = "http";
+        private static final String CONNECTOR_PROTOCOL_AJP = "org.apache.coyote.ajp.AjpNioProtocol";//"AJP/1.3";
 
         @Value("${http.port:8080}")
         Integer httpPort;
 
         @Value("${server.port:8443}")
         Integer serverPort;
+
+        @Value("${server.tomcat.ajp.port:8090}")
+        Integer ajpPort;
 
         @Value("${security.require-ssl:false}")
         Boolean requireSsl;
@@ -339,21 +345,48 @@ public class SpringWebConfig
         public void customize(TomcatServletWebServerFactory factory) {
             factory.setPort(serverPort);
             if (!httpPort.equals(serverPort)) {
-                factory.addAdditionalTomcatConnectors(getHttpConnector());
+                factory.addAdditionalTomcatConnectors(createHttpConnector());
+            }
+            if (ajpPort != null) {
+                factory.addAdditionalTomcatConnectors(createAjpConnector());
+                factory.addContextValves(createRemoteIpValves());
             }
         }
 
-        //https://stackoverflow.com/questions/30896234/how-set-up-spring-boot-to-run-https-http-ports
-        private Connector getHttpConnector() {
+        // https://stackoverflow.com/questions/30896234/how-set-up-spring-boot-to-run-https-http-ports
+        private Connector createHttpConnector() {
             Connector connector = new Connector(CONNECTOR_PROTOCOL);
             connector.setPort(httpPort);
             connector.setScheme(CONNECTOR_SCHEME);
             connector.setSecure(false);
-            //If redirect, uncoment
+            // If redirect, uncoment
             if (requireSsl != null && requireSsl) {
                 connector.setRedirectPort(serverPort);
             }
             return connector;
+        }
+
+        //https://access.redhat.com/solutions/4851251
+        //https://stackoverflow.com/questions/49275241/spring-boot-2-ajp
+        //https://stormpath.com/blog/secure-spring-boot-webapp-apache-letsencrypt-ssl
+        //https://stackoverflow.com/questions/60501470/springboot-the-ajp-connector-is-configured-with-secretrequired-true-but-the-s
+        private Connector createAjpConnector() {
+            Connector ajpConnector = new Connector(CONNECTOR_PROTOCOL_AJP);
+            //ajpConnector.setProtocol("AJP/1.3");
+            ajpConnector.setPort(ajpPort);
+            //ajpConnector.setScheme(CONNECTOR_SCHEME);
+            ajpConnector.setScheme("ajp");
+            ajpConnector.setSecure(false);
+            ((AbstractAjpProtocol) ajpConnector.getProtocolHandler()).setSecretRequired(false);
+            //ajpConnector.setAllowTrace(false);
+            return ajpConnector;
+        }
+
+        private RemoteIpValve createRemoteIpValves() {
+            RemoteIpValve remoteIpValve = new RemoteIpValve();
+            remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+            remoteIpValve.setProtocolHeader("x-forwarded-proto");
+            return remoteIpValve;
         }
     }
 }

@@ -200,7 +200,8 @@ public class SecurityService extends CRUDGenericController<UserLogin> implements
                     .addChild(new Menu("Scratch").link("/jsf/entity-crud-scratch.xhtml"))
                     .addChild(new Menu("Legacy").link("/jsf/tmp/index.xhtml"))
                     .addChild(new Menu("Layout-1").link("/pkg/startbootstrap-sb-admin/index.html"))
-                    .addChild(new Menu("Layout-2").link("/pkg/startbootstrap-sb-admin-2/index.html"));
+                    .addChild(new Menu("Layout-2").link("/pkg/startbootstrap-sb-admin-2/index.html"))
+                    .addChild(new Menu("Layout-3").link("/tmp/sidebar/chart-chartjs.html"));
             menus.add(desenvMenu);
         }
 

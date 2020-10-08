@@ -1,10 +1,17 @@
 package com.github.braully.web.jsf;
 
+import com.github.braully.app.SpringMainConfig;
+import com.github.braully.app.logutil;
 import com.github.braully.util.MemoryAppender;
 import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilProperty;
+import com.github.braully.util.WebConsoleAppender;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +23,7 @@ import org.apache.logging.log4j.core.util.Throwables;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -186,5 +194,117 @@ public class AppMB {
             }
         }*/
         return sb.toString();
+    }
+
+    public void restartSystem() {
+        try {
+            SpringMainConfig.restartApplication();
+        } catch (Exception ex) {
+            logutil.error("Fail on restart appt", ex);
+        }
+    }
+
+    public void compileSystem() {
+        String[] commandToExecute = new String[]{"/bin/bash", System.getProperty("user.home") + "/maxge/sh/compile.sh"};//getExecuteCommand(graph);
+        executeCommand(commandToExecute);
+    }
+
+    public void updateSystem() {
+        String[] commandToExecute = new String[]{"/bin/bash", System.getProperty("user.home") + "/maxge/sh/update.sh"};//getExecuteCommand(graph);
+        executeCommand(commandToExecute);
+    }
+
+    protected void executeCommand(String[] commandToExecute) {
+        Map<String, Object> response;
+        try {
+            logWebConsole.info(commandToExecute);
+            //File execFile = new File(exec);
+            //execFile.setExecutable(true);
+            process = Runtime.getRuntime().exec(commandToExecute);
+            InputStreamReader input = new InputStreamReader(process.getInputStream());
+            BufferedReader reader = new BufferedReader(input);
+
+            response = new HashMap<>();
+            String lastLine = "";
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                try {
+                    if (line != null && !line.trim().isEmpty()) {
+                        logWebConsole.info(line);
+                        log.info(line);
+                        String[] splits = line.split("=", 2);
+                        if (splits != null && splits.length >= 2) {
+                            response.put(splits[0].trim(), splits[1].trim());
+                        }
+                        lastLine = line;
+                    }
+                } catch (Exception e) {
+                    logWebConsole.error("Error: " + e.getLocalizedMessage());
+                    logWebConsole.error("fail on execute", e);
+                    log.error("fail on execute", e);
+                }
+            }
+            if (response.isEmpty()) {
+                response.put("Result", lastLine);
+            }
+            int waitFor = process.waitFor();
+            if (waitFor > 0) {
+                response.put("Result", "Erro");
+                try {
+                    InputStreamReader inputError = new InputStreamReader(process.getErrorStream());
+                    BufferedReader readerError = new BufferedReader(inputError);
+
+                    String erorline = "";
+                    while ((erorline = readerError.readLine()) != null) {
+
+                        if (erorline != null && !erorline.trim().isEmpty()) {
+                            logWebConsole.info("Error: " + erorline);
+                        }
+
+                    }
+                } catch (Exception e) {
+                    logWebConsole.error("error on update", e);
+                    log.error("erro on update", e);
+                }
+            }
+        } catch (IOException | InterruptedException ex) {
+            logWebConsole.error("error", ex);
+            log.error("erro on update", ex);
+        }
+    }
+
+    @RequestMapping(value = {"system/console"},
+            method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> processStatus(Long lastTime) {
+        Map<String, Object> map = new HashMap<>();
+        List<String> lines = new ArrayList<>();
+        List<LogEvent> loggingEvents = null;
+
+        long last = 0;
+
+        if (lastTime != null && lastTime > 0) {
+            loggingEvents = WebConsoleAppender.getLoggingEvents(lastTime);
+            last = lastTime;
+        } else {
+            loggingEvents = WebConsoleAppender.getLoggingEvents();
+        }
+
+        if (loggingEvents != null) {
+            for (LogEvent e : loggingEvents) {
+                lines.add("" + e);
+                /*Object message = e.getMessage();
+                lines.add("" + message);
+                if (e.getTimeStamp() > last) {
+                    last = e.getTimeStamp();
+                }*/
+            }
+        }
+
+        map.put("processing", "");
+        map.put("last", last);
+        map.put("output", lines);
+        map.put("result", "");
+        return map;
     }
 }

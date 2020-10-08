@@ -99,10 +99,16 @@ public class UtilExpression {
     }
 
     public static Money dinheiro(String valor) {
-        if (valor == null) {
+        if (valor == null || valor.isEmpty()) {
             return new Money();
         }
-        return new Money(valor);
+        Money ret = null;
+        try {
+            ret = new Money(Long.parseLong(valor));
+        } catch (Exception e) {
+            ret = new Money(valor);
+        }
+        return ret;
     }
 
     public static Money dinheiro(Money valor) {

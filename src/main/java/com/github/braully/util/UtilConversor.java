@@ -54,4 +54,18 @@ public class UtilConversor {
         }
         return ret;
     }
+
+    public static Double getDoubleValue(Object o) {
+        Double ret = null;
+        if (o != null) {
+            if (o instanceof Number) {
+                ret = ((Number) o).doubleValue();
+            } else {
+                String tmpVal = o.toString();
+                tmpVal = tmpVal.replaceAll("[a-zA-Z]+", "");
+                ret = Double.parseDouble(tmpVal);
+            }
+        }
+        return ret;
+    }
 }

@@ -74,7 +74,7 @@ public class ReportGeneratorDynamic implements IReportGenerator {
 
         styleColNomeCampo = novoEstilo(Border.NO_BORDER(), VerticalAlign.MIDDLE,
                 HorizontalAlign.RIGHT);
-        styleColNomeCampo.setFont(new Font(Font.ARIAL_MEDIUM_BOLD.getFontSize(),
+        styleColNomeCampo.setFont(new Font((int) Font.ARIAL_MEDIUM_BOLD.getFontSize(),
                 Font.ARIAL_MEDIUM_BOLD.getFontName(), "Helvetica-Bold",
                 Font.PDF_ENCODING_CP1252_Western_European_ANSI, true));
 

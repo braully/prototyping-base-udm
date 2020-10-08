@@ -3,71 +3,44 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.interfaces.IOrganiztionEntityDependent;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(schema = "sale")
 @DiscriminatorValue("0")
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
         columnDefinition = "smallint default '0'", length = 1)
-public class Inventory extends AbstractEntity implements Serializable {
+@Getter
+@Setter
+public class Inventory extends AbstractEntity implements IOrganiztionEntityDependent, Serializable {
+
+    @ManyToOne
+    Organization organization;
 
     @Basic
-    private String localization;
+    String localization;
 
     @Basic
-    private String name;
+    String name;
 
     @Basic
-    private String description;
+    String description;
 
     @Basic
-    private String type;
-
-    public Inventory() {
-
-    }
-
-    public String getLocalization() {
-        return this.localization;
-    }
-
-    public void setLocalization(String localization) {
-        this.localization = localization;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    String type;
 
     @Override
-    public String toString() {
-        return name + " (" + this.id + ')';
+    protected String preToString() {
+        return name;
     }
 }

@@ -38,6 +38,9 @@ public class GenericDAO extends DAO {
     @Transactional
     @Override
     public void saveEntity(IEntity... e) {
+        if (e == null) {
+            return;
+        }
         super.saveEntity(e);
     }
 
@@ -62,6 +65,12 @@ public class GenericDAO extends DAO {
     @Override
     public void delete(Object entity) {
         super.delete(entity);
+    }
+
+    @Transactional
+    @Override
+    public void deleteSoft(ILightRemoveEntity entity) {
+        super.deleteSoft(entity);
     }
 
     @Transactional
@@ -115,6 +124,12 @@ public class GenericDAO extends DAO {
     @Transactional(propagation = Propagation.MANDATORY)
     public void flush() {
         this.getEntityManager().flush();
+    }
+
+    @Transactional
+    @Override
+    public <T> T loadEntity(T entidade) {
+        return super.loadEntity(entidade); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

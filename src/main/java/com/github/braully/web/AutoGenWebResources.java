@@ -38,6 +38,65 @@ public class AutoGenWebResources {
             return html;
         }
 
+        public ContainerTag entityHtmlDetail(DescriptorHtmlEntity entityDescriptor,
+                StatisticalConsolidation statistic) {
+
+            var detail = div();
+
+            entityDescriptor.elementsForm.forEach(e
+                    -> detail.with(entityHtmlDetailInputGroup(e, statistic))
+            );
+
+            return detail;
+        }
+
+        protected void extraEntityHtmlDetailInput(ContainerTag html,
+                DescriptorHtmlEntity entityDescriptor,
+                StatisticalConsolidation statistic) {
+
+        }
+
+        public ContainerTag entityHtmlDetailInputGroup(DescriptorHtmlEntity e,
+                StatisticalConsolidation statistic) {
+            ContainerTag inputGroup = null;
+            ContainerTag label = null;
+            ContainerTag input = null;
+
+            String size = e.getAttributeAscending("size");
+            String classDivGroupInput = "avg";
+            if (UtilValidation.isStringValid(size)) {
+                classDivGroupInput = "avg-" + size;
+            }
+
+            switch (e.getTypeLow()) {
+                case "int":
+                case "integer":
+                case "float":
+                case "double":
+                case "string":
+                case "money":
+                case "monetary":
+                case "bigdecimal":
+                case "date":
+                case "boolean":
+                    label = span(e.label).withClass("avg-label font-weight-bold").attr("data-i18n", e.label);
+                    extraEntityHtmlFormLabel(label, e, statistic);
+                    input = new ContainerTag("span").withValue(e.property).withClass("afg-span");
+                    extraEntityHtmlDetailInput(input, e, statistic);
+                    inputGroup = div(label, span(":"), input).withClass(classDivGroupInput);
+                    break;
+                default:
+                    label = label(e.label).withClass("avg-label font-weight-bold").attr("data-i18n", e.label);
+                    extraEntityHtmlFormLabel(label, e, statistic);
+                    input = new ContainerTag("span").withValue(e.property).withClass("afg-span");
+                    extraEntityHtmlDetailInput(input, e, statistic);
+                    inputGroup = div(label, span(":"), input).withClass(classDivGroupInput);
+                    break;
+            }
+
+            return inputGroup;
+        }
+
         public ContainerTag entityHtmlForm(DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             /* 
@@ -59,7 +118,7 @@ public class AutoGenWebResources {
                     -> form.with(entityHtmlFormInputGroup(e, statistic))
             );
 
-            ContainerTag formGroupActions = div().withClass("autogen-form-group");
+            ContainerTag formGroupActions = div().withClass("afg-2 text-right");
 
             var defaultAction = input()
                     .withClass("autogen-button")
@@ -68,14 +127,27 @@ public class AutoGenWebResources {
                     .withAction("save")
                     .attr("data-i18n", "Save");
             Tag defaultActionTag = extraEntityHtmlFormActionDefault(defaultAction, entityDescriptor, statistic);
-            formGroupActions.with(defaultActionTag);
-            extraEntityHtmlFormActionExtra(formGroupActions, entityDescriptor, statistic);
+            ContainerTag formGroupActionsRow
+                    = div().withClass("afg af-row").with(
+                            div().withClass("col"),
+                            formGroupActions.with(defaultActionTag)
+                    );
 
-            if (!entityDescriptor.isAttribute("noaction")) {
-                form.with(formGroupActions);
-            }
+//            <div class="afg af-row">
+//                    <div class="col"></div>
+//                    <div class="afg-2 text-right">
+//                        <h:commandButton class="autogen-button float-right"
+//                                         value="Buscar" action="#{enrollmentMB.findSilent()}" />    
+//                    </div>
+//            </div>
+            extraEntityHtmlFormActionExtra(formGroupActionsRow, entityDescriptor, statistic);
 
             extraEntityHtmlForm(form, entityDescriptor, statistic);
+
+            if (!entityDescriptor.isAttribute("noaction")) {
+                form.with(formGroupActionsRow);
+            }
+
             return form;
         }
 
@@ -213,7 +285,7 @@ public class AutoGenWebResources {
 
             //Select list elements
             if (selectable) {
-                trh.with(th().withClass("autogen-list-table-head-col")
+                trh.with(th().attr("scope", "col").withClass("autogen-list-table-head-col")
                         .with(input().withType("checkbox").attr("onclick", "checkAll(this);")));
             }
 
@@ -222,13 +294,16 @@ public class AutoGenWebResources {
                     e -> trh.with(th(e.label).attr("data-i18n", e.label)
                             .withClass("autogen-list-table-head-col"))
             );
+
+            extraEntityHtmlListHeadRow(trh, he, statistic);
+
             //Action colummn
-            trh.with(th().withClass("autogen-list-table-head-col"));
+            trh.with(th().attr("scope", "col").withClass("autogen-list-table-head-col"));
             var thead = thead(trh).withClass("autogen-list-table-head");
 
             //tbody
             //tbody-row
-            var trb = tr().withClass("autogen-list-table-body-row");
+            var trb = tr().attr("scope", "col").withClass("autogen-list-table-body-row");
 
             //tbody-row-col-check
             if (selectable) {
@@ -249,7 +324,7 @@ public class AutoGenWebResources {
                                     td().withClass("autogen-list-table-body-col")
                                             .attr("model", e.property),
                                     e, statistic
-                            )
+                            ).attr("data-id", "id")
                     )
             );
 
@@ -261,14 +336,17 @@ public class AutoGenWebResources {
             //trb.with(td(btnEditList).withClass("autogen-list-table-body-col"));
             extraEntityHtmlListBodyRowActionEdit(btnEditList, he, statistic);
 
-            Tag btnView = a(i(" ").withClass("ico-search"), span("View").withData("i18n", "View")).withHref("#")
+            Tag btnView = a(i(" ").withClass("ico-search"), span("View")
+                    .withData("i18n", "View")).withHref("#")
                     .withValue("View").withTitle("View")
                     .withClass("autogen-button-extra-button");
             extraEntityHtmlListBodyRowActionView(btnView, he, statistic);
 
-            ContainerTag btnRemove = a(i(" ").withClass("ico-remove"), span("Remove").withData("i18n", "Remove")).withHref("#")
+            ContainerTag btnRemove = a(i(" ").withClass("ico-remove"),
+                    span("Remove").withData("i18n", "Remove"))
                     .withValue("Remove").withTitle("Remove")
-                    .withClass("autogen-button-extra-button");
+                    .withClass("autogen-button-extra-button")
+                    .withHref("remove/#id");
             extraEntityHtmlListBodyRowActionRemove(btnRemove, he, statistic);
 
             Tag btnListExtraActions = button(i().withClass("ico-opcoes"))
@@ -286,14 +364,14 @@ public class AutoGenWebResources {
 
             ContainerTag col = div().withClass("autogen-button-col");
             extraEntityHtmlListBodyRowAction(col, he, statistic);
-            if (he.isAttribute("noedit")) {
+            if (he.isAttribute("noedit") || he.isAttribute("noaction")) {
                 col.with(btnListExtraActions, menuExtraActions);
             } else {
                 col.with(btnEditList, btnListExtraActions, menuExtraActions);
             }
 
-            trb.with(td().with(col));
             extraEntityHtmlListBodyRow(trb, he, statistic);
+            trb.with(td().withClass("text-right").with(col));
 
             var tbody = tbody(trb).withClass("autogen-list-table-body");
             table.with(thead, tbody);
@@ -363,7 +441,13 @@ public class AutoGenWebResources {
             return th;
         }
 
-        protected void extraEntityHtmlListBodyRow(Tag html,
+        protected void extraEntityHtmlListHeadRow(ContainerTag html,
+                DescriptorHtmlEntity entityDescriptor,
+                StatisticalConsolidation statistic) {
+
+        }
+
+        protected void extraEntityHtmlListBodyRow(ContainerTag html,
                 DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
 
@@ -485,6 +569,11 @@ public class AutoGenWebResources {
         }
 
         @Override
+        protected void extraEntityHtmlListBodyRowActionView(Tag btnView, DescriptorHtmlEntity he, StatisticalConsolidation statistic) {
+            btnView.withHref("view/#{ent.id}");
+        }
+
+        @Override
         protected void extraEntityHtmlForm(ContainerTag form, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             form.attr("jsfc", "h:form");
@@ -514,6 +603,41 @@ public class AutoGenWebResources {
         }
 
         @Override
+        protected void extraEntityHtmlDetailInput(ContainerTag output,
+                DescriptorHtmlEntity entityDescriptor,
+                StatisticalConsolidation statistic) {
+            String entityBind = getEntityBind(entityDescriptor);
+            String typeLow = entityDescriptor.getTypeLow();
+
+            output.attr("value", entityBind);
+            output.attr("ps:data-type", typeLow);
+
+            switch (typeLow) {
+                case "string":
+                    output.attr("jsfc", "h:outputText");
+                    break;
+                case "int":
+                case "integer":
+                case "long":
+                case "float":
+                case "double":
+                case "date":
+                case "monetary":
+                case "money":
+                case "bigdecimal":
+                    output.attr("jsfc", "h:outputText");
+                    output.attr("converter", "converterGenericJsf");
+                    break;
+                case "boolean":
+                    output.attr("jsfc", "h:outputText");
+                    break;
+                default:
+                    output.attr("jsfc", "h:outputText");
+                    break;
+            }
+        }
+
+        @Override
         protected void extraEntityHtmlFormInput(ContainerTag input, DescriptorHtmlEntity fieldEntity,
                 StatisticalConsolidation statistic) {
 
@@ -534,6 +658,7 @@ public class AutoGenWebResources {
                 case "double":
                 case "date":
                 case "monetary":
+                case "money":
                 case "bigdecimal":
                     input.attr("jsfc", "h:inputText");
                     input.attr("converter", "converterGenericJsf");
@@ -597,7 +722,7 @@ public class AutoGenWebResources {
 
         protected void extraEntityHtmlFilterSearchInput(Tag btn, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-            btn.attr("action", "#{" + getBindExpression(entityDescriptor) + ".find()}");
+            btn.attr("action", "#{" + getBindExpression(entityDescriptor) + ".findSilent()}");
             btn.attr("jsfc", "h:commandButton");
             btn.attr("ps:data-i18n", "Search");
         }
@@ -606,20 +731,30 @@ public class AutoGenWebResources {
         protected void extraEntityHtmlListBodyRowActionRemove(ContainerTag btn,
                 DescriptorHtmlEntity he,
                 StatisticalConsolidation statistic) {
-            btn.attr("action", "#{" + getBindExpression(he) + ".remove(ent)}");
-            btn.attr("jsfc", "h:commandLink");
-            btn.attr("ps:data-i18n", "Remove");
-            btn.with(tag("h:panelGroup").withClass("ico-remove"));
+//            if (he.isAttribute("removeInPlace")) {
+//                btn.attr("action", "#{" + getBindExpression(he) + ".remove(ent)}");
+//                btn.attr("jsfc", "h:commandLink");
+//                btn.attr("ps:data-i18n", "Remove");
+//                btn.with(tag("h:panelGroup").withClass("ico-remove"));
+//            } else {
+            btn.withHref("remove/#{ent.id}");
+            //}
         }
 
         @Override
         protected void extraEntityHtmlFilter(Tag html, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
-
+            html.attr("jsfc", "h:form");
         }
 
         @Override
-        protected void extraEntityHtmlListBodyRow(Tag row, DescriptorHtmlEntity entityDescriptor,
+        protected void extraEntityHtmlListHeadRow(ContainerTag row, DescriptorHtmlEntity entityDescriptor,
+                StatisticalConsolidation statistic) {
+            row.with(emptyTag("ui:insert").withName("extraHead"));
+        }
+
+        @Override
+        protected void extraEntityHtmlListBodyRow(ContainerTag row, DescriptorHtmlEntity entityDescriptor,
                 StatisticalConsolidation statistic) {
             row.attr("jsfc", "ui:repeat");
             String entities = entityDescriptor.getAttribute("entities");
@@ -630,6 +765,8 @@ public class AutoGenWebResources {
                 row.attr("value", "#{" + bind + ".entities}");
             }
             row.attr("var", "ent");
+            row.attr("ps:data-id", "#{ent.id}");
+            row.with(emptyTag("ui:insert").withName("extraBody"));
         }
 
         protected String getBindExpression(DescriptorHtmlEntity entityDescriptor) {

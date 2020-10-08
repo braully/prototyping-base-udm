@@ -17,31 +17,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class AbstractExpirableEntity implements IEntity, Serializable {
-
-    public AbstractExpirableEntity() {
-
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
+public abstract class AbstractExpirableEntity
+        extends AbstractEntity implements IEntity, Serializable {
 
     @Basic
-    private Date dateBegin;
+    protected Date dateBegin;
 
     @Basic
-    private Date dateEnd;
+    protected Date dateEnd;
 
     public Date getDateBegin() {
         return this.dateBegin;

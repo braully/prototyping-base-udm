@@ -234,14 +234,26 @@ public class Money implements Serializable, Comparable<MonetaryAmount>, Monetary
         return this.porcentagem(((double) l / FATOR_UNIDADE));
     }
 
+    public Money porcentagemFator(String val) {
+        return this.porcentagem(val);
+    }
+
+    public Money porcentagem(String val) {
+        if (val != null && val.contains(",")) {
+            val = val.replaceAll(",", ".");
+        }
+        return this.porcentagem(Double.parseDouble(val));
+    }
+
     public Money porcentagem(long l) {
         return this.porcentagem((double) l);
     }
 
     public Money porcentagem(double descontoPontualidade) {
         Money res = this;
-        res = new Money(Math.round((double) this.valor
-                * (double) ((double) descontoPontualidade / (double) 100)));
+        double fatorDesconto = ((double) descontoPontualidade / (double) 100);
+        long newVal = Math.round((double) this.valor * fatorDesconto);
+        res = new Money(newVal);
         return res;
     }
 

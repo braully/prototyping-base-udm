@@ -193,7 +193,7 @@ public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile
     }
 
 //    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected void importarDadosCobranca(Object[] arr) {
+    protected void importarDadosCobranca(Collection arr) {
         importarAccountTransaction(arr);
     }
 
@@ -314,7 +314,7 @@ public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile
     }
 
     @Override
-    public void importar(Object[] arr) {
+    public void importar(Collection arr) {
         this.importarAccountTransaction(arr);
     }
 }

@@ -3,6 +3,7 @@ package com.github.braully.business;
 import com.github.braully.persistence.GenericDAO;
 import com.github.braully.persistence.ICrudEntity;
 import com.github.braully.persistence.IEntity;
+import com.github.braully.persistence.ILightRemoveEntity;
 import com.github.braully.persistence.PagedQueryResult;
 import java.io.Serializable;
 import java.util.Collection;

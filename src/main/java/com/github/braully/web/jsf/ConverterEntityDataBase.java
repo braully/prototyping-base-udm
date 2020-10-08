@@ -12,6 +12,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.LazyInitializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -44,7 +46,8 @@ public class ConverterEntityDataBase implements Converter, Serializable {
                 if (exposedEntity != null) {
                     o = genericoDAO.loadEntityFetch(exposedEntity.getClassExposed(), id);
                 } else if (null != (exposedEntityField = exposed.getExposedEntityField(nomeClasse))) {
-                    o = genericoDAO.loadEntityFetch(exposedEntityField.getType(), id);
+                    Class type = exposedEntityField.getType();
+                    o = genericoDAO.loadEntityFetch(type, id);
                 } else {
                     //TODO: Trhows exception if not exposed entity
                     //Raw type, security warning
@@ -63,7 +66,18 @@ public class ConverterEntityDataBase implements Converter, Serializable {
         if (value == null || value.equals("")) {
             return "";
         } else {
-            return value.getClass().getName() + ":"
+            Class classe = value.getClass();
+            try {
+                if (value instanceof HibernateProxy) {
+                    classe = value.getClass().getSuperclass();
+//                    LazyInitializer lazyInitializer
+//                            = ((HibernateProxy) value).getHibernateLazyInitializer();
+//                    classe = lazyInitializer.getPersistentClass();
+                }
+            } catch (Exception e) {
+
+            }
+            return classe.getName() + ":"
                     + String.valueOf(((IEntity) value).getId());
         }
     }

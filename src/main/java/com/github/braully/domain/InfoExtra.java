@@ -89,7 +89,7 @@ public class InfoExtra extends AbstractGlobalEntity {
         }
         return props;
     }
-
+    
     public <T extends Enum<T>> T getEnumValue(Class<T> aClass, String attrb) {
         T ret = null;
         Long l = this.getLong(attrb);

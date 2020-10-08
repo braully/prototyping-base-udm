@@ -21,6 +21,6 @@ package com.github.braully.constant;
  * @author braullyrocha
  */
 public enum TipoPeriodoLancamento {
-//TODO: Translate and unify 
+//TODO: Translate and unify and Merge in TypePeriod 
     DIA, MES, ANO
 }

@@ -23,6 +23,7 @@ import javax.faces.convert.ByteConverter;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.DateTimeConverter;
+import javax.faces.convert.DoubleConverter;
 import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;
 import javax.faces.convert.LongConverter;
@@ -60,7 +61,7 @@ public class ConverterGenericJsf implements Converter {
 
     //TODO: From configuration or system
     public static final String DEFAULT_DATE_PATTERN = "dd/MM/yyyy";
-    public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
+    public static final String DEFAULT_TIME_PATTERN = "HH:mm";
 
     private static final boolean cacheConverter = true;
     private static final Map<String, Field> CACHE_TYPE = new HashMap<>();
@@ -73,6 +74,7 @@ public class ConverterGenericJsf implements Converter {
     DateTimeConverter dateTimeConverter = new DateTimeConverter();
     ByteConverter byteConverter = new ByteConverter();
     NumberConverter percentageConverter = new NumberConverter();
+    DoubleConverter doubleConverter = new DoubleConverter();
     EnumConverter enumConverter = new EnumConverter();
 
     {
@@ -83,9 +85,9 @@ public class ConverterGenericJsf implements Converter {
     ConverterValorFator converterValorFator = new ConverterValorFator();
     ConverterValorFator converterMonetaryBig = new ConverterValorFator(ConverterValorFator.Type.BIG);
 
-    Map<String, Converter> converters = Map.of("numberConverter", numberConverter, "dateTimeConverter",
-            dateTimeConverter, "converterMonetary", converterMonetary, "converterValorFator", converterValorFator,
-            "converterMonetaryBigDecimal", converterMonetaryBig);
+    Map<String, Converter> converters = Map.of("numberConverter", numberConverter, "doubleConverter", doubleConverter,
+            "dateTimeConverter", dateTimeConverter, "converterMonetary", converterMonetary,
+            "converterValorFator", converterValorFator, "converterMonetaryBigDecimal", converterMonetaryBig);
 
     @Override
     public synchronized Object getAsObject(FacesContext fc, UIComponent uic, String string) {

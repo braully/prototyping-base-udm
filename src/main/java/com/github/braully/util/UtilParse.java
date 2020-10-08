@@ -1,5 +1,6 @@
 package com.github.braully.util;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,4 +18,12 @@ public class UtilParse {
         return Arrays.asList(excludes);
     }
 
+    public static BigDecimal parseBigDecimal(String strValor, int scale) {
+        if (strValor == null) {
+            return null;
+        }
+        String strValorTrimed = UtilString.removeLeftZeros(UtilString.numbers(strValor));
+        long parseLong = Long.parseLong(strValorTrimed);
+        return BigDecimal.valueOf(parseLong, scale);
+    }
 }

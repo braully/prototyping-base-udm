@@ -23,12 +23,59 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
  * @author braully
  */
 public class UtilCollection {
+
+    /**
+     * Add itens to set, if set is null create one.
+     *
+     * @param <T>
+     * @param set
+     * @param itens
+     * @return
+     */
+    public static <T> Set<T> add(Set<T> set, T... itens) {
+        if (set == null) {
+            set = new TreeSet<>();
+        }
+        if (itens != null) {
+            for (T item : itens) {
+                set.add(item);
+            }
+        }
+        return set;
+    }
+
+    public static <K, V> Map<K, V> add(Map<K, V> map, Object... args) {
+        if (map == null) {
+            map = mapOf(args);
+        }
+        if (args != null) {
+            putArgs(args, map);
+        }
+        return map;
+    }
+
+    protected static <V, K> void putArgs(Object[] args, Map<K, V> map) {
+        try {
+            if (args != null) {
+                K key = null;
+                V val = null;
+                for (int i = 0; i < args.length; i = i + 2) {
+                    key = (K) args[i];
+                    val = (V) args[i + 1];
+                    map.put(key, val);
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
 
     public static <K, V> Map<K, V> mapOf(Object... args) {
         Map<K, V> map = new HashMap<>();
@@ -87,5 +134,20 @@ public class UtilCollection {
             list.add(i);
         }
         return list;
+    }
+
+    public static String printCollection(Collection list) {
+        StringBuilder sb = new StringBuilder();
+        if (list != null) {
+            sb.append("| ");
+            for (Object o : list) {
+                try {
+                    sb.append(o).append(" | ");
+                } catch (Exception e) {
+
+                }
+            }
+        }
+        return sb.toString();
     }
 }

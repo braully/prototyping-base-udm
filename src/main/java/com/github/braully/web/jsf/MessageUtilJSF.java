@@ -2,15 +2,24 @@ package com.github.braully.web.jsf;
 
 import com.github.braully.interfaces.ErrorMessage;
 import com.github.braully.interfaces.InfoMessage;
+import com.github.braully.util.UtilValidation;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 public class MessageUtilJSF {
 
+    public static String tratarExecao(Exception e) {
+        String message = "";
+        if (e != null) {
+            message = e.getMessage();
+        }
+        return message;
+    }
+
     public void add(InfoMessage infoMsg) {
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, infoMsg.getText(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, infoMsg.getText(), ""));
         }
     }
 
@@ -27,7 +36,27 @@ public class MessageUtilJSF {
         if (facesContext != null) {
             facesContext.addMessage(
                     null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, mensagem.toString(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, mensagem.toString(), ""));
+        }
+    }
+
+    public static void addMensagem(String title, String detail, String type) {
+        if (UtilValidation.isStringEmpty(title)) {
+            return;
+        }
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+
+        if (facesContext != null) {
+            FacesMessage.Severity stype = FacesMessage.SEVERITY_INFO;
+            if (type != null) {
+                if ("error".equalsIgnoreCase(type)) {
+                    stype = FacesMessage.SEVERITY_ERROR;
+                } else if ("warn".equalsIgnoreCase(type)) {
+                    stype = FacesMessage.SEVERITY_WARN;
+                }
+            }
+            facesContext.addMessage(null,
+                    new FacesMessage(stype, title, detail));
         }
     }
 
@@ -44,9 +73,12 @@ public class MessageUtilJSF {
     }
 
     public static void addErroMensagem(String string, Exception e) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         String detalhe = null;
         if (e != null) {
-            detalhe = e.getMessage();
+            detalhe = tratarExecao(e);
         }
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (facesContext != null) {
@@ -56,14 +88,20 @@ public class MessageUtilJSF {
     }
 
     public static void addErroMensagem(String string) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (facesContext != null) {
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, string, null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, string, ""));
         }
     }
 
     public void addErro(String string, String detalhe) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
             facesContext.addMessage(null,
@@ -72,6 +110,9 @@ public class MessageUtilJSF {
     }
 
     public void addErro(String string) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
             facesContext.addMessage(null,
@@ -88,6 +129,9 @@ public class MessageUtilJSF {
     }
 
     public static void addMensagem(String string) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (facesContext != null) {
             facesContext.addMessage(null,
@@ -96,6 +140,9 @@ public class MessageUtilJSF {
     }
 
     public static void addAlertaMensagem(String string) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (facesContext != null) {
             facesContext.addMessage(null,
@@ -104,6 +151,9 @@ public class MessageUtilJSF {
     }
 
     public void addAlerta(String string) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
             facesContext.addMessage(null,
@@ -112,6 +162,9 @@ public class MessageUtilJSF {
     }
 
     public void addAlerta(String string, String detalhes) {
+        if (UtilValidation.isStringEmpty(string)) {
+            return;
+        }
         FacesContext facesContext = getFacesContext();
         if (facesContext != null) {
             facesContext.addMessage(null,

@@ -1,17 +1,32 @@
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
+import com.github.braully.interfaces.IGlobalEntity;
 import com.github.braully.persistence.IEntity;
 import com.github.braully.util.UtilValidation;
 import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Where;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Setter
@@ -19,15 +34,77 @@ import lombok.Setter;
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER,
         name = "type_id", columnDefinition = "smallint default '0'"
 )
-public abstract class AbstractEntity implements IEntity, Serializable {
+@Where(clause = "removed = false")
+@EntityListeners(AuditingEntityListener.class)
+public abstract class AbstractEntity
+        implements IEntity, Serializable,
+        ILightRemoveEntity, IGlobalEntity {
 
     public AbstractEntity() {
 
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //Global generator entity
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "snowflawke-id-generator")
+    @GenericGenerator(name = "snowflawke-id-generator",
+            strategy = "com.github.braully.persistence.HibernateSnowflakeIdGenerator")
     protected Long id;
+
+//    @Attr("hidden")
+//    @Basic
+//    @Column(unique = true, insertable = false, updatable = false,
+//            //Postgres
+//            columnDefinition = "bigint NOT NULL DEFAULT nextval('base.sequence_abstract_entity_id')"
+//    )
+//    protected Long shortId;
+    @Attr("hidden")
+    @Basic
+    @Column(columnDefinition = "boolean DEFAULT false")
+    protected Boolean removed = false;
+
+    //https://stackoverflow.com/questions/5257709/how-to-autogenerate-created-or-modified-timestamp-field
+    @Attr("hidden")
+    //@Basic
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
+    @LastModifiedDate
+    protected Date lastModifiedDate;
+
+    //https://blog.countableset.com/2014/03/08/auditing-spring-data-jpa-java-config/
+    @Attr("hidden")
+    @CreatedBy
+    @LastModifiedBy
+    /*
+    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    protected UserLogin lastModifiedUser;
+     */
+    //@Basic//For performance
+    //https://github.com/spring-projects/spring-data-examples/blob/master/jpa/example/src/main/java/example/springdata/jpa/auditing/AuditableUser.java
+    @Column(name = "fk_last_modified_user")
+    protected Long lastModifiedUser;
+
+    /*@PrePersist
+    @PreUpdate
+    protected void refreshLastModifiedDate() {
+        this.lastModifiedDate = new Date();
+    }*/
+    public void toggleRemoved() {
+        if (this.removed == null) {
+            this.removed = false;
+        }
+        this.removed = !this.removed;
+    }
+
+    public Boolean getActive() {
+        return getRemoved() == null || !getRemoved();
+    }
+
+    public void setActive(Boolean set) {
+        setRemoved(!set);
+    }
 
     @Override
     public Long getId() {

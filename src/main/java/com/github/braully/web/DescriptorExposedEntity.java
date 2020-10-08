@@ -407,12 +407,14 @@ public class DescriptorExposedEntity {
                 lproperty = propoffset + "." + field.getName();
             }
             String lpattern = null;
-            if (field.getAnnotation(OneToOne.class) != null
+            String extraType = UtilReflection.getExtraAttribute(field, "type");
+            if (UtilValidation.isStringValid(extraType)) {
+                ltype = extraType.toLowerCase();
+            } else if (field.getAnnotation(OneToOne.class) != null
                     || field.getAnnotation(ManyToOne.class) != null) {
                 lpattern = ltype;
                 ltype = "entity";
-            }
-            if (field.getType().isAssignableFrom(Collection.class)
+            } else if (field.getType().isAssignableFrom(Collection.class)
                     && (field.getAnnotation(ManyToMany.class) != null
                     || field.getAnnotation(OneToMany.class) != null)) {
                 lpattern = ltype;

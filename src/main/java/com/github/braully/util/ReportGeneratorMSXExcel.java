@@ -150,7 +150,8 @@ public class ReportGeneratorMSXExcel implements IReportGenerator {
                 boolean parada = false;
                 for (int i = linhaPropriedades + 1; !parada && i < maxLinhaConsiderar; i++) {
                     linhaAtual = planilhaAtual.getRow(i);
-                    Object[] linha = new Object[propriedades.size()];
+                    //Object[] linha = new Object[propriedades.size()];
+                    List linha = new ArrayList(propriedades.size());
                     int j = 0;
                     if (linhaAtual != null) {
                         try {
@@ -161,7 +162,8 @@ public class ReportGeneratorMSXExcel implements IReportGenerator {
                                     cell = linhaAtual.getCell(col);
                                     valorCell = getValorCelular(cell);
                                 }
-                                linha[j++] = valorCell;
+                                //linha[j++] = valorCell;
+                                linha.add(valorCell);
                             }
                             linhas.add(linha);
                         } catch (Exception e) {

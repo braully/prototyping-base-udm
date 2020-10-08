@@ -1,10 +1,12 @@
 package com.github.braully.app;
 
+import com.github.braully.domain.UserLogin;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +20,13 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
@@ -30,6 +36,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     "com.github.braully.domain.util", "com.github.braully.tmp",
     "com.github.braully.veritas"})
 @EnableJpaRepositories("com.github.braully")
+@EnableJpaAuditing
 @EnableScheduling
 @EnableAsync
 //@EnableOAuth2Sso

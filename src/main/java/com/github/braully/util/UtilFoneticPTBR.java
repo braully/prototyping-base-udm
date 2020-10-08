@@ -135,6 +135,7 @@ public class UtilFoneticPTBR {
 
         return valor;
     }
+
     /*
     
      LETRAS 	-> REPRESENTAÇÃO FONÉTICA (COMENTARIOS)

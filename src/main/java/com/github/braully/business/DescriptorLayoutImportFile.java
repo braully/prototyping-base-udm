@@ -1,7 +1,9 @@
 package com.github.braully.business;
 
+import com.github.braully.util.CollectionMapDelegate;
 import com.github.braully.util.UtilConversor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,11 +89,10 @@ public abstract class DescriptorLayoutImportFile {
         return this.mapPropriedades;
     }
 
-    protected String getString(Enum camposImportacao, Object[] arr) {
+    protected String getString(Enum camposImportacao, Collection arr) {
         String ret = null;
-        if (camposImportacao != null && arr.length > camposImportacao.ordinal()) {
-            int ordinal = camposImportacao.ordinal();
-            Object o = arr[ordinal];
+        if (camposImportacao != null && arr.size() >= camposImportacao.ordinal()) {
+            Object o = getObject(arr, camposImportacao);
             if (o != null) {
                 ret = UtilConversor.getStringValue(o);
             }
@@ -102,22 +103,45 @@ public abstract class DescriptorLayoutImportFile {
         return ret;
     }
 
-    protected Long getLong(Enum camposImport, Object[] arr) {
+    protected Object getObject(Collection arr, Enum camposImportacao) {
+        Object o = null;
+        if (arr instanceof List) {
+            int ordinal = camposImportacao.ordinal();
+            o = ((List) arr).get(ordinal);
+        } else if (arr instanceof Map) {
+            o = ((Map) arr).get(camposImportacao);
+        } else if (arr instanceof CollectionMapDelegate) {
+            o = ((CollectionMapDelegate) arr).get(camposImportacao);
+        }
+        return o;
+    }
+
+    protected Long getLong(Enum camposImport, Collection arr) {
         Long ret = null;
-        if (camposImport != null && camposImport.ordinal() < arr.length) {
-            int ordinal = camposImport.ordinal();
-            Object o = arr[ordinal];
+        if (camposImport != null && camposImport.ordinal() < arr.size()) {
+            Object o = getObject(arr, camposImport);
             ret = UtilConversor.getLongValue(o);
         }
         return ret;
     }
 
-    protected boolean isExisteElementoNaoNulo(Object[] arr) {
+    protected Double getDouble(Enum camposImport, Collection arr) {
+        Double ret = null;
+        if (camposImport != null && camposImport.ordinal() < arr.size()) {
+            Object o = getObject(arr, camposImport);
+            ret = UtilConversor.getDoubleValue(o);
+        }
+        return ret;
+    }
+
+    protected boolean isExisteElementoNaoNulo(Collection arr) {
         boolean ret = false;
-        if (arr != null && arr.length > 0) {
-            int i = 0;
-            while (!ret && i < arr.length) {
-                ret = arr[i++] != null;
+        if (arr != null && arr.size() > 0) {
+            for (Object o : arr) {
+                ret = ret || o != null;
+                if (ret) {
+                    break;
+                }
             }
         }
         return ret;
@@ -135,11 +159,16 @@ public abstract class DescriptorLayoutImportFile {
 
     public abstract IDescrpitorFieldLayout[] getDescritorCampos();
 
-    public abstract void importar(Object[] arr);
+    public abstract void importar(Collection arr);
 
-    void importarSeTemElemento(Object[] arr) {
+    void importarSeTemElemento(Collection arr) {
         if (isExisteElementoNaoNulo(arr)) {
+            log.info("Import Line:");
+            log.info(arr);
             importar(arr);
+        } else {
+            log.debug("Invalid Line:");
+            log.debug(arr);
         }
     }
 

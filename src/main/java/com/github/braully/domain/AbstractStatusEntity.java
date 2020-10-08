@@ -1,5 +1,6 @@
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
 import com.github.braully.persistence.IEntity;
 import com.github.braully.persistence.IEntityStatus;
 import com.github.braully.persistence.Status;
@@ -17,6 +18,7 @@ import lombok.Setter;
 @MappedSuperclass
 public abstract class AbstractStatusEntity extends AbstractEntity implements IEntity, IEntityStatus, Serializable {
 
+    @Attr("hidden")
     @Column(name = "status",
             columnDefinition = "integer default '0'")
     @Enumerated(EnumType.ORDINAL)
@@ -27,11 +29,18 @@ public abstract class AbstractStatusEntity extends AbstractEntity implements IEn
     private Boolean removed;
 
     public Boolean getRemoved() {
+        if (this.removed == null) {
+            this.removed = this.status == Status.BLOCKED;
+        }
         return this.removed;
     }
 
-    public void setRemoved(Boolean removed) {
-        this.removed = removed;
+    public Boolean getActive() {
+        return status == null || status == Status.ACTIVE;
+    }
+
+    public void setActive(Boolean active) {
+        IEntityStatus.super.setActive(active);
     }
 
     @Override

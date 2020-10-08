@@ -125,4 +125,81 @@ public class UtilString {
         }
         return number.replaceFirst("^0+(?!$)", "");
     }
+
+    public static String concatPlusRightTrunk(String deflt, String ret) {
+        String result = deflt;
+        if (deflt == null) {
+            return null;
+        }
+        if (ret == null) {
+            ret = "";
+        }
+        result = ret + deflt;
+        result = result.substring(0, deflt.length());
+        return result;
+    }
+
+    public static String concatPlusLeftTrunk(String deflt, String ret) {
+        String result = deflt;
+        if (deflt == null) {
+            return null;
+        }
+        if (ret == null) {
+            ret = "";
+        }
+        result = deflt + ret;
+        result = result.substring(result.length() - deflt.length());
+        return result;
+    }
+
+    public static String firstNonNull(String... strs) {
+        if (strs != null) {
+            for (String str : strs) {
+                if (str != null) {
+                    return str;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static String firstNonEmpty(String... strs) {
+        if (strs != null) {
+            for (String str : strs) {
+                if (UtilValidation.isStringValid(str)) {
+                    return str;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static String emptyIfNull(String fiscalCode) {
+        if (fiscalCode == null) {
+            return "";
+        }
+        return fiscalCode;
+    }
+
+    public static String emptyIfNull(Object o) {
+        if (o == null) {
+            return "";
+        }
+        return o.toString();
+    }
+
+    public static String[] splitInNewLine(String str) {
+        if (UtilValidation.isStringEmpty(str)) {
+            return new String[0];
+        }
+        String[] ret = null;
+        //Try first windows new line style
+        String delim = "\r\n";
+        if (str.contains(delim)) {
+            ret = str.split(delim);
+        } else {
+            ret = str.split("\n");
+        }
+        return ret;
+    }
 }

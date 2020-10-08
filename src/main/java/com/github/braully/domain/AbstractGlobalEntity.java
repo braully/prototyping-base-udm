@@ -1,7 +1,10 @@
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
 import com.github.braully.persistence.IEntity;
 import java.io.Serializable;
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
@@ -35,6 +38,11 @@ public abstract class AbstractGlobalEntity
     public void setId(Long id) {
         this.id = id;
     }
+
+    @Column(unique = true)
+    @Basic
+    @Attr("hidden")
+    protected String uniqueCode;
 
     @Override
     public boolean isPersisted() {

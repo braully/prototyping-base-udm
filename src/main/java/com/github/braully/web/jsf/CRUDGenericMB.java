@@ -32,6 +32,7 @@ import javax.servlet.http.HttpSession;
  */
 public abstract class CRUDGenericMB<T extends IEntity> extends CRUDGenericController<T> {
 
+    @Override
     public void addErro(String msg, Exception e) {
         MessageUtilJSF.addErroMensagem(msg, e);
     }

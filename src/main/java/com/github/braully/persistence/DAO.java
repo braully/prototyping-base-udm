@@ -1,6 +1,5 @@
 package com.github.braully.persistence;
 
-import com.github.braully.domain.ILightRemoveEntity;
 import com.github.braully.interfaces.ISystemEntity;
 import com.github.braully.util.UtilComparator;
 import com.github.braully.util.UtilReflection;
@@ -747,6 +746,7 @@ public abstract class DAO implements ICrudEntity, Serializable {
 
     @Override
     public <T> T loadEntity(T entidade) {
+        T ret = entidade;
         try {
             //this.getEntityManager().find(entidade.getClass(), PropertyUtils.getProperty(entidade, "id"));
             Class<? extends Object> entityClass = entidade.getClass();

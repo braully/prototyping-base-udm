@@ -28,7 +28,8 @@ import org.springframework.stereotype.Component;
 @Qualifier("genericMB")
 @Component("genericMB")
 @Scope("view")
-public class GenericMB extends CRUDGenericController {
+//public class GenericMB extends CRUDGenericController {
+public class GenericMB extends CRUDGenericMB {
 
     public static final String NOME_PROPRIEDADE_INDICE_TAB = "tabIndex";
 
@@ -40,19 +41,18 @@ public class GenericMB extends CRUDGenericController {
     protected int index;
 
     @PostConstruct
+    @Override
     public void init() {
         super.init();
+        /*
         try {
             String value = (String) this.getAtributeFromRequest(NOME_PROPRIEDADE_INDICE_TAB);
             if (value != null && !value.trim().isEmpty()) {
                 Integer i = getInt(value);
-                if (i != null && i > 0) {
-                    index = i;
-                }
+                if (i != null && i > 0) {index = i;}
             }
-        } catch (Exception e) {
-
-        }
+        } catch (Exception e) {} 
+         */
     }
 
     public void paginacaoTabelaLazy(PageEvent event) {
@@ -80,19 +80,23 @@ public class GenericMB extends CRUDGenericController {
         return menusUser;
     }
 
+    @Override
     public Authentication getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication;
     }
 
+    @Override
     protected ICrudEntity getGenericoBC() {
         return genericDAO;
     }
 
+    @Override
     public int getIndex() {
         return index;
     }
 
+    @Override
     public void setIndex(int index) {
         this.index = index;
     }
@@ -103,8 +107,18 @@ public class GenericMB extends CRUDGenericController {
     }
 
     @Override
+    protected void addMensagem(String title, String detail, String type) {
+        MessageUtilJSF.addMensagem(title, detail, type);
+    }
+
+    @Override
     public void addAlerta(String msg) {
         MessageUtilJSF.addAlertaMensagem(msg);
+    }
+
+    @Override
+    public void addErro(String msg, Exception e) {
+        MessageUtilJSF.addErroMensagem(msg, e);
     }
 
     @Override

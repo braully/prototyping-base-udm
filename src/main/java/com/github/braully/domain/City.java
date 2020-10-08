@@ -33,6 +33,11 @@ public class City extends AbstractGlobalEntity implements Serializable, IFormata
 
     }
 
+    public City(String name, String state) {
+        this.name = name;
+        this.state = state;
+    }
+
     public String getCountry() {
         return this.country;
     }

@@ -17,12 +17,17 @@ limitations under the License.
  */
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
+import java.math.BigDecimal;
+import javax.persistence.Basic;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
@@ -33,6 +38,8 @@ import javax.persistence.Table;
 @DiscriminatorValue("0")
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER, name = "type_id",
         columnDefinition = "smallint default '0'", length = 1)
+@Getter
+@Setter
 public class InventoryItemTransaction extends AbstractEntity {
 
     @ManyToOne
@@ -40,20 +47,15 @@ public class InventoryItemTransaction extends AbstractEntity {
     @ManyToOne
     protected InventoryItem inventoryItem;
 
-    public Inventory getInventory() {
-        return inventory;
-    }
+    @Basic
+    protected Long quantity;
 
-    public void setInventory(Inventory inventory) {
-        this.inventory = inventory;
-    }
+    @Attr("hidden")
+    @Basic
+    protected Long scaleQuantity;
 
-    public InventoryItem getInventoryItem() {
-        return inventoryItem;
-    }
-
-    public void setInventoryItem(InventoryItem inventoryItem) {
-        this.inventoryItem = inventoryItem;
-    }
+    @Basic
+    @Attr({"converter", "converterMonetaryBigDecimal"})
+    protected BigDecimal actualBalance;
 
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -83,6 +84,13 @@ public class Menu extends AbstractLightRemoveEntity implements Serializable {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public List<Menu> getChildsActive() {
+        return (List<Menu>) this.cache().getMap()
+                .computeIfAbsent("childsActive",
+                        k -> this.childs.stream()
+                                .filter(v -> v.getActive()).collect(Collectors.toList()));
     }
 
     public List<Menu> getChilds() {

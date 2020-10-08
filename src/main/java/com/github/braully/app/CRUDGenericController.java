@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static com.github.braully.app.GenericController.log;
 import com.github.braully.constant.Attr;
-import com.github.braully.domain.ILightRemoveEntity;
+import com.github.braully.persistence.ILightRemoveEntity;
 import com.github.braully.domain.Organization;
 import com.github.braully.domain.OrganizationRole;
 import com.github.braully.domain.Role;
@@ -575,6 +575,11 @@ public abstract class CRUDGenericController<T extends IEntity> {
             protected HttpServletRequest getCurrentRequest() {
                 return CRUDGenericController.this.getCurrentRequest();
             }
+
+            @Override
+            protected void addMensagem(String title, String detail, String type) {
+                CRUDGenericController.this.addMensagem(title, detail, type);
+            }
         };
         CACHE_CRUDS.put(alias, tmp);
         return tmp;
@@ -971,6 +976,22 @@ public abstract class CRUDGenericController<T extends IEntity> {
             ret = Long.parseLong(parse);
         }
         return ret;
+    }
+
+    protected List<Long> getIdsFromRequest() {
+        List<Long> ids = null;
+        try {
+            List<String> parseList = UtilParse.parseList("" + this.getAtributeFromRequest(IDS), ",");
+            ids = new ArrayList<>();
+            for (String id : parseList) {
+                if (UtilValidation.isStringValid(id)) {
+                    ids.add(parseLong(id.strip()));
+                }
+            }
+        } catch (Exception e) {
+            log.error("fail on parse", e);
+        }
+        return ids;
     }
 
     protected Object getIdFromRequest() {

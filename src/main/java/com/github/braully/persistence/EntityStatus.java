@@ -16,8 +16,6 @@ limitations under the License.
  */
 package com.github.braully.persistence;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;

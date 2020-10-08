@@ -156,12 +156,6 @@ public class UtilReflection {
 
         if (fieldType != null && fieldType.isAnnotationPresent(Attrs.class)
                 || fieldType.isAnnotationPresent(Attr.class)) {
-            Annotation[] annotations = fieldType.getAnnotations();
-            if (annotations != null) {
-                for (Annotation a : annotations) {
-                    System.out.println(a);
-                }
-            }
             Attr[] value = null;
             Attrs attrs = fieldType.getAnnotation(Attrs.class);
             if (attrs == null) {

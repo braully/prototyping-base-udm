@@ -8,7 +8,7 @@ import java.util.Date;
  * @author braully
  */
 public enum TypePeriodInterest {
-//TODO: Translate and unify 
+//TODO: Translate and unify and Merge in TypePeriod
     DIARIO("Dia", "por Dia"), MENSAL("Mês", "por Mês"), ANUAL("Ano", "por Ano");
 
     private final String name;

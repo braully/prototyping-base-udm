@@ -105,7 +105,7 @@ public class DescriptorFilePartner extends DescriptorLayoutImportFile {
         return DescritorCamposPessoa.values();
     }
 
-    @Override
+    //@Override
     public void importar(Collection arr) {
         this.importPartner(arr);
     }

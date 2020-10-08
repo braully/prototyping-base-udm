@@ -17,7 +17,7 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(schema = "base")
-public class Organization extends AbstractGlobalEntity 
+public class Organization extends AbstractGlobalEntity
         implements VisualIdentity, INameComparable {
 
     /*
@@ -127,5 +127,13 @@ public class Organization extends AbstractGlobalEntity
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public String getFiscalCodeClean() {
+        String ret = fiscalCode;
+        if (ret != null) {
+            ret = ret.replaceAll("\\D", "");
+        }
+        return ret;
     }
 }

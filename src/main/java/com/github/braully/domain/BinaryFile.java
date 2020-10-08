@@ -3,6 +3,7 @@
 //
 package com.github.braully.domain;
 
+import com.github.braully.constant.Attr;
 import com.github.braully.constant.StatusExecutionCycle;
 import com.github.braully.util.UtilIO;
 import com.github.braully.util.UtilValidation;
@@ -52,6 +53,10 @@ public class BinaryFile extends AbstractStatusEntity implements Serializable {
 
     @Basic
     protected String subtype;
+
+    @Attr("hidden")
+    @ManyToOne(targetEntity = InfoExtra.class)
+    protected InfoExtra infoExtra;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Basic

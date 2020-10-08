@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
 
 @MappedSuperclass
 public abstract class AbstractAuditableEntity extends AbstractEntity implements Serializable, IAuditableEntity {
@@ -16,6 +17,7 @@ public abstract class AbstractAuditableEntity extends AbstractEntity implements 
     private Long userIdModified;
 
     @Basic
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date lastModified;
 
     public AbstractAuditableEntity() {

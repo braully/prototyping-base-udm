@@ -1,9 +1,8 @@
 package com.github.braully.util;
 
 import com.github.braully.persistence.IEntity;
-import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Date;
+import java.util.Map;
 
 /**
  *
@@ -11,12 +10,23 @@ import java.util.Date;
  */
 public class UtilValidation {
 
-    public static synchronized boolean isContemDados(Collection collection) {
+    public static synchronized boolean hasData(Collection collection) {
+        return collection != null && !collection.isEmpty();
+    }
+
+    public static synchronized boolean hasData(Map collection) {
         return collection != null && !collection.isEmpty();
     }
 
     public static boolean isStringEmpty(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    public static synchronized boolean isValid(Object value) {
+        if (value instanceof String) {
+            return isStringValid((String) value);
+        }
+        return value != null;
     }
 
     public static boolean isStringValid(String... strs) {

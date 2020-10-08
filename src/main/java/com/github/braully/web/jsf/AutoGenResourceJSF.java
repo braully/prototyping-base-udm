@@ -51,6 +51,7 @@ public class AutoGenResourceJSF extends ResourceWrapper {
     /* */
     public static String DIRECTORY_DYNAMIC_TEMPLATE_JSF = "web/jsf/template/"; //"jsf/template/";
     public static String FILE_DYNAMIC_TEMPLATE_ENTITY_CRUD = DIRECTORY_DYNAMIC_TEMPLATE_JSF + "template-base-app-entity-crud.xhtml";
+    public static String FILE_DYNAMIC_TEMPLATE_ENTITY = DIRECTORY_DYNAMIC_TEMPLATE_JSF + "template-base-app-entity";
 
     public static final String DEFAULT_PROP_TEMPLATE_HTML_ATTRIBUTE_APPEND_JSF = "xmlns=\"http://www.w3.org/1999/xhtml\"\n"
             + "      xmlns:h=\"http://xmlns.jcp.org/jsf/html\"\n"

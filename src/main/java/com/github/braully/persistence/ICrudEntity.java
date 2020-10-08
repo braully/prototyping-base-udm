@@ -1,6 +1,5 @@
 package com.github.braully.persistence;
 
-import com.github.braully.domain.ILightRemoveEntity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

@@ -30,7 +30,8 @@ public class JsfResourceHandler extends ResourceHandlerWrapper {
         }
 
         //Offset Folder resource view
-        if (resource == null && !resourceName.startsWith(DEFAULT_JSF_DIRECTORY_PREFIX) && !resourceName.startsWith(DEFAULT_JSF_DIRECTORY_PREFIX)
+        if (resource == null && !resourceName.startsWith(DEFAULT_JSF_DIRECTORY_PREFIX)
+                && !resourceName.startsWith(DEFAULT_JSF_DIRECTORY_PREFIX)
                 && resourceName.endsWith("html")) {
             resource = super.createViewResource(context, DEFAULT_JSF_DIRECTORY_PREFIX + resourceName);
         }
