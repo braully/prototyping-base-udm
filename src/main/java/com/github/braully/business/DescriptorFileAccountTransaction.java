@@ -198,8 +198,8 @@ public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    //protected EntradaCaixaPrevisto importarEntradaCaixaPrevisto(Object[] arr) {
-    protected AccountTransaction importarAccountTransaction(Object[] arr) {
+    //protected EntradaCaixaPrevisto importarEntradaCaixaPrevisto(Collection arr) {
+    protected AccountTransaction importarAccountTransaction(Collection arr) {
         AccountTransaction ecp = null;
         if (arr != null && isExisteElementoNaoNulo(arr)) {
             //preImportarEntradaCaixaPrevisto(arr);
@@ -217,20 +217,50 @@ public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile
             UtilReflection.setPropertyIfNull(ecp, "datePrevist",
                     UtilDate.parseData(getString(CamposImportacaoCobranca.DATA_VENCIMENTO, arr))
             );
-            Long valLong = getLong(CamposImportacaoCobranca.VALOR, arr);
+            Long valLong = null;
+            try {
+                valLong = getLong(CamposImportacaoCobranca.VALOR, arr);
+                if (valLong != null) {
+                    valLong = valLong * 100;
+                }
+            } catch (NumberFormatException e) {
+                try {
+                    Double aDouble = getDouble(CamposImportacaoCobranca.VALOR, arr);
+                    if (aDouble != null) {
+                        valLong = (long) (aDouble * 100.0d);
+                    }
+                } catch (Exception ex) {
+                    log.debug("Can't parse value valor_recdebido: " + getString(CamposImportacaoCobranca.VALOR_RECEBIDO, arr));
+                }
+            }
             if (valLong != null) {
-                UtilReflection.setPropertyIfNull(ecp, "creditTotal", BigDecimal.valueOf(valLong));
+                UtilReflection.setPropertyIfNull(ecp, "creditTotal", BigDecimal.valueOf(valLong, 2));
             }
 
             UtilReflection.setPropertyIfNull(ecp, "dateExecuted",
                     UtilDate.parseData(getString(CamposImportacaoCobranca.DATA_RECEBIMENTO, arr))
             );
 
-            Long valRecebido = getLong(CamposImportacaoCobranca.VALOR_RECEBIDO, arr);
+            Long valRecebido = null;
+            try {
+                Long valrec = getLong(CamposImportacaoCobranca.VALOR_RECEBIDO, arr);
+                if (valrec != null) {
+                    valRecebido = valrec * 100;
+                }
+            } catch (NumberFormatException e) {
+                try {
+                    Double valrec = getDouble(CamposImportacaoCobranca.VALOR_RECEBIDO, arr);
+                    if (valrec != null) {
+                        valRecebido = (long) (valrec * 100d);
+                    }
+                } catch (Exception ex) {
+                    log.debug("Can't parse value valor_recdebido: " + getString(CamposImportacaoCobranca.VALOR_RECEBIDO, arr));
+                }
+            }
 
             if (valRecebido != null) {
-                UtilReflection.setPropertyIfNull(ecp, "valueExecuted",
-                        BigDecimal.valueOf(valRecebido));
+                BigDecimal valueOf = BigDecimal.valueOf(valRecebido, 2);
+                UtilReflection.setPropertyIfNull(ecp, "valueExecuted", valueOf);
             }
 
             if (ecp.getAccount() == null) {
@@ -290,7 +320,7 @@ public class DescriptorFileAccountTransaction extends DescriptorLayoutImportFile
         } catch (NoResultException e) {
         } catch (EmptyResultDataAccessException e) {
         } catch (Exception e) {
-            logutil.info("Fail on search", e);
+            log.info("Fail on search accountTransaction: " + codCobranca, e);
         }
         return ecp;
     }
