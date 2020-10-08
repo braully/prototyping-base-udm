@@ -7,6 +7,8 @@
 
     <groupId>com.github.braully</groupId>
     <artifactId>prototyping-base-udm</artifactId>
+    <packaging>pom</packaging>
+<!--    https://github.com/spring-guides/gs-multi-module/tree/master/complete-->
     <version>1.0.0</version>
     <name>prototyping-base-udm</name>    
 
