@@ -3,7 +3,7 @@
 //
 package com.github.braully.domain;
 
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import com.github.braully.constant.Attr;
 import com.github.braully.interfaces.IOrganiztionEntityDependent;
 import com.github.braully.domain.util.Money;

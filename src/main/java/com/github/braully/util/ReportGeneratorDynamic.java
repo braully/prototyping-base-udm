@@ -16,7 +16,7 @@ import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import ar.com.fdvs.dj.domain.entities.DJGroup;
 import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 import ar.com.fdvs.dj.domain.entities.columns.PropertyColumn;
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import com.github.braully.interfaces.IReportGenerator;
 import java.awt.Color;
 import java.io.InputStream;

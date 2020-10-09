@@ -1,6 +1,6 @@
 package com.github.braully.constant;
 
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 
 public enum MimeTypeFile {
 

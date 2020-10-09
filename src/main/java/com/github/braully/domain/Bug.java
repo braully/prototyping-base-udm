@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  
  */
-package com.github.braully.domain.util;
+package com.github.braully.domain;
 
 import com.github.braully.constant.StatusBug;
 import com.github.braully.domain.AbstractStatusEntity;

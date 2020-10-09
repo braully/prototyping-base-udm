@@ -1,7 +1,7 @@
 package com.github.braully.web.jsf;
 
 import com.github.braully.app.SpringMainConfig;
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import com.github.braully.util.MemoryAppender;
 import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilProperty;

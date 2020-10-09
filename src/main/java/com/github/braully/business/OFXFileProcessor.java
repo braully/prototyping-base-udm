@@ -1,6 +1,6 @@
 package com.github.braully.business;
 
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import com.github.braully.domain.AccountTransaction;
 import com.github.braully.domain.Bank;
 import com.github.braully.domain.BinaryFile;

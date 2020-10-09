@@ -16,7 +16,8 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
 
 /**
- * Based in: https://developer.twitter.com/en/docs/basics/twitter-ids.html
+ * Based in: 
+ * https://developer.twitter.com/en/docs/basics/twitter-ids.html
  * https://github.com/magicae/hibernate-snowball-id-generator/
  * https://github.com/sony/sonyflake
  *

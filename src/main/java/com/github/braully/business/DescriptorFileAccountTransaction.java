@@ -1,6 +1,6 @@
 package com.github.braully.business;
 
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import com.github.braully.constant.GenericEntityType;
 import com.github.braully.domain.Account;
 import com.github.braully.domain.AccountTransaction;

@@ -1,7 +1,7 @@
 package com.github.braully.web.jsf;
 
 import com.github.braully.app.exposed;
-import com.github.braully.domain.util.GenericTO;
+import com.github.braully.util.GenericTO;
 import com.github.braully.persistence.IEntity;
 import com.github.braully.util.UtilReflection;
 import com.github.braully.web.DescriptorExposedEntity;

@@ -1,5 +1,6 @@
 package com.github.braully.app;
 
+import com.github.braully.util.logutil;
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.ClassicConfiguration;

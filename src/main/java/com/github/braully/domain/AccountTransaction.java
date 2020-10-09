@@ -3,7 +3,7 @@
 //
 package com.github.braully.domain;
 
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;

@@ -17,7 +17,7 @@ limitations under the License.
  */
 package com.github.braully.util;
 
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 
 /**

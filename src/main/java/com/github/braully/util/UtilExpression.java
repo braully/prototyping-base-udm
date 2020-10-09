@@ -1,6 +1,6 @@
 package com.github.braully.util;
 
-import com.github.braully.app.logutil;
+import com.github.braully.util.logutil;
 import com.github.braully.domain.util.Money;
 import java.util.Date;
 import java.util.Map;
