@@ -1,4 +1,4 @@
-package com.github.braully.util;
+package com.github.braully.persistence;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.ImplicitJoinColumnNameSource;

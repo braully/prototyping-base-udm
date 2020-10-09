@@ -5,7 +5,7 @@
  */
 package com.github.braully.interfaces;
 
-import com.github.braully.util.GenericDataReport;
+import com.github.braully.report.GenericDataReport;
 import java.io.InputStream;
 
 /**

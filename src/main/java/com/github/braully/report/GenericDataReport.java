@@ -1,4 +1,4 @@
-package com.github.braully.util;
+package com.github.braully.report;
 
 import com.github.braully.domain.BinaryFile;
 import com.github.braully.persistence.IEntity;

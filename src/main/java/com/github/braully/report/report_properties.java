@@ -13,9 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package com.github.braully.domain.util;
+package com.github.braully.report;
 
 import com.github.braully.constant.ReportType;
+import com.github.braully.domain.util.ReportProperty;
 //import com.github.braully.tmp.Matricula;
 import com.github.braully.util.UtilProperty;
 import java.io.IOException;

@@ -10,7 +10,7 @@ import com.github.braully.domain.BinaryFile;
 import com.github.braully.persistence.GenericDAO;
 import com.github.braully.persistence.IEntity;
 import com.github.braully.constant.MimeTypeFile;
-import com.github.braully.util.ReportGeneratorMSXExcel;
+import com.github.braully.report.ReportGeneratorMSXExcel;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

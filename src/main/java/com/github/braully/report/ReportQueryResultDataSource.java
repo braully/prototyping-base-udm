@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  
  */
-package com.github.braully.util;
+package com.github.braully.report;
 
 import java.util.Iterator;
 import java.util.List;

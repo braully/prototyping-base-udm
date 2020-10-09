@@ -1,4 +1,4 @@
-package com.github.braully.util;
+package com.github.braully.report;
 
 import com.github.braully.domain.util.ClassDiscover;
 import com.github.braully.domain.util.ReportTemplate;

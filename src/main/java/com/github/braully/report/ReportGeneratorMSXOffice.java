@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.github.braully.util;
+package com.github.braully.report;
 
 import com.github.braully.interfaces.IReportGenerator;
+import com.github.braully.util.UtilIO;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

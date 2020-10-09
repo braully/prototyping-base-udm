@@ -1,4 +1,4 @@
-package com.github.braully.util;
+package com.github.braully.report;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
@@ -18,6 +18,10 @@ import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 import ar.com.fdvs.dj.domain.entities.columns.PropertyColumn;
 import com.github.braully.util.logutil;
 import com.github.braully.interfaces.IReportGenerator;
+import com.github.braully.util.GenericColumn;
+import com.github.braully.util.GenericValue;
+import com.github.braully.util.UtilPath;
+import com.github.braully.util.logutil;
 import java.awt.Color;
 import java.io.InputStream;
 import java.text.DateFormat;

@@ -52,7 +52,7 @@ public class UtilEncode {
     public static String appendDv(String str) {
         StringBuilder sb = new StringBuilder(str);
         try {
-            sb.append("-").append(UtilCipher.MD5(str).charAt(0));
+            sb.append("-").append(UtilCipher.md5(str).charAt(0));
         } catch (Exception ex) {
             logutil.error("fail on check digit", ex);
         }

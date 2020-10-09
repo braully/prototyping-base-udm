@@ -246,7 +246,7 @@ public class UtilCipher {
         return (buf[(off + 2)] & 0x3F);
     }
 
-    public static String MD5(String string) {
+    public static String md5(String string) {
         String ret = null;
         String text = "";
         try {

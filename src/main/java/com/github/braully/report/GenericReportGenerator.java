@@ -1,6 +1,11 @@
-package com.github.braully.util;
+package com.github.braully.report;
 
+import com.github.braully.report.ReportGeneratorJasper;
+import com.github.braully.report.ReportGeneratorDynamic;
+import com.github.braully.report.ReportGeneratorMSXExcel;
+import com.github.braully.report.ReportGeneratorMSXOffice;
 import com.github.braully.interfaces.IReportGenerator;
+import com.github.braully.util.UtilValidation;
 import java.io.InputStream;
 
 public class GenericReportGenerator {
