@@ -253,11 +253,10 @@ public class UtilCipher {
             if (string != null) {
                 text = string;
             }
-            MessageDigest md;
-            md = MessageDigest.getInstance("MD5");
-            byte[] md5hash;
-//            md.update(text.getBytes("iso-8859-1"), 0, text.length());
-            md5hash = md.digest(text.getBytes("iso-8859-1"));
+            MessageDigest md = MessageDigest.getInstance(DEFAULT_ALGORITHM);
+            byte[] md5hash = new byte[32];
+            md.update(text.getBytes(DEFAULT_HASH_CHARSET), 0, text.length());
+            md5hash = md.digest();
             ret = convertToHex(md5hash);
         } catch (Exception e) {
             log4j.warn("Falha ao cacluar md5 da string: " + string, e);

@@ -1,4 +1,4 @@
-package com.github.braully.util;
+package com.github.braully.report;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
@@ -14,6 +14,8 @@ import ar.com.fdvs.dj.domain.entities.columns.AbstractColumn;
 import com.github.braully.domain.FinancialAccount;
 import com.github.braully.domain.util.CashFlow;
 import com.github.braully.domain.util.FinancialPeriod;
+import com.github.braully.util.UtilDate;
+import com.github.braully.util.UtilPath;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.List;
