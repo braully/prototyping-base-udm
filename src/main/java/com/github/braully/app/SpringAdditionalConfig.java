@@ -51,35 +51,5 @@ public class SpringAdditionalConfig implements ApplicationListener<ApplicationRe
         return new FlywayMigrationInitializer(flyway);
     }
 
-    // @Bean(initMethod = "migrate")
-    // @DependsOn("entityManagerFactory")
-    // Flyway delayedFlyway(DataSource dataSource) {
-    // ClassicConfiguration configuration = new ClassicConfiguration();
-    // configuration.setDataSource(dataSource);
-    // configuration.setOutOfOrder(true);
-    // configuration.setValidateOnMigrate(false);
-    // configuration.setLocationsAsStrings("classpath:db/migration-data");
-    // Flyway flywaytmp = new Flyway(configuration);
-    // return flywaytmp;
-    // }
-    // @Bean
-    // @DependsOn("entityManagerFactory")
-    // /* Execute after hibernate schema update */
-    // FlywayMigrationInitializer delayedFlywayInitializer(Flyway flyway) {
-    // ClassicConfiguration configuration = (ClassicConfiguration)
-    // flyway.getConfiguration();
-    // /*
-    // *
-    // https://stackoverflow.com/questions/36077766/detected-resolved-migration-not-applied-to-database-on-flyway
-    // */
-    // configuration.setOutOfOrder(true);
-    // configuration.setValidateOnMigrate(false);
-    // configuration.setLocationsAsStrings("classpath:db/migration-data");
-    // Flyway flywaytmp = new Flyway(configuration);
-    // //flywaytmp.migrate();
-    // return new FlywayMigrationInitializer(flywaytmp);
-    // }
-    
     /* WebDAV */
-    
 }
