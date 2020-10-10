@@ -2,7 +2,7 @@ package com.github.braully.report;
 
 import com.github.braully.util.logutil;
 import com.github.braully.business.DescriptorLayoutImportFile;
-import com.github.braully.domain.util.ReportTemplate;
+import com.github.braully.domain.ReportTemplate;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

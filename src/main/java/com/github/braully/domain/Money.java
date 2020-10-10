@@ -1,4 +1,6 @@
-package com.github.braully.domain.util;
+package com.github.braully.domain;
+
+
 
 import java.io.Serializable;
 import java.math.BigDecimal;

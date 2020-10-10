@@ -6,7 +6,6 @@ package com.github.braully.domain;
 import com.github.braully.util.logutil;
 import com.github.braully.constant.Attr;
 import com.github.braully.interfaces.IOrganiztionEntityDependent;
-import com.github.braully.domain.util.Money;
 import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilValidation;
 import java.io.Serializable;

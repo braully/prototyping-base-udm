@@ -16,7 +16,7 @@ limitations under the License.
  */
 package com.github.braully.interfaces;
 
-import com.github.braully.domain.util.ReportTemplate;
+import com.github.braully.domain.ReportTemplate;
 import java.util.Collection;
 import java.util.Map;
 

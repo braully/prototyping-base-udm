@@ -16,7 +16,7 @@ limitations under the License.
  */
 package com.github.braully.report;
 
-import com.github.braully.domain.util.ReportTemplate;
+import com.github.braully.domain.ReportTemplate;
 import com.github.braully.interfaces.IReportGenerator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

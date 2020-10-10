@@ -1,4 +1,4 @@
-package com.github.braully.domain.util;
+package com.github.braully.interfaces;
 
 public interface FieldDescriptor {
 

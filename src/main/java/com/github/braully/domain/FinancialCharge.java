@@ -15,7 +15,7 @@ limitations under the License.
  
  
  */
-package com.github.braully.domain.util;
+package com.github.braully.domain;
 
 import com.github.braully.constant.FactorType;
 import com.github.braully.constant.TypePeriodInterest;

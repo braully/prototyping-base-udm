@@ -21,10 +21,8 @@ import com.github.braully.domain.PurchaseOrder;
 import com.github.braully.domain.PurchaseOrderItem;
 import com.github.braully.domain.Task;
 import com.github.braully.domain.UserMessage;
-import com.github.braully.domain.util.BilletTicket;
-import com.github.braully.domain.util.BilletTicketAgreement;
-import com.github.braully.domain.util.EntityDummy;
-import com.github.braully.domain.util.FinancialCharge;
+import com.github.braully.domain.EntityDummy;
+import com.github.braully.domain.FinancialCharge;
 import com.github.braully.web.DescriptorExposedEntity;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -103,13 +101,6 @@ public class exposed {
                 .hidden("parentAccount", "type", "uniqueCode")
         );
         putExposedEntity("financialCharge", new DescriptorExposedEntity(FinancialCharge.class).hidden("removed", "status"));
-        putExposedEntity("billetTicketAgreement",
-                new DescriptorExposedEntity(BilletTicketAgreement.class)
-                        .hidden("maskNumber", "defaultAgreement", "registerRequeried", "removed")
-        );
-        putExposedEntity("billetTicket",
-                new DescriptorExposedEntity(BilletTicket.class)
-        );
 
         putExposedEntity("genericType", new DescriptorExposedEntity(GenericType.class));
         putExposedEntity("genericValue", new DescriptorExposedEntity(GenericValue.class));

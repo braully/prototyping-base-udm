@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
  
  */
-package com.github.braully.domain.util;
+package com.github.braully.domain;
 
+import com.github.braully.domain.AbstractEntity;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Access;
@@ -33,7 +34,7 @@ import javax.persistence.Table;
 @Entity(name = "TagItem")
 //@Access(AccessType.FIELD)
 @Table(name = "tag_item", schema = "legacy")
-public class TagItem extends TagAbstrata implements Serializable {
+public class TagItem extends AbstractEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private TagItem pai;
@@ -43,11 +44,6 @@ public class TagItem extends TagAbstrata implements Serializable {
     public TagItem() {
     }
 
-    public TagItem(String descricao) {
-        super(descricao);
-    }
-
-    @Override
     public Set<TagItem> getFilhos() {
         return filhos;
     }
@@ -56,7 +52,6 @@ public class TagItem extends TagAbstrata implements Serializable {
         this.filhos = filhos;
     }
 
-    @Override
     public TagItem getPai() {
         return pai;
     }

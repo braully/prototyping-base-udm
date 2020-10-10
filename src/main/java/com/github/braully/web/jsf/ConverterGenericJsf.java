@@ -585,7 +585,7 @@ public class ConverterGenericJsf implements Converter {
 
         @Override
         public Object getAsObject(FacesContext arg0, UIComponent arg1, String arg2) {
-            com.github.braully.domain.util.Money m = ((com.github.braully.domain.util.Money) superGetAsObject(arg0, arg1, arg2));
+            com.github.braully.domain.Money m = ((com.github.braully.domain.Money) superGetAsObject(arg0, arg1, arg2));
             if (m != null) {
                 if (type == Type.BIG) {
                     return m.getValorBig();
@@ -600,9 +600,9 @@ public class ConverterGenericJsf implements Converter {
         public String getAsString(FacesContext arg0, UIComponent arg1, Object arg2) {
             if (arg2 != null && arg2 instanceof Number) {
                 if (arg2 instanceof BigDecimal) {
-                    return new com.github.braully.domain.util.Money((BigDecimal) arg2).formatarValor();
+                    return new com.github.braully.domain.Money((BigDecimal) arg2).formatarValor();
                 }
-                return new com.github.braully.domain.util.Money(((Number) arg2).longValue()).formatarValor();
+                return new com.github.braully.domain.Money(((Number) arg2).longValue()).formatarValor();
             }
             return "";
 
@@ -610,7 +610,7 @@ public class ConverterGenericJsf implements Converter {
 
         public Object superGetAsObject(FacesContext arg0, UIComponent arg1, String arg2) {
             if (arg2 != null && !arg2.trim().isEmpty()) {
-                return new com.github.braully.domain.util.Money(arg2);
+                return new com.github.braully.domain.Money(arg2);
             }
             return null;
         }
@@ -618,7 +618,7 @@ public class ConverterGenericJsf implements Converter {
         public String superGetAsString(FacesContext arg0, UIComponent arg1, Object arg2) {
             String ret = "";
             if (arg2 != null) {
-                com.github.braully.domain.util.Money m = (com.github.braully.domain.util.Money) arg2;
+                com.github.braully.domain.Money m = (com.github.braully.domain.Money) arg2;
                 ret = m.toString();
             }
             return ret;

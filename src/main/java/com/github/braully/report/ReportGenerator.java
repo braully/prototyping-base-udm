@@ -1,8 +1,8 @@
 package com.github.braully.report;
 
-import com.github.braully.domain.util.ClassDiscover;
-import com.github.braully.domain.util.ReportTemplate;
+import com.github.braully.domain.ReportTemplate;
 import com.github.braully.interfaces.IRelatorioMisto;
+import com.github.braully.util.UtilReflection;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -74,8 +74,7 @@ public abstract class ReportGenerator implements IRelatorioMisto {
             }
         } else {
             try {
-                ClassDiscover discoClass = new ClassDiscover();
-                gr = discoClass.getInstancia(PACOTE_BUSCA_GERADORES, ReportGenerator.class, NOME_CAMPO, ext);
+                gr = UtilReflection.getInstancia(PACOTE_BUSCA_GERADORES, ReportGenerator.class, NOME_CAMPO, ext);
             } catch (RuntimeException e) {
                 log.error("erro", e);
                 if (".jasper".equalsIgnoreCase(ext.trim())) {

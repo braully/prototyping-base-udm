@@ -15,7 +15,7 @@ limitations under the License.
  
  
  */
-package com.github.braully.domain.util;
+package com.github.braully.domain;
 
 import java.util.Calendar;
 import java.util.Date;

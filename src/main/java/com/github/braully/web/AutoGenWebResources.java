@@ -960,7 +960,7 @@ public class AutoGenWebResources {
 //            return;
 //        }
 
-        DescriptorHtmlEntity descritor = new DescriptorHtmlEntity(com.github.braully.domain.util.EntityDummy.class);
+        DescriptorHtmlEntity descritor = new DescriptorHtmlEntity(com.github.braully.domain.EntityDummy.class);
         System.err.println(JSF_ENTITY_CRUD.entityHtmlCrud(descritor, null).renderFormatted());
 
     }

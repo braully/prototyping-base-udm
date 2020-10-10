@@ -20,7 +20,6 @@ import com.github.braully.constant.Attr;
 import com.github.braully.constant.Attrs;
 import com.github.braully.constant.SituacaoTransaction;
 import com.github.braully.interfaces.IOrganiztionEntityDependent;
-import com.github.braully.domain.util.Money;
 import com.github.braully.util.UtilDate;
 import com.github.braully.util.UtilValidation;
 import java.util.HashMap;

@@ -18,7 +18,7 @@ limitations under the License.
 package com.github.braully.app;
 
 import com.github.braully.domain.AccountTransaction;
-import com.github.braully.domain.util.Money;
+import com.github.braully.domain.Money;
 import com.github.braully.util.UtilExpression;
 import com.github.braully.util.UtilString;
 import java.util.Date;

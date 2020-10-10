@@ -1,6 +1,5 @@
 package com.github.braully.domain;
 
-import com.github.braully.domain.util.Tag;
 import com.github.braully.constant.StatusExecutionCycle;
 import java.util.Collection;
 import java.util.Date;

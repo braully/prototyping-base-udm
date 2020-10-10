@@ -18,7 +18,6 @@ limitations under the License.
 package com.github.braully.interfaces;
 
 import java.util.Date;
-import com.github.braully.domain.util.IParameterSystem;
 
 /**
  *

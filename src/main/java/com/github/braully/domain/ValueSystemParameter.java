@@ -1,6 +1,7 @@
-package com.github.braully.domain.util;
+package com.github.braully.domain;
 
 import com.github.braully.domain.AbstractStatusEntity;
+import com.github.braully.interfaces.IParameterSystem;
 import com.github.braully.interfaces.IValorParametroSistema;
 import java.util.Date;
 import javax.persistence.Column;
