@@ -10,7 +10,7 @@ package com.github.braully.util;
  * A busca por fonética consiste em:
  * <p>
  * - converter todas as letras para minúsculo - transformar letras duplas em
- * unidades - converter consoantes com o mesmo fonema (ss <> ç, w <> v...) -
+ * unidades - converter consoantes com o mesmo fonema -
  * remover acentuações - remover caracteres especiais - corrigir erro comuns da
  * lingua (lingua portuguesa)
  * <p>

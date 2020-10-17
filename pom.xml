@@ -657,13 +657,15 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <doclet>ch.raffael.mddoclet.MarkdownDoclet</doclet>
+                    <show>public</show>
+                    <source>${maven.compiler.source}</source>
+                    <doclet>org.asciidoctor.Asciidoclet</doclet>
                     <docletArtifact>
-                        <groupId>ch.raffael.markdown-doclet</groupId>
-                        <artifactId>markdown-doclet</artifactId>
-                        <version>1.4</version>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoclet</artifactId>
+                        <version>1.5.6</version>
                     </docletArtifact>
-                    <!--<useStandardDocletOptions>true</useStandardDocletOptions>-->
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
                 </configuration>
             </plugin>
         </plugins>
