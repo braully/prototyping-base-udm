@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.3.RELEASE</version>
+        <version>2.5.2</version>
     </parent>
 
     <properties>
@@ -676,6 +676,12 @@
             <name>Maven Repository Switchboard</name>
             <url>https://repo1.maven.org/maven2</url>
         </repository>
+        <repository> 
+            <id>repository.spring.release</id> 
+            <name>Spring GA Repository</name> 
+            <url>http://repo.spring.io/release</url> 
+        </repository>
+       
         <repository>
             <id>primefaces-repository</id>
             <url>https://repository.primefaces.org/</url>
@@ -714,7 +720,7 @@
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
     </repositories>
-    <pluginRepositories>
+<!--    <pluginRepositories>
         <pluginRepository>
             <id>spring-releases</id>
             <url>https://repo.spring.io/libs-release</url>
@@ -727,5 +733,5 @@
             <id>spring-milestones</id>
             <url>https://repo.spring.io/milestone</url>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories>-->
 </project>
