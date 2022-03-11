@@ -6,12 +6,6 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <ui:composition template="/autogen/template-base-app.xhtml">
         <ui:define name="template.app.title">entityDummy</ui:define>
-        <ui:define name="template.body.append"></ui:define>
-
-        <ui:define name="template.head.append">
-            <meta name="_csrf" content="${_csrf.token}"/>
-            <meta name="_csrf_header" content="${_csrf.headerName}"/>
-        </ui:define>
 
         <ui:define name="template.app.content">
             <h:messages infoClass="autogen-message-info" 
@@ -58,321 +52,46 @@
 
         <ui:define name="template.app.content.form">
             <h:outputText value="Entity-id: #{param['id']}" />
-
-            <!--<ui:include src="/autogen/entityDummy/template-base-app/form.xhtml" />-->
-            <h:form>
-                <div class="autogen-form-group">
-                    <label class="autogen-form-group-label">#{genericMB.i18n('Name')}</label>
-                    <input class="autogen-form-group-input" 
-                           jsfc="h:inputText" 
-                           value="#{genericMB.crud('entityDummy').entity.name}" />
-                </div>
-                <div class="autogen-form-group">
-                    <label data-i18n="Code">Code</label>
-                    <input class="autogen-form-group-input" jsfc="h:inputText" 
-                           value="#{genericMB.crud('entityDummy').entity.code}" />
-                </div>
-
-                <div class="autogen-form-group">
-                    <label>Fraction</label>
-                    <input class="autogen-form-group-input" jsfc="h:inputText" 
-                           value="#{genericMB.crud('entityDummy').entity.fraction}" />
-                </div>
-
-                <div class="autogen-form-group">
-                    <label>Big Decimal</label>
-                    <input class="autogen-form-group-input" jsfc="h:inputText" 
-                           value="#{genericMB.crud('entityDummy').entity.decimal}" />
-                </div>
-
-                <div class="autogen-form-group">
-                    <label>Date</label>
-                    <input class="autogen-form-group-input" jsfc="h:inputText" 
-                           value="#{genericMB.crud('entityDummy').entity.date}" />
-                </div>
-
-                <div class="autogen-form-group-check">
-                    <input type="checkbox" class="autogen-form-group-input-check" 
-                           jsfc="h:selectBooleanCheckbox" 
-                           value="#{genericMB.crud('entityDummy').entity.checked}"/>
-                    <label class="autogen-form-group-label-check">Checked</label>
-                </div>
-
-                <div class="autogen-form-group">
-                    <label>Status</label>
-                    <select class="autogen-form-group-input" jsfc="h:selectOneMenu"
-                            value="#{genericMB.crud('entityDummy').entity.statusType}">	
-                        <f:selectItem itemLabel="" itemValue="" />
-                        <f:selectItems value="#{genericMB.crud('entityDummy').values('entityDummy.statusType')}" 
-                                       var="st" itemLabel="#{st.toString()}" itemValue="#{st}" />
-                    </select>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label>Inventory</label>
-                        <!--https://docs.angularjs.org/api/ng/directive/select-->
-                        <div class="input-group">
-                            <select class="custom-select"
-                                    id="inventory-select-2">
-                                <option value=""></option>
-                            </select>
-                            <span class="input-group-append">
-                                <button class="btn btn-outline-secondary" 
-                                        type="button">
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>City</label>
-                        <div class="autogen-input-group">
-                            <div class="autogen-input-group-prepend-text autogen-input-group-append">
-                                <i class="ico-search"></i>
-                            </div>
-
-                            <input class="autogen-form-group-input" type="text" 
-                                   autocomplete="off" value="#{genericMB.crud('address').entity.city}" />
-                            <h:inputHidden value="#{genericMB.crud('address').entity.city}" 
-                                           converter="#{converterEntityBD}" />
-
-                            <button class="autogen-button-alt autogen-input-group-append " type="button"                                 
-                                    onclick="$(this).prev('input[type=hidden]').val('').prev().val('').attr('disabled', false);">
-                                <i class="ico-cancelar" />
-                            </button>
-                            <script>
-                                autocompleteInput($('script').last().closest('div').find('input[type=text]'), 'city');
-                            </script>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="autogen-form-group">
-                    <input class="autogen-button"  jsfc="h:commandButton" 
-                           value="Salvar" action="#{genericMB.crud('entityDummy').save()}">
-                    </input>
-                </div>
-            </h:form>
+            <ui:decorate template="/autogen/entityDummy/template-base-app/form.xhtml">
+                <ui:define name="extraAction">
+                    <button class="autogen-button"  value="Ajuda" 
+                        data-intro="Hello step one!" onclick="introJs().start(); return false;">Ajuda intro.js</button>
+                </ui:define>
+            </ui:decorate>
         </ui:define>
 
         <ui:define name="template.app.content.filter">
-            <!--<ui:include src="/autogen/entityDummy/template-base-app/filter.xhtml" />-->
             <hr />
-            <h:form>
-                <div class="aig">
-                    <input class="autogen-form-group-input autogen-filter-group-input" jsfc="h:inputText" 
-                           value="#{genericMB.crud('entityDummy').searchString}" />
-                    <input class="aiga autogen-button" jsfc="h:commandButton" 
-                           value="Buscar" action="#{genericMB.crud('entityDummy').find()}" />
-                </div>
-            </h:form>
+            <ui:include src="/autogen/entityDummy/template-base-app/filter.xhtml" />
         </ui:define>
 
         <ui:define name="template.app.content.list">
-            <!--<ui:include src="/autogen/entityDummy/template-base-app/list.xhtml" />-->
             <br />
-            <h:form>
-                <div class="autogen-list-responsive">
-                    <table class="autogen-list-table">
-                        <thead class="autogen-list-table-head">
-                            <tr class="autogen-list-table-head-row">
-                                <th class="autogen-list-table-head-col" scope="col">
-                                    <input type="checkbox" onclick="checkAll(this);" />
-                                </th>
-                                <th class="autogen-list-table-head-col" scope="col">#</th>
-                                <th class="autogen-list-table-head-col" scope="col">Name</th>
-                                <th class="autogen-list-table-head-col" scope="col">Code</th>
-                                <th class="autogen-list-table-head-col" scope="col">Fraction</th>
-                                <th class="autogen-list-table-head-col" scope="col">Checked</th>
-                                <th class="autogen-list-table-head-col" scope="col">Status</th>
-                                <th class="autogen-list-table-head-col" scope="col">Col1</th>
-                                <th class="autogen-list-table-head-col" scope="col">Col2</th>
-                                <th class="autogen-list-table-head-col" scope="col">Col3</th>
-                                <th class="autogen-list-table-head-col" scope="col">Col4</th>
-                                <th class="autogen-list-table-head-col" scope="col">Col5</th>
-                                <th class="autogen-list-table-head-col" scope="col">Col6</th>
-                                <th class="autogen-list-table-head-col" scope="col">
+            <!--https://stackoverflow.com/questions/10778068/what-is-the-real-conceptual-difference-between-uidecorate-and-uiinclude-->
+            <ui:decorate template="/autogen/entityDummy/list.xhtml?selectable=true"> 
 
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="autogen-list-table-body">
-                            <ui:repeat value="#{genericMB.crud('entityDummy').entities}" var="lin">
-                                <tr class="autogen-list-table-body-row" data-id="#{lin.id}">
-                                    <td class="autogen-list-table-body-col">
-                                        <input data-id="#{lin.id}" type="checkbox" 
-                                               onclick="$(this).toggleClass('selected')" />
-                                    </td>
-                                    <td class="autogen-list-table-body-col">#{lin.id}</td>
-                                    <td class="autogen-list-table-body-col">#{lin.name}</td>
-                                    <td class="autogen-list-table-body-col">#{lin.code}</td>
-                                    <td class="autogen-list-table-body-col">#{lin.fraction}</td>
-                                    <td class="autogen-list-table-body-col">#{lin.checked}</td>
-                                    <td class="autogen-list-table-body-col">#{lin.statusType}</td>
-                                    <th class="autogen-list-table-head-col" scope="col">Col1</th>
-                                    <th class="autogen-list-table-head-col" scope="col">Col2</th>
-                                    <th class="autogen-list-table-head-col" scope="col">Col3</th>
-                                    <th class="autogen-list-table-head-col" scope="col">Col4</th>
-                                    <th class="autogen-list-table-head-col" scope="col">Col5</th>
-                                    <th class="autogen-list-table-head-col" scope="col">Col6</th>
-                                    <td class="autogen-list-table-body-col" align="right">
-                                        <div class="autogen-button-col" role="group">
-                                            <input actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}"
-                                                   jsfc="h:commandButton" value="Editar" title="Editar"
-                                                   class="autogen-button">
-                                            </input>
-                                            <button id="autogen-list-table-body-col-input-extra-action"
-                                                    type="button" class="btn btn-outline-secondary" title="Mais" 
-                                                    data-toggle="dropdown" aria-haspopup="true" 
-                                                    aria-expanded="false">
-                                                <i class="fa fa-ellipsis-v"></i>
-                                            </button>
-                                            <div class="dropdown-menu" 
-                                                 aria-labelledby="autogen-list-table-body-col-input-extra-action">
-                                                <a class="autogen-button-extra-button" 
-                                                   href="/app/delete/entityDummy/#{lin.id}">
-                                                    <i class="fa fa-search"></i> Ver
-                                                </a>
-                                                <a class="autogen-button-extra-button" href="#"
-                                                   jsfc="h:commandLink" title="Editar"  
-                                                   actionListener="#{genericMB.crud('entityDummy').setEntity(lin)}" >
-                                                    <i class="fa fa-pencil"></i> Editar
-                                                </a>
-                                                <a class="autogen-button-extra-button" 
-                                                   href="#" data-toggle="modal" data-target="#autogen-modal"
-                                                   title="Excluir Modal">
-                                                    <i class="fa fa-trash"></i> Excluir modal
-                                                </a>
-                                                <a class="autogen-button-extra-button" href="#"
-                                                   jsfc="h:commandLink" title="Excluir JSF"  
-                                                   actionListener="#{genericMB.crud('entityDummy').remove(lin)}" >
-                                                    <i class="fa fa-trash"></i> Excluir jsf
-                                                </a>
-                                                <a onclick="normal_post('/jsf/index.xhtml', {id: '#{lin.id}'});"
-                                                   class="autogen-button-extra-button" href="#">
-                                                    <i class="fa fa-barcode"></i> Ação individual (post)
-                                                </a>
-                                                <a onclick="$.post('/app/delete/entityDummy/#{lin.id}');
-                                                        location.reload();" 
-                                                   class="autogen-button-extra-button" title="Excluir Rest" href="#">
-                                                    <i class="fa fa-trash"></i> Excluir rest
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="autogen-list-group">
-                    <div class="autogen-button-col" role="group">
-                        <button type="button" class="autogen-button-alt" title="Mais" 
-                                data-toggle="dropdown"
-                                aria-haspopup="true" 
-                                aria-expanded="false" 
-                                id="autogen-list-head-extra-action">
-                            Selecionados
-                            <i class="fa fa-ellipsis-v"></i>
-                        </button>
-                        <div class="dropdown-menu" 
-                             aria-labelledby="autogen-list-head-extra-action">
-                            <a class="autogen-button-extra-button" href="#">
-                                <i class="fa fa-search"></i> Excluir
-                            </a>
-                            <a onclick="normal_post('/jsf/index.xhtml', {ids: table_selected_id(this)});"
-                               class="autogen-button-extra-button" href="#">
-                                <i class="fa fa-barcode"></i> Ação 1  (post)
-                            </a>
-                        </div>
-                        <input data-toggle="modal" data-target="#autogen-modal" 
-                               value="Ação em lote 2" 
-                               title="Ação em lote 2" type="button"
-                               class="autogen-button-alt autogen-button-warn">
-                        </input>
-                        <input data-toggle="modal" data-target="#autogen-modal" 
-                               value="Ação em lote 3" 
-                               title="Ação em lote 3" type="button"
-                               class="autogen-button-alt">
-                        </input>
-                    </div>  
-
-
-                    Ini: #{genericMB.crud('partner').windowIni}
-                    Cur: #{genericMB.crud('partner').currentPage}
-                    End: #{genericMB.crud('partner').windowEnd-1}
-                    <div class="autogen-list-group-pagination-col">
-                        <h:commandLink class="autogen-list-group-pagination-button-prev autogen-button-page" value="«"
-                                       disabled="#{not genericMB.crud('partner').hasPreviousPageQueryResult()}"
-                                       action="#{genericMB.crud('partner').previousPageQueryResult()}"/>
-
-                        <!--TODO: ui:repeat begin="" end="" has bug, verify in future -->
-                        <ui:repeat value="#{genericMB.crud('partner').windowPages}" var="idx">
-                            <h:commandLink class="#{genericMB.crud('partner').currentPage eq idx ? 'autogen-button-page autogen-button-page-active':'autogen-button-page'}"
-                                           action="#{genericMB.crud('partner').paginate(idx)}"
-                                           value="#{idx+1}" />
-                        </ui:repeat>
-
-                        <h:outputText rendered="#{genericMB.crud('partner').hasWindowPageQueryResult()}" 
-                                      class="autogen-button-page">...</h:outputText>
-                        <h:commandLink rendered="#{genericMB.crud('partner').hasWindowPageQueryResult()}" 
-                                       class="#{genericMB.crud('partner').currentPage ge genericMB.crud('partner').totalPages ? 'autogen-button-page autogen-button-page-active':'autogen-button-page'}" 
-                                       action="#{genericMB.crud('partner').paginate(genericMB.crud('partner').totalPages)}"
-                                       value="#{genericMB.crud('partner').totalPages}" />
-
-                        <h:commandLink class="autogen-button-page autogen-list-group-pagination-button-next" value="»"
-                                       disabled="#{not genericMB.crud('partner').hasNextPageQueryResult()}"
-                                       action="#{genericMB.crud('partner').nextPageQueryResult()}"/>
-                    </div>
-
-                    <div class="autogen-list-group-pagination-col">
-                        <input class="autogen-list-group-pagination-button-prev autogen-button-page" jsfc="h:commandButton" value="«"
-                               disabled="#{not genericMB.crud('entityDummy').hasPreviousPageQueryResult()}"
-                               action="#{genericMB.crud('entityDummy').previousPageQueryResult()}"
-                               aria-label="Anterior"/>
-
-                        <!--TODO: ui:repeat begin="" end="" has bug, verify in future -->
-                        <c:forEach begin="0" end="#{genericMB.crud('entityDummy').totalPages}" var="idx">
-                            <input class="#{genericMB.crud('entityDummy').currentPage eq idx ? 'autogen-button-page autogen-button-page-active':'autogen-button-page'}" 
-                                   jsfc="h:commandButton" action="#{genericMB.crud('entityDummy').paginate(idx)}"
-                                   value="#{idx+1}" aria-label="Pagina #{idx}" />
-                        </c:forEach>
-
-                        <input class="autogen-button-page autogen-list-group-pagination-button-next" jsfc="h:commandButton" value="»"
-                               disabled="#{not genericMB.crud('entityDummy').hasNextPageQueryResult()}"
-                               action="#{genericMB.crud('entityDummy').nextPageQueryResult()}"
-                               aria-label="Proximo"/>
-                    </div>
-                </div>
-
-                <div>
-                    <a href="/autogen/partner.xhtml" 
-                       class="autogen-button autogen-confirm">
-                        Confirmar
+                <ui:define name="extraActionMenu">
+                    <a onclick="normal_post('/jsf/index.xhtml', {id: '#{ent.id}'});"
+                       class="autogen-button-extra-button" href="#">
+                        <i class="fa fa-barcode"></i> Ação individual (post)
                     </a>
+                </ui:define> 
 
-                    <a href="/autogen/partner.xhtml"
-                       class="autogen-button autogen-popup iframe">
-                        Modal url iframe
-                    </a>
+                <ui:define name="extraBulkAction">
+                    <input data-toggle="modal" data-target="#autogen-modal" 
+                           value="Ação em lote 2" 
+                           title="Ação em lote 2" type="button"
+                           class="autogen-button-alt">
+                    </input>
+                </ui:define>
 
-                    <a href="/autogen/partner.xhtml" 
-                       class="autogen-button autogen-popup body">
-                        Modal url
+                <ui:define name="extraBulkActionMenu">
+                    <a onclick="normal_post('/jsf/index.xhtml', {ids: table_selected_id(this)});"
+                       class="autogen-button-extra-button" href="#">
+                        <i class="fa fa-barcode"></i> Ação 1
                     </a>
-
-                    <a href="html/error.html div.page-error-wrapper" 
-                       class="autogen-button autogen-popup">
-                        Modal url subcontent
-                    </a>
-
-                    <a href="/autogen/partner.xhtml div.base-app-main-content-body" 
-                       class="autogen-button autogen-popup">
-                        Modal url subcontent 2
-                    </a>
-                </div>
-            </h:form>
+                </ui:define>
+            </ui:decorate>
         </ui:define>
     </ui:composition>
 </html>
