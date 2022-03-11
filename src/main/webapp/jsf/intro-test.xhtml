@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ps="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">entityDummy</ui:define>
+
+        <ui:define name="template.app.content">
+            <h:messages id="area-mensagem" ps:data-intro="Aréa de mensagens importante"
+                        infoClass="autogen-message-info" 
+                        warnClass="autogen-message-warning"
+                        fatalClass="autogen-message-error"
+                        errorClass="autogen-message-error" 
+                        showSummary="true" showDetail="true"  />
+        </ui:define>
+
+        <ui:define name="template.app.content.form">
+            <ui:decorate template="/autogen/entityDummy/template-base-app/form.xhtml">
+                <ui:define name="extraAction">
+                    <button class="autogen-button"  value="Ajuda" 
+                            data-intro="Botão de ajuda" 
+                            onclick="introJs().setOptions({'nextLabel': 'Próximo', 'prevLabel': 'Anterior', 'skipLabel': 'Pular', 'doneLabel': 'Pronto'}).start(); return false;">Ajuda intro.js</button>
+                </ui:define>
+            </ui:decorate>
+        </ui:define>
+
+        <ui:define name="template.app.content.filter">
+            <hr />
+            <ui:include src="/autogen/entityDummy/template-base-app/filter.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content.list">
+            <br />
+            <div data-intro="Tabela com todos os resultados da busca">
+                <!--https://stackoverflow.com/questions/10778068/what-is-the-real-conceptual-difference-between-uidecorate-and-uiinclude-->
+                <ui:decorate template="/autogen/entityDummy/list.xhtml?selectable=true"> 
+                    <ui:define name="extraBulkAction">
+                        <input data-toggle="modal" data-target="#autogen-modal" 
+                               value="Apagar tudo" data-intro="Esse botão apagará todos os resgistros cadastrados. Cuidado!" 
+                               title="Apagar tudo" type="button"
+                               class="autogen-button-alt">
+                        </input>
+                    </ui:define>
+                </ui:decorate>
+            </div>
+        </ui:define>
+    </ui:composition>
+</html>
