@@ -57,7 +57,7 @@
     </properties>
     
     <profiles>
-                <profile>
+        <profile>
             <id>exec-jar</id>
             <properties>
                 <profile.name>Executable Jar</profile.name>
@@ -790,10 +790,6 @@
             <id>jasperreports.sourceforge.net</id>
             <name>Jasperreports Repository</name>
             <url>http://jasperreports.sourceforge.net/maven2</url>
-        </repository>
-        <repository>
-            <id>milton-repo-bintray</id>
-            <url>https://dl.bintray.com/milton/Milton/</url>
         </repository>
         <repository>
             <id>sonatype</id>
