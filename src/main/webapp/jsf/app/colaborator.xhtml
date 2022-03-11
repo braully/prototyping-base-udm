@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">Colaboradores</ui:define>
+
+        <ui:define name="template.app.menu">
+            <ui:include src="/jsf/template/menu-base-app.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content.form">
+            <ui:include src="/autogen/employmentContract/template-base-app/form.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content.filter">
+            <hr />
+            <ui:include src="/autogen/employmentContract/template-base-app/filter.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content.list">
+            <br />
+            <ui:decorate template="/autogen/employmentContract/template-base-app/list.xhtml?responsive=true"> </ui:decorate>
+        </ui:define>
+    </ui:composition>
+</html>

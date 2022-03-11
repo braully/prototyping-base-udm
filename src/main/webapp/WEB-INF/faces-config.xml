@@ -25,10 +25,14 @@
     </converter>
     <converter>
         <converter-id>converterEntity</converter-id>
-        <converter-class>com.github.braully.web.jsf.ConverterEntity</converter-class>
+        <converter-class>com.github.braully.web.jsf.ConverterGenericJsf.ConverterEntity</converter-class>
     </converter>
     <converter>
         <converter-id>converterEnum</converter-id>
-        <converter-class>com.github.braully.web.jsf.ConverterEnum</converter-class>
+        <converter-class>com.github.braully.web.jsf.ConverterGenericJsf.ConverterEnum</converter-class>
+    </converter>
+    <converter>
+        <converter-id>converterGenericJsf</converter-id>
+        <converter-class>com.github.braully.web.jsf.ConverterGenericJsf</converter-class>
     </converter>
 </faces-config>

@@ -41,9 +41,9 @@
                                     <input class="form-check-input" type="checkbox" name="remember" value="Remember Me">
                                     Remember Me</label>
                             </div>
-                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                        
                             <c:if test="${not empty param.error}">
-                                <c:set var="erros" value="${erros + 1}" scope="session" />
+
                             </c:if>
                             <c:if test="${not empty param.error}">
                                 <label class="lbl" style="color: red; font-size: normal; font-weight: bold;">Usuário ou senha incorreto!</label>

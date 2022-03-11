@@ -5,13 +5,11 @@ import com.github.braully.app.url;
 import com.github.braully.web.jsf.ViewScope;
 
 import java.util.HashMap;
+import java.util.Map;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import org.apache.catalina.connector.Connector;
-import org.apache.catalina.valves.RemoteIpValve;
-import org.apache.coyote.ajp.AbstractAjpProtocol;
 //import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.ocpsoft.rewrite.annotation.RewriteConfiguration;
 import org.ocpsoft.rewrite.config.ConfigurationBuilder;
@@ -39,9 +37,7 @@ import org.springframework.web.servlet.view.JstlView;
 import org.ocpsoft.rewrite.servlet.RewriteFilter;
 import org.ocpsoft.rewrite.servlet.config.Forward;
 import org.ocpsoft.rewrite.servlet.config.Path;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.ocpsoft.rewrite.servlet.config.rule.Join;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -50,7 +46,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 
@@ -58,8 +53,9 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
 @EnableWebMvc
 @EnableTransactionManagement
 @RewriteConfiguration
+@EnableWebSecurity
 public class SpringWebConfig
-        //extends WebSecurityConfigurerAdapter
+        //        extends WebSecurityConfigurerAdapter
         implements WebMvcConfigurer, ConfigurationProvider<ServletContext>,
         ServletContextInitializer {
 
@@ -110,17 +106,6 @@ public class SpringWebConfig
     }
 
     /* Redirect and map rules Config */
-
- /*
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    @Bean
-    public FilterRegistrationBean filterRegistrationBean() {
-        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        registrationBean.setName("urlRewriteFilterTuckey");
-        registrationBean.setFilter(new UrlRewriteFilter());
-        registrationBean.addUrlPatterns("/*");
-        return registrationBean;
-    }*/
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @Bean
     public FilterRegistrationBean rewriteFilterOCP() {
@@ -130,16 +115,27 @@ public class SpringWebConfig
         registrationBean.addUrlPatterns("/*");
         return registrationBean;
     }
-    //Redirect
+    // Redirect
 
-    //@RewriteConfiguration
-    //public static class SpringRewrite implements ConfigurationProvider<ServletContext> {
+    // @RewriteConfiguration
+    // public static class SpringRewrite implements
+    // ConfigurationProvider<ServletContext> {
+    // https://www.ocpsoft.org/prettyfaces/
+    // https://www.ocpsoft.org/java/migrating-from-prettyfaces-to-rewrite-simplicity-meets-power/
+    // https://github.com/ocpsoft/rewrite/blob/master/config-prettyfaces/src/main/java/org/ocpsoft/rewrite/prettyfaces/PrettyFacesRewriteConfigurationProvider.java
     @Override
     public org.ocpsoft.rewrite.config.Configuration getConfiguration(ServletContext context) {
         ConfigurationBuilder config = ConfigurationBuilder.begin();
-        url.rewrite_forward.forEach((k, v) -> config.addRule().when(
-                Direction.isInbound().and(Path.matches(k))).perform(Forward.to(v))
-        );
+        for (Map.Entry<String, String> entry : url.rewrite_forward.entrySet()) {
+            String k = entry.getKey();
+            String v = entry.getValue();
+            // https://stackoverflow.com/questions/23582991/url-rewriting-with-ocpsoft-rewrite-join-path-rule
+            if (v.contains(".xhtml")) {// if (v.endsWith(".xhtml")) {
+                config.addRule(Join.path(k).to(v));
+            } else {
+                config.addRule().when(Direction.isInbound().and(Path.matches(k))).perform(Forward.to(v));
+            }
+        }
         return config;
     }
 
@@ -256,7 +252,7 @@ public class SpringWebConfig
 
     //Security
     @Configuration
-    @EnableWebSecurity
+//    @EnableWebSecurity
     public static class SpringWebSecurityConfig
             extends WebSecurityConfigurerAdapter {
 
@@ -286,107 +282,98 @@ public class SpringWebConfig
         /*  https://stackoverflow.com/questions/44064346/spring-security-filter-authenticates-sucessfuly-but-sends-back-403-response */
         @Override
         public void configure(WebSecurity web) throws Exception {
-            web.ignoring()
-                    .antMatchers(
-                            "/pkg/**", "/assets/**", "/*resource/**", "/favicon.ico",
-                            "/error**", "/error/**"
-                    );
+            web.ignoring().antMatchers("/pkg/**", "/assets/**", "/*resource/**",
+                    "/favicon.ico", "/error**", "/error/**");
         }
 
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().disable()
-                    .authorizeRequests()//Login urls
-                    .antMatchers(
-                            "/login**", "/enter**",
-                            "/logout**"
-                    ).permitAll()
-                    .and()
-                    .authorizeRequests()
-                    .anyRequest().authenticated()
-                    .and()
-                    .formLogin()
-                    .loginPage("/enter")
+                    .authorizeRequests()// Login urls
+                    .antMatchers("/login**", "/enter**", "/logout**").permitAll()
+                    .and().authorizeRequests().anyRequest()
+                    .authenticated().and()
+                    .formLogin().loginPage("/enter")
                     .loginProcessingUrl("/login")
                     .defaultSuccessUrl("/index")
-                    .permitAll()
-                    .and().logout().deleteCookies("JSESSIONID")
+                    .permitAll().and().logout().deleteCookies("JSESSIONID")
                     .invalidateHttpSession(true).permitAll();
 
-            //Permit iframes from same origin;
-            //https://stackoverflow.com/questions/28647136/how-to-disable-x-frame-options-response-header-in-spring-security
-            http.headers()
-                    .frameOptions()
-                    .sameOrigin();
+            // Permit iframes from same origin;
+            // https://stackoverflow.com/questions/28647136/how-to-disable-x-frame-options-response-header-in-spring-security
+            http.headers().frameOptions().sameOrigin();
 
         }
     }
 
     //Tomcat conector
-    @Component
-    public static class SpringWebConnectorConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
-
-        private final static String CONNECTOR_PROTOCOL = TomcatServletWebServerFactory.DEFAULT_PROTOCOL; //"org.apache.coyote.http11.Http11NioProtocol";
-        private final static String CONNECTOR_SCHEME = "http";
-        private static final String CONNECTOR_PROTOCOL_AJP = "org.apache.coyote.ajp.AjpNioProtocol";//"AJP/1.3";
-
-        @Value("${http.port:8080}")
-        Integer httpPort;
-
-        @Value("${server.port:8443}")
-        Integer serverPort;
-
-        @Value("${server.tomcat.ajp.port:8090}")
-        Integer ajpPort;
-
-        @Value("${security.require-ssl:false}")
-        Boolean requireSsl;
-
-        @Override
-        public void customize(TomcatServletWebServerFactory factory) {
-            factory.setPort(serverPort);
-            if (!httpPort.equals(serverPort)) {
-                factory.addAdditionalTomcatConnectors(createHttpConnector());
-            }
-            if (ajpPort != null) {
-                factory.addAdditionalTomcatConnectors(createAjpConnector());
-                factory.addContextValves(createRemoteIpValves());
-            }
-        }
-
-        // https://stackoverflow.com/questions/30896234/how-set-up-spring-boot-to-run-https-http-ports
-        private Connector createHttpConnector() {
-            Connector connector = new Connector(CONNECTOR_PROTOCOL);
-            connector.setPort(httpPort);
-            connector.setScheme(CONNECTOR_SCHEME);
-            connector.setSecure(false);
-            // If redirect, uncoment
-            if (requireSsl != null && requireSsl) {
-                connector.setRedirectPort(serverPort);
-            }
-            return connector;
-        }
-
-        //https://access.redhat.com/solutions/4851251
-        //https://stackoverflow.com/questions/49275241/spring-boot-2-ajp
-        //https://stormpath.com/blog/secure-spring-boot-webapp-apache-letsencrypt-ssl
-        //https://stackoverflow.com/questions/60501470/springboot-the-ajp-connector-is-configured-with-secretrequired-true-but-the-s
-        private Connector createAjpConnector() {
-            Connector ajpConnector = new Connector(CONNECTOR_PROTOCOL_AJP);
-            //ajpConnector.setProtocol("AJP/1.3");
-            ajpConnector.setPort(ajpPort);
-            //ajpConnector.setScheme(CONNECTOR_SCHEME);
-            ajpConnector.setScheme("ajp");
-            ajpConnector.setSecure(false);
-            ((AbstractAjpProtocol) ajpConnector.getProtocolHandler()).setSecretRequired(false);
-            //ajpConnector.setAllowTrace(false);
-            return ajpConnector;
-        }
-
-        private RemoteIpValve createRemoteIpValves() {
-            RemoteIpValve remoteIpValve = new RemoteIpValve();
-            remoteIpValve.setRemoteIpHeader("x-forwarded-for");
-            remoteIpValve.setProtocolHeader("x-forwarded-proto");
-            return remoteIpValve;
-        }
-    }
+//    @Component
+//    public static class SpringWebConnectorConfig implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+//
+//        private final static String CONNECTOR_PROTOCOL = TomcatServletWebServerFactory.DEFAULT_PROTOCOL; //"org.apache.coyote.http11.Http11NioProtocol";
+//        private final static String CONNECTOR_SCHEME = "http";
+//        private static final String CONNECTOR_PROTOCOL_AJP = "org.apache.coyote.ajp.AjpNioProtocol";//"AJP/1.3";
+//
+//        @Value("${http.port:8080}")
+//        Integer httpPort;
+//
+//        @Value("${server.port:8443}")
+//        Integer serverPort;
+//
+//        @Value("${server.tomcat.ajp.port:8090}")
+//        Integer ajpPort;
+//
+//        @Value("${security.require-ssl:false}")
+//        Boolean requireSsl;
+//
+//        //https://stackoverflow.com/questions/64822250/illegalstateexception-after-upgrading-web-app-to-spring-boot-2-4
+//        @Override
+//        public void customize(TomcatServletWebServerFactory factory) {
+//            factory.setPort(serverPort);
+//            //https://stackoverflow.com/questions/64822250/illegalstateexception-after-upgrading-web-app-to-spring-boot-2-4
+////            factory.setRegisterDefaultServlet(true);
+//            if (!httpPort.equals(serverPort)) {
+//                factory.addAdditionalTomcatConnectors(createHttpConnector());
+//            }
+//            if (ajpPort != null) {
+//                factory.addAdditionalTomcatConnectors(createAjpConnector());
+//                factory.addContextValves(createRemoteIpValves());
+//            }
+//        }
+//
+//        // https://stackoverflow.com/questions/30896234/how-set-up-spring-boot-to-run-https-http-ports
+//        private Connector createHttpConnector() {
+//            Connector connector = new Connector(CONNECTOR_PROTOCOL);
+//            connector.setPort(httpPort);
+//            connector.setScheme(CONNECTOR_SCHEME);
+//            connector.setSecure(false);
+//            // If redirect, uncoment
+//            if (requireSsl != null && requireSsl) {
+//                connector.setRedirectPort(serverPort);
+//            }
+//            return connector;
+//        }
+//
+//        //https://access.redhat.com/solutions/4851251
+//        //https://stackoverflow.com/questions/49275241/spring-boot-2-ajp
+//        //https://stormpath.com/blog/secure-spring-boot-webapp-apache-letsencrypt-ssl
+//        //https://stackoverflow.com/questions/60501470/springboot-the-ajp-connector-is-configured-with-secretrequired-true-but-the-s
+//        private Connector createAjpConnector() {
+//            Connector ajpConnector = new Connector(CONNECTOR_PROTOCOL_AJP);
+//            //ajpConnector.setProtocol("AJP/1.3");
+//            ajpConnector.setPort(ajpPort);
+//            //ajpConnector.setScheme(CONNECTOR_SCHEME);
+//            ajpConnector.setScheme("ajp");
+//            ajpConnector.setSecure(false);
+//            ((AbstractAjpProtocol) ajpConnector.getProtocolHandler()).setSecretRequired(false);
+//            //ajpConnector.setAllowTrace(false);
+//            return ajpConnector;
+//        }
+//
+//        private RemoteIpValve createRemoteIpValves() {
+//            RemoteIpValve remoteIpValve = new RemoteIpValve();
+//            remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+//            remoteIpValve.setProtocolHeader("x-forwarded-proto");
+//            return remoteIpValve;
+//        }
+//    }
 }

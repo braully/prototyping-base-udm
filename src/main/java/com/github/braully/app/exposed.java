@@ -85,8 +85,7 @@ public class exposed {
 
         putExposedEntity("accountTransaction",
                 new DescriptorExposedEntity(AccountTransaction.class)
-                        .hiddenForm("dateExecuted",
-                                "typeTransaction", "actualBalance",
+                        .hiddenForm("typeTransaction", "actualBalance",
                                 "parentTransaction", "childTransactions")
                         .hiddenList("childTransactions")
         );

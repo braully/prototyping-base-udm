@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ps="http://xmlns.jcp.org/jsf/passthrough">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">Index</ui:define>
+        <ui:define name="template.body.append"></ui:define>
+
+        <ui:define name="template.app.header">
+            <ui:include src="/jsf/template/header-base-slim.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.menu">
+            <ui:include src="/jsf/template/menu-base-app.xhtml" />
+        </ui:define>
+
+        <ui:define name="template.app.content">
+            <h:form>
+                <div class="autogen-form-group">
+                    <label class="autogen-form-group-label" 
+                           data-i18n="Organization">Organization</label>
+                    <select value="#{genericMB.crud('matricula').extraSearchParams['turma.organization']}" 
+                            class="custom-select" data-type="entity" 
+                            jsfc="h:selectOneMenu" converter="#{converterEntity}">
+                        <f:selectItem itemLabel="" itemValue="">
+                        </f:selectItem>
+                        <f:selectItems value="#{genericMB.permitedOrganizations}" 
+                                       var="st" itemValue="#{st}" itemLabel="#{st.toString()}">
+                        </f:selectItems>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="slim-card-title mg-b-20">Sale Progress</h6>
+
+                        <label class="mg-b-5">24,224 sales</label>
+                        <div class="progress mg-b-15">
+                            <div class="progress-bar bg-warning progress-bar-xs wd-50p" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div><!-- progress -->
+
+                        <label class="mg-b-5">43,765 sales</label>
+                        <div class="progress mg-b-15">
+                            <div class="progress-bar bg-primary progress-bar-xs wd-70p" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div><!-- progress -->
+
+                        <label class="mg-b-5">14,220 sales</label>
+                        <div class="progress mg-b-15">
+                            <div class="progress-bar bg-danger progress-bar-xs wd-30p" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div><!-- progress -->
+
+                        <label class="mg-b-5">20,220 sales</label>
+                        <div class="progress mg-b-15">
+                            <div class="progress-bar bg-success progress-bar-xs wd-85p" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div><!-- progress -->
+                    </div><!-- card-body -->
+
+                    <div class="card-todo">
+                        <div class="todo-list">
+                            <div class="todo-item">
+                                <label class="ckbox">
+                                    <input type="checkbox" checked="true"/><span>Tarefa 1</span>
+                                </label>
+                            </div><!-- todo-item -->
+                            <div class="todo-item">
+                                <label class="ckbox">
+                                    <input type="checkbox" checked="true"/><span>Tarefa 2</span>
+                                </label>
+                            </div><!-- todo-item -->
+                            <div class="todo-item">
+                                <label class="ckbox">
+                                    <input type="checkbox"/><span>Tarefa 3</span>
+                                </label>
+                            </div><!-- todo-item -->
+                            <div class="todo-item">
+                                <label class="ckbox">
+                                    <input type="checkbox"/><span>Tarefa 4</span>
+                                </label>
+                            </div><!-- todo-item -->
+                            <div class="todo-item">
+                                <label class="ckbox">
+                                    <input type="checkbox"/><span>Tarefa 5</span>
+                                </label>
+                            </div><!-- todo-item -->
+                            <div class="todo-item">
+                                <label class="ckbox">
+                                    <input type="checkbox"/><span>Tarefa 6</span>
+                                </label>
+                            </div><!-- todo-item -->
+                            <div class="todo-item">
+                                <label class="ckbox">
+                                    <input type="checkbox"/><span>Tarefa 7</span>
+                                </label>
+                            </div><!-- todo-item -->
+                        </div><!-- todo-list -->
+                    </div>
+                </div>
+
+                <a href="/autogen/partner.xhtml"
+                   class="autogen-button autogen-confirm"
+                   data-modal-titulo="Confirmar" data-modal-mensagem="Desejar excluir realmente?">
+                    Confirmar
+                </a>
+
+                <div>
+                    <a href="/autogen/partner.xhtml"
+                       class="autogen-button autogen-popup iframe">
+                        Modal url iframe
+                    </a>
+
+                    <a href="/autogen/partner.xhtml" 
+                       class="autogen-button autogen-popup body">
+                        Modal url
+                    </a>
+
+                    <a href="html/error.html div.page-error-wrapper" 
+                       class="autogen-button autogen-popup">
+                        Modal url subcontent
+                    </a>
+
+                    <a onclick="ajuda();" href="#"
+                       class="autogen-button">help
+                    </a>
+
+                    <a href="/autogen/partner.xhtml div.base-app-main-content-body" 
+                       class="autogen-button autogen-popup">
+                        Modal url subcontent 2
+                    </a>
+                </div>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

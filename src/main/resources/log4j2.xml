@@ -46,6 +46,14 @@
             <AppenderRef ref="Console" />
             <!--<AppenderRef ref="File" />-->
         </Logger>
+        
+        <!-- Log everything in Spring Core -->
+        <Logger name="org.springframework.web" 
+                additivity="false"
+                level="debug" >
+            <AppenderRef ref="Console" />
+            <!--<AppenderRef ref="File" />-->
+        </Logger>
 
         <Root level="error">
             <AppenderRef ref="Console" />

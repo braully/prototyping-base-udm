@@ -1,8 +1,8 @@
 package com.github.braully.web.jsf;
 
 import com.github.braully.app.exposed;
-import com.github.braully.util.GenericTO;
 import com.github.braully.persistence.IEntity;
+import com.github.braully.util.GenericTO;
 import com.github.braully.util.UtilReflection;
 import com.github.braully.web.DescriptorExposedEntity;
 import java.lang.reflect.Field;
@@ -82,12 +82,9 @@ public class ConverterGenericJsf implements Converter {
     }
     /* */
     ConverterMonetary converterMonetary = new ConverterMonetary();
-    ConverterValorFator converterValorFator = new ConverterValorFator();
-    ConverterValorFator converterMonetaryBig = new ConverterValorFator(ConverterValorFator.Type.BIG);
 
     Map<String, Converter> converters = Map.of("numberConverter", numberConverter, "doubleConverter", doubleConverter,
-            "dateTimeConverter", dateTimeConverter, "converterMonetary", converterMonetary,
-            "converterValorFator", converterValorFator, "converterMonetaryBigDecimal", converterMonetaryBig);
+            "dateTimeConverter", dateTimeConverter, "converterMonetary", converterMonetary);
 
     @Override
     public synchronized Object getAsObject(FacesContext fc, UIComponent uic, String string) {
@@ -273,16 +270,8 @@ public class ConverterGenericJsf implements Converter {
         return dateTimeConverter;
     }
 
-    public ConverterValorFator getConverterValorFator() {
-        return converterValorFator;
-    }
-
     public ConverterMonetary getConverterMonetary() {
         return converterMonetary;
-    }
-
-    public ConverterValorFator getConverterMonetaryBig() {
-        return converterMonetaryBig;
     }
 
     public ByteConverter getByteConverter() {
@@ -291,6 +280,10 @@ public class ConverterGenericJsf implements Converter {
 
     public LongConverter getLongConverter() {
         return longConverter;
+    }
+
+    public DoubleConverter getDoubleConverter() {
+        return doubleConverter;
     }
 
     public NumberConverter getPercentageConverter() {
@@ -564,68 +557,6 @@ public class ConverterGenericJsf implements Converter {
                 }
             }
             return ret;
-        }
-    }
-
-    @FacesConverter(value = "converterValorFator")
-    public static class ConverterValorFator implements Converter {
-
-        Type type = null;
-
-        public ConverterValorFator() {
-        }
-
-        public ConverterValorFator(Type type) {
-            this.type = type;
-        }
-
-        public void setType(Type type) {
-            this.type = type;
-        }
-
-        @Override
-        public Object getAsObject(FacesContext arg0, UIComponent arg1, String arg2) {
-            com.github.braully.domain.Money m = ((com.github.braully.domain.Money) superGetAsObject(arg0, arg1, arg2));
-            if (m != null) {
-                if (type == Type.BIG) {
-                    return m.getValorBig();
-                } else {
-                    return m.getValor();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public String getAsString(FacesContext arg0, UIComponent arg1, Object arg2) {
-            if (arg2 != null && arg2 instanceof Number) {
-                if (arg2 instanceof BigDecimal) {
-                    return new com.github.braully.domain.Money((BigDecimal) arg2).formatarValor();
-                }
-                return new com.github.braully.domain.Money(((Number) arg2).longValue()).formatarValor();
-            }
-            return "";
-
-        }
-
-        public Object superGetAsObject(FacesContext arg0, UIComponent arg1, String arg2) {
-            if (arg2 != null && !arg2.trim().isEmpty()) {
-                return new com.github.braully.domain.Money(arg2);
-            }
-            return null;
-        }
-
-        public String superGetAsString(FacesContext arg0, UIComponent arg1, Object arg2) {
-            String ret = "";
-            if (arg2 != null) {
-                com.github.braully.domain.Money m = (com.github.braully.domain.Money) arg2;
-                ret = m.toString();
-            }
-            return ret;
-        }
-
-        public static enum Type {
-            BIG, MONEY, DOUBLE
         }
     }
 }

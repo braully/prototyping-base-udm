@@ -45,5 +45,6 @@ public class autogenweb {
         putAutogenWeb("role", new DescriptorExposedEntity(Role.class)
                 .hidden("parent", "childs", "sysRole", "menus")
         );
+
     }
 }

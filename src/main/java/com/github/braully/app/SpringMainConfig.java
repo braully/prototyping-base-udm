@@ -44,25 +44,32 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class SpringMainConfig {
 
     @Value("${http.port:8080}")
-    private Integer httpPort;
+    Integer httpPort;
 
     @Value("${server.port:8443}")
-    private Integer serverPort;
+    Integer serverPort;
 
-    //@Bean
-    public ServletWebServerFactory servletContainer() {
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-        tomcat.addAdditionalTomcatConnectors(createStandardConnector());
-        return tomcat;
-    }
+    @Value("${security.require-ssl:false}")
+    Boolean requireSsl;
 
-    private Connector createStandardConnector() {
-        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
-        connector.setPort(httpPort);
-        connector.setRedirectPort(serverPort);
-        connector.setSecure(false);
-        return connector;
-    }
+//    //@Bean
+//    public ServletWebServerFactory servletContainer() {
+//        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+////        //https://stackoverflow.com/questions/64822250/illegalstateexception-after-upgrading-web-app-to-spring-boot-2-4
+////        tomcat.setRegisterDefaultServlet(true);
+//        tomcat.addAdditionalTomcatConnectors(createStandardConnector());
+//        return tomcat;
+//    }
+//
+//    private Connector createStandardConnector() {
+//        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+//        connector.setPort(httpPort);
+//        if (requireSsl) {
+//            connector.setRedirectPort(serverPort);
+//        }
+//        connector.setSecure(false);
+//        return connector;
+//    }
 
     @Primary
     @Bean

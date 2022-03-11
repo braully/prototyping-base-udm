@@ -46,12 +46,22 @@ public class url {
         (2, 23, 'Stock', 'stock', '/financial/stock', 'ico-stock'),
         (2, 24, 'Sale', 'sale', '/financial/sale', 'ico-sale'),
          */
+        rewrite_forward.put("/financial/cashier/receivable/", "/jsf/app/account-transaction-execute.xhtml");
+        rewrite_forward.put("/financial/cashier/payable/", "/jsf/app/account-transaction-execute.xhtml");
+        rewrite_forward.put("/financial/cashier/add", "/jsf/app/account-transaction-execute.xhtml");
+        rewrite_forward.put("/financial/cashier/", "/jsf/app/cashier.xhtml");
 
-        rewrite_forward.put("/financial/cashier", "/jsf/app/cashier.xhtml");
-        rewrite_forward.put("/financial/receivable", "/jsf/app/receivable.xhtml");
-        rewrite_forward.put("/financial/payable", "/jsf/app/payable.xhtml");
-        rewrite_forward.put("/financial/stock", "/jsf/app/stock.xhtml");
-        rewrite_forward.put("/financial/sale", "/jsf/app/sale.xhtml");
+        rewrite_forward.put("/financial/receivable/", "/jsf/app/receivable.xhtml");
+        rewrite_forward.put("/financial/receivable/add", "/jsf/app/receivable-add.xhtml");
+        rewrite_forward.put("/financial/receivable/subscription", "/jsf/app/receivable-subscription.xhtml");
+        rewrite_forward.put("/financial/receivable/billet/", "/jsf/app/gerar-boletos.xhtml");
+        rewrite_forward.put("/financial/receivable/billet/file", "/jsf/app/gerar-remessa.xhtml");
+        rewrite_forward.put("/financial/receivable/{op}/{id}", "/autogen/AccountTransaction/{op}.xhtml");
+
+        rewrite_forward.put("/financial/payable/", "/jsf/app/contas-pagar.xhtml");
+        rewrite_forward.put("/financial/stock/", "/jsf/app/estoque.xhtml");
+        rewrite_forward.put("/financial/sale/", "/jsf/app/vendas.xhtml");
+        rewrite_forward.put("/financial/sale/add", "/jsf/app/venda.xhtml");
 
         /*         
         (3, 30, 'Report', 'report', '/system/report', 'ico-report'),
@@ -63,5 +73,11 @@ public class url {
         rewrite_forward.put("/system/import", "/mb/import");
 
         rewrite_forward.put("/entity-scratch", "/jsf/entity-crud-scratch.xhtml");
-    }
+  
+        //Error
+        rewrite_forward.put("/error/401", "/jsp/error.jsp?errr=401");
+        rewrite_forward.put("/error/404", "/jsp/error.jsp?errr=404");
+        rewrite_forward.put("/error/403", "/jsp/error.jsp?errr=403");
+        rewrite_forward.put("/error", "/jsp/error.jsp");
+  }
 }

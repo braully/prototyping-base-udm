@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">entityName - Remover</ui:define>
+
+        <ui:define name="template.app.content.form">
+            #{genericMB.crud('entityName').loadEntityFromRequestIfPresent()}
+            #{genericMB.crud('entityName').loadEntitiesFromRequestIfPresent()}
+            <h:form>
+                <ui:fragment rendered="#{genericMB.crud('entityName').entity.persisted}">
+                    <div class="afg">
+                        <p>
+                            Tem certeza que deseja excluir 
+                            <span data-i18n="entityName">entityName</span>: 
+                            #{genericMB.crud('entityName').entity} ?
+                        </p>
+                    </div>
+
+                    <div class="afg" >
+                        <h:commandButton class="autogen-button" value="Sim"
+                                         action="#{genericMB.crud('entityName').removeEntityAndRedirect('..')}" />
+
+                        <h:commandButton class="autogen-button" value="Sim"
+                                         rendered="false"
+                                         action="#{genericMB.crud('entityName').removeEntity()}" />
+
+                        <a class="autogen-button" href="/"
+                           onclick="try {
+                                       window.history.go(-1);
+                                       return false;
+                                   } catch (err) {
+                                   }">Não</a>
+                    </div>
+                </ui:fragment>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>

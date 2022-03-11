@@ -1,0 +1,60 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition template="/autogen/template-base-app.xhtml">
+        <ui:define name="template.app.title">Controle de estoque</ui:define>
+
+
+        <ui:define name="template.app.content.msg">
+            <h:messages style="list-style: none;" 
+                        infoClass="autogen-message-info"
+                        warnClass="autogen-message-warning"
+                        fatalClass="autogen-message-error"
+                        errorClass="autogen-message-error"
+                        showSummary="true" showDetail="true" /> 
+
+            <ui:fragment>
+                <div class="autogen-message-warning" id="msg-inst">
+                    <strong>Atenção: </strong> Você não tem permissão de estoquista.
+                </div>
+            </ui:fragment>
+        </ui:define>
+
+        <ui:define name="template.app.content">
+            <p:tabView widgetVar="tabView" onTabChange="tabChange(this, index)" styleClass="autogen-tabview"
+                       id="tabViewEstoque">
+                <p:tab id="tabItemEstoque" title="Itens estocados">
+                    <ui:decorate template="/autogen/inventoryItem/filter.xhtml"></ui:decorate>
+                    <br />
+                    <ui:decorate template="/autogen/inventoryItem/list.xhtml"></ui:decorate>
+                </p:tab>
+
+                <p:tab id="tabPrecoProduto" title="Precificação">
+                    <ui:decorate template="/autogen/productPrice/form.xhtml"></ui:decorate>
+                    <br />
+                    <ui:decorate template="/autogen/productPrice/list.xhtml"></ui:decorate>
+                </p:tab>
+
+                <p:tab id="tabMovimentoEstoque" title="Movimentação">
+                    <ui:decorate template="/autogen/inventoryItemTransaction/form.xhtml"></ui:decorate>
+                    <br />
+                    <ui:decorate template="/autogen/inventoryItemTransaction/list.xhtml"></ui:decorate>
+                </p:tab>
+
+                <p:tab id="catalogoProduto" title="Catálogo">
+                    <ui:decorate template="/autogen/product/form.xhtml"></ui:decorate>
+                    <br />
+                    <ui:decorate template="/autogen/product/list.xhtml"></ui:decorate>
+                </p:tab>
+
+                <p:tab id="tabEstoque" title="Estoque">
+                    <ui:decorate template="/autogen/inventory/form.xhtml"></ui:decorate>
+                    <br />
+                    <ui:decorate template="/autogen/inventory/list.xhtml"></ui:decorate>
+                </p:tab>
+            </p:tabView>
+        </ui:define>
+    </ui:composition>
+</html>

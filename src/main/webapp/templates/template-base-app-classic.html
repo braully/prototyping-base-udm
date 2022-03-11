@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html {template.html.attribute} lang="en">
+<html {template.html.attribute} lang="pt-BR" >
     <!--{template.html.append}-->
     <head {template.head.attribute}>
         <meta charset="UTF-8" />
@@ -11,24 +11,21 @@
         <!--<link rel="stylesheet" href="/pkg/jquery-ui-dist/jquery-ui.min.css" />-->
 
         <link rel="stylesheet" href="/assets/scss/template-base-app.css" />
-        <link rel="stylesheet" href="/assets/scss/template-base-comp.css" />
-        <link rel="stylesheet" href="/assets/scss/template-base-ico.css" />
+        <link rel="stylesheet" href="/assets/scss/template-base-slim.css" />
         <link rel="stylesheet" href="/assets/scss/template-base-custom.css" />
 
-        <link rel="stylesheet" href="/tmp/css/ionicons.css" />
-        <link rel="stylesheet" href="/pkg/chartist/dist/chartist.min.css" />
-
         <script src="/pkg/jquery/dist/jquery.min.js"></script>
-        <script>
-            var $j = jQuery.noConflict(true);
-            window.jQuery = window.$ = jQuery || $j;
-        </script>
         <script src="/pkg/jquery-ui-dist/jquery-ui.min.js"></script>
         <script src="/pkg/jquery-mask-plugin/dist/jquery.mask.min.js"></script>
         <script src="/pkg/underscore/underscore-min.js"></script>
         <script src="/pkg/backbone/backbone-min.js"></script>
-        <script src="/pkg/chartist/dist/chartist.min.js"></script>
         <script src="/assets/js/template-base-app.js"></script>
+
+        <script>
+            //jQuery.noConflict();
+            //$.noConflict();
+            // Code that uses other library's $ can follow here.
+        </script>
         <!--{template.head.append}-->
     </head>
     <!--https://stackoverflow.com/questions/40497288/how-to-create-a-fixed-sidebar-layout-with-bootstrap-4-->
@@ -40,7 +37,6 @@
         <main class="base-app-main">
             <!--{template.app.menu}-->
             <div class="base-app-main-content">
-		<!--{template.app.content.msg}-->
                 <!--{template.app.content}-->
                 <!--{template.app.content.form}-->
                 <!--{template.app.content.filter}-->
@@ -52,34 +48,9 @@
             <input id="autogen-form-action-input-action" type="hidden" name="action" />
             <input id="autogen-form-action-input-param" type="hidden" name="param" />
         </form>
-        <div id="autogen-modal" aria-hidden="true" 
-             aria-labelledby="autogen-modal-title"
-             tabindex="-1" role="dialog" class="modal fade">
-            <!--https://stackoverflow.com/questions/42896820/modal-width-increase-->
-            <div class="modal-dialog mw-100 w-50" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="autogen-modal-title"></h5>
-                        <button type="button" class="close" 
-                                data-dismiss="modal" aria-label="Fechar">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div id="autogen-modal-body" class="modal-body"></div>
-                    <div class="modal-body">
-                        <!--https://stackoverflow.com/questions/9975810/make-iframe-automatically-adjust-height-according-to-the-contents-without-using-->
-                        <iframe id="autogen-modal-body-iframe" frameborder="0" 
-                                allowfullscreen="allowfullscreen" scrolling="no" src="">
-                        </iframe>
-                    </div>
-                    <div id="autogen-modal-footer" class="modal-footer"></div>
-                </div>
-            </div>
-        </div>
-
+        <div id="autogen-modal" aria-hidden="true"></div>
         <script src="/js/i18n.js"></script>
         <script src="/pkg/popper.js/dist/umd/popper.min.js"></script>
         <script src="/pkg/bootstrap/dist/js/bootstrap.min.js"></script>
-        <script src="/pkg/perfect-scrollbar/perfect-scrollbar.min.js"></script>
     </body>
 </html>
