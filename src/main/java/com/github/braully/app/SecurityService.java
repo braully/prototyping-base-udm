@@ -195,7 +195,7 @@ public class SecurityService extends CRUDGenericController<UserLogin> implements
         if (true) {//if (config.isProduction(env)) {//TODO: Remover na primeira relese
             Menu desenvMenu = new Menu("Development");
             desenvMenu
-                    .addChild(new Menu("Intro test").link("/jsf/app/usuario.xhtml"))
+                    .addChild(new Menu("Intro test").link("/jsf/intro-test.xhtml"))
                     .addChild(new Menu("Usuario").link("/jsf/app/usuario.xhtml"))
                     .addChild(new Menu("Autogen").link("/jsf/entity-crud-autogen.xhtml"))
                     .addChild(new Menu("Scratch").link("/jsf/entity-crud-scratch.xhtml"))
