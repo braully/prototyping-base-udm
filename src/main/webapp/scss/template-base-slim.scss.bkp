@@ -1,0 +1,134 @@
+/* 
+ * References:  
+ * https://sass-lang.com/guide
+ * https://uxplanet.org/how-to-customize-bootstrap-b8078a011203
+ * https://getbootstrap.com.br/docs/4.1/getting-started/theming
+ * https://getbootstrap.com/docs/4.1/components/navbar
+ * https://getbootstrap.com/docs/4.1/examples/dashboard/
+ * https://fontawesome.com/v4.7.0/icon
+ * https://stackoverflow.com/questions/48816716/bootstrap-4-navbar-not-collapsing-or-expanding
+*/
+
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700');
+@import url('https://fonts.googleapis.com/css?family=Lato:300,400,700');
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../tmp/scss/bootstrap/variables";
+@import "variables";
+
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../tmp/scss/bootstrap/mixins";
+@import "../tmp/scss/bootstrap/custom-forms";
+@import "../tmp/scss/bootstrap/custom";
+@import "../tmp/scss/bootstrap/dropdown";
+@import "../tmp/scss/bootstrap/progress";
+@import "../tmp/scss/lib/mixins";
+
+
+@import "../tmp/scss/layout/sidebar";
+@import "../tmp/scss/layout/header";
+@import "../tmp/scss/layout/global";
+@import "../tmp/scss/layout/navbar";
+@import "../tmp/scss/layout/mainpanel";
+@import "../tmp/scss/layout/sticky-header";
+@import "../tmp/scss/layout/footer";
+@import "../tmp/scss/layout/full-width";
+
+@import "../tmp/scss/pages/widgets";
+@import "../tmp/scss/pages/error";
+@import "../tmp/scss/pages/messages";
+
+@import "../tmp/scss/pages/signin";
+@import "../tmp/scss/util/margin";
+@import "../tmp/scss/util/width";
+
+/*App style layout*/
+.base-app-main, .bam {
+    @extend .slim-body;
+
+}
+
+.base-app-main-content, .bamc {
+    @extend .slim-mainpanel;
+    //@extend .container;
+}
+
+.base-app-header, .bah {
+    @extend .slim-header;
+    @extend .with-sidebar;
+}
+
+.base-app-title{
+    @extend .slim-pagetitle;
+    //margin-bottom: 20px;
+}
+
+.base-app-header-avatar, .base-app-menu-avatar, .baha {
+    @extend .logged-user;
+}
+
+.base-app-footer {
+    @extend .slim-footer;
+    @extend .mg-t-0;
+}
+
+.base-app-main-menu, .bamm {
+    @extend .slim-sidebar;
+}
+
+.base-app-main-menu-list, .bamm-list {
+    @extend .nav;
+    @extend .nav-sidebar;
+}
+
+.base-app-main-menu-list-item, .bamm-l-item {
+    @extend .sidebar-nav-item;
+    //@extend .with-sub;
+}
+
+.base-app-main-menu-list-item-link, .bamm-l-i-link {
+    @extend .sidebar-nav-link;
+}
+
+.base-app-main-menu-sublist {
+    @extend .nav; 
+    @extend .sidebar-nav-sub;
+    display: block;
+}
+
+.base-app-main-menu-sublist-item, .bamm-sl-item {
+    @extend .nav-sub-item;
+}
+
+.base-app-main-menu-sublist-item-link, .bamm-sli-link {
+    @extend .nav-sub-link;
+}
+
+.base-app-login {
+    @extend .signin-box;
+}
+
+.base-app-brand {
+    @extend .slim-logo;
+}
+
+.base-app-login-title {
+    @extend .signin-title-primary;
+}
+
+.base-app-title-menu {
+    display: flex;
+}
+
+.base-app-title-menu a {
+    display: block;
+    font-size: 26px;
+    margin-left: 15px;
+}
+
+a:focus, a:active {
+    outline: none !important;
+}

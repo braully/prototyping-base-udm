@@ -29,6 +29,15 @@
     @extend .input-group;
 }
 
+.avg {
+    /*
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    margin-bottom: 0;
+    */                              
+}
+
 .autogen-input-group-prepend-text, .aigpt {
     /*    @extend .input-group-prepend;*/
     @extend .input-group-text;
@@ -159,15 +168,19 @@
 //https://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-tables.php
 .autogen-list-responsive, .alr {
     /*    @extend .table-responsive-sm;*/
-    @extend .table-responsive-sm;
+    @extend .table-responsive-md;
 }
 
 .autogen-list-table, .alt {
     @extend .table;
     @extend .table-sm;
     @extend .table-striped;
-    @extend .w-auto;
+    //@extend .w-auto;
 }
+
+/*autogen-list-table.th[data-i18n="Id"] {
+    @extend .th-sm
+}*/
 
 .autogen-list-table-body-col-input, .alt-b-c-input  {
     /*    @extend .btn;
@@ -278,7 +291,7 @@
     @extend .small;
 }
 
-.enum-vencido, .enum-vencida {
+.enum-vencido, .enum-vencida, .enum-warn {
     @extend .bg-warning;
     /*@extend .text-white;*/
     @extend .rounded;
@@ -304,4 +317,9 @@
     @extend .rounded;
     @extend .border;
     @extend .small;
+}
+
+//Chart 
+.autogen-chart{
+    height: 300px;
 }
