@@ -31,7 +31,7 @@
         <!--<jsf.version>2.2.18</jsf.version>-->
         <jsf.version>2.3.8</jsf.version>
         <tomahawk2-version>1.1.14</tomahawk2-version>
-        <primefaces-version>7.0</primefaces-version>
+        <primefaces-version>8.0</primefaces-version>
         <primefaces-theme-version>1.0.10</primefaces-theme-version>
         <j2html.version>1.4.0</j2html.version>
         <!--report-->
